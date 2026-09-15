@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Center-Mode Productivity Slider (Pro v5)</title>
+    <style>
+      :root {
+        --gap: 1.25rem;
+        --speed: 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        --closed: 5rem;
+        --open: 30rem;
+        --accent: #ff6b35;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, sans-serif;
+        background: #07090d;
+        color: #c5c7ce;
+      }
+
+      .head {
+        max-width: 1400px;
+        margin: auto;
+        padding: 70px 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 2rem;
+      }
+      .head h2 {
+        font: 400 1.5rem/1.2 Inter, sans-serif;
+        color: #fff;
+      }
+      @media (min-width: 1024px) {
+        .head h2 {
+          font-size: 2.25rem;
+        }
+      }
+      .nav-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .nav-btn:hover {
+        background: var(--accent);
+      }
+      .nav-btn:disabled {
+        opacity: 0.3;
+        cursor: default;
+      }
+
+      .slider {
+        max-width: 1400px;
+        margin: auto;
+        overflow: hidden;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+      }
+      .track {
+        display: flex;
+        gap: var(--gap);
+        align-items: flex-start;
+        justify-content: center;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 40px;
+      }
+      .track::-webkit-scrollbar {
+        display: none;
+      }
+
+      .project-card {
+        position: relative;
+        flex: 0 0 var(--closed);
+        height: 26rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        cursor: pointer;
+        transition: flex-basis var(--speed), transform var(--speed);
+      }
+      .project-card[active] {
+        flex-basis: var(--open);
+        transform: translateY(-6px);
+        box-shadow: 0 18px 55px rgba(0, 0, 0, 0.45);
+      }
+      .project-card__bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.75) saturate(75%);
+        transition: filter 0.3s, transform var(--speed);
+      }
+      .project-card:hover .project-card__bg {
+        filter: brightness(0.9) saturate(100%);
+        transform: scale(1.06);
+      }
+
+      .project-card__content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0;
+        background: linear-gradient(transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+        z-index: 2;
+      }
+      .project-card__title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.35rem;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+      }
+      .project-card__thumb,
+      .project-card__desc,
+      .project-card__btn {
+        display: none;
+      }
+
+      .project-card[active] .project-card__content {
+        flex-direction: row;
+        align-items: center;
+        padding: 1.2rem 2rem;
+        gap: 1.1rem;
+      }
+      .project-card[active] .project-card__title {
+        writing-mode: horizontal-tb;
+        transform: none;
+        font-size: 2.4rem;
+      }
+      .project-card[active] .project-card__thumb,
+      .project-card[active] .project-card__desc,
+      .project-card[active] .project-card__btn {
+        display: block;
+      }
+
+      .project-card__thumb {
+        width: 133px;
+        height: 269px;
+        border-radius: 0.45rem;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+      .project-card__desc {
+        color: #ddd;
+        font-size: 1rem;
+        line-height: 1.4;
+        max-width: 16rem;
+      }
+      .project-card__btn {
+        padding: 0.55rem 1.3rem;
+        border: none;
+        border-radius: 9999px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .project-card__btn:hover {
+        background: #ff824f;
+      }
+
+      .dots {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        padding: 20px 0;
+      }
+      .dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .dot.active {
+        background: var(--accent);
+        transform: scale(1.2);
+      }
+
+      /* --- KHUSUS TAMPILAN MOBILE --- */
+      @media (max-width: 767px) {
+        :root {
+          --closed: 3.5rem; /* Ukuran card saat tertutup diperkecil */
+          --open: 15rem;   /* Ukuran card saat aktif diperkecil */
+          --gap: 0.5rem;
+        }
+
+        .head {
+          padding: 30px 15px 15px;
+          flex-direction: row;
+          align-items: center;
+        }
+
+        .head h2 {
+          font-size: 1.1rem;
+        }
+
+        .slider {
+          padding: 0 10px;
+        }
+
+        /* Mengatur track agar tetap menyamping (Horizontal) */
+        .track {
+          flex-direction: row;
+          scroll-snap-type: x mandatory;
+          justify-content: flex-start;
+          padding-bottom: 15px;
+        }
+
+        .project-card {
+          height: 16rem; /* Tinggi card diperkecil */
+          scroll-snap-align: center;
+        }
+
+        .project-card[active] {
+          transform: translateY(-3px);
+        }
+
+        .project-card__title {
+          font-size: 0.9rem;
+        }
+
+        .project-card[active] .project-card__content {
+          flex-direction: column;
+          justify-content: flex-end;
+          align-items: flex-start;
+          padding: 0.8rem;
+          gap: 0.3rem;
+        }
+
+        .project-card[active] .project-card__title {
+          font-size: 1.1rem;
+          margin: 0;
+        }
+
+        /* Menyembunyikan thumbnail di mobile agar tetap ringkas */
+        .project-card[active] .project-card__thumb {
+          display: none;
+        }
+
+        .project-card[active] .project-card__desc {
+          font-size: 0.75rem;
+          line-height: 1.2;
+          max-width: 100%;
+        }
+
+        .project-card[active] .project-card__btn {
+          padding: 0.35rem 0.8rem;
+          font-size: 0.75rem;
+          margin-top: 0.3rem;
+        }
+
+        .nav-btn {
+          width: 2rem;
+          height: 2rem;
+          font-size: 1.1rem;
+        }
+
+        .dots {
+          padding: 10px 0;
+        }
+
+        .dot {
+          width: 8px;
+          height: 8px;
+        }
+      }
+    </style>
+  </head>
+    
+  <body>
+    <section>
+      <div class="head">
+        <h2>Boost your professional workflow and productivity</h2>
+
+        <div class="controls">
+          <button id="prev" class="nav-btn" aria-label="Prev">‹</button>
+          <button id="next" class="nav-btn" aria-label="Next">›</button>
+        </div>
+      </div>
+
+      <div class="slider">
+        <div class="track" id="track">
+
+          <article class="project-card" active>
+            <img class="project-card__bg" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/designers.webp" alt="">
+            <div class="project-card__content">
+              <img class="project-card__thumb" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/img-designer.webp?w=480" alt="">
+              <div>
+                <h3 class="project-card__title">Designers</h3>
+                <p class="project-card__desc">Tools that work like you do.</p>
+                <button class="project-card__btn">Details</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <img class="project-card__bg" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/marketers.webp" alt="">
+            <div class="project-card__content">
+              <img class="project-card__thumb" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/img-marketer.webp?w=480" alt="">
+              <div>
+                <h3 class="project-card__title">Marketers</h3>
+                <p class="project-card__desc">Create faster, explore new possibilities.</p>
+                <button class="project-card__btn">Details</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <img class="project-card__bg" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/filmmakers.webp" alt="">
+            <div class="project-card__content">
+              <img class="project-card__thumb" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/img-film.webp?w=480" alt="">
+              <div>
+                <h3 class="project-card__title">VFX filmmakers</h3>
+                <p class="project-card__desc">From concept to cut, faster.</p>
+                <button class="project-card__btn">Details</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <img class="project-card__bg" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/content-creators.webp" alt="">
+            <div class="project-card__content">
+              <img class="project-card__thumb" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/img-content.webp?w=480" alt="">
+              <div>
+                <h3 class="project-card__title">Content creators</h3>
+                <p class="project-card__desc">Make scroll-stopping content, easily.</p>
+                <button class="project-card__btn">Details</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <img class="project-card__bg" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/art-directors.webp" alt="">
+            <div class="project-card__content">
+              <img class="project-card__thumb" src="https://cdn-front.freepik.com/home/anon-rvmp/professionals/img-art.webp?w=480" alt="">
+              <div>
+                <h3 class="project-card__title">Art directors</h3>
+                <p class="project-card__desc">Creative control at every stage.</p>
+                <button class="project-card__btn">Details</button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <div class="dots" id="dots"></div>
+    </section>
+
+    <script>
+      (() => {
+        const track = document.getElementById("track");
+        const wrap = track.parentElement;
+        const cards = Array.from(track.children);
+        const prev = document.getElementById("prev");
+        const next = document.getElementById("next");
+        const dotsBox = document.getElementById("dots");
+
+        cards.forEach((_, i) => {
+          const dot = document.createElement("span");
+          dot.className = "dot";
+          dot.onclick = () => activate(i, true);
+          dotsBox.appendChild(dot);
+        });
+        const dots = Array.from(dotsBox.children);
+
+        let current = 0;
+
+        function center(i) {
+          const card = cards[i];
+          // Keduanya menggunakan sumbu Horizontal (left)
+          const axis = "left";
+          const size = "clientWidth";
+          const start = card.offsetLeft;
+          
+          wrap.scrollTo({
+            [axis]: start - (wrap[size] / 2 - card[size] / 2),
+            behavior: "smooth"
+          });
+        }
+
+        function toggleUI(i) {
+          cards.forEach((c, k) => c.toggleAttribute("active", k === i));
+          dots.forEach((d, k) => d.classList.toggle("active", k === i));
+          prev.disabled = i === 0;
+          next.disabled = i === cards.length - 1;
+        }
+
+        function activate(i, scroll) {
+          if (i === current) return;
+          current = i;
+          toggleUI(i);
+          if (scroll) center(i);
+        }
+
+        function go(step) {
+          activate(Math.min(Math.max(current + step, 0), cards.length - 1), true);
+        }
+
+        prev.onclick = () => go(-1);
+        next.onclick = () => go(1);
+
+        addEventListener(
+          "keydown",
+          (e) => {
+            if (["ArrowRight", "ArrowDown"].includes(e.key)) go(1);
+            if (["ArrowLeft", "ArrowUp"].includes(e.key)) go(-1);
+          },
+          { passive: true }
+        );
+
+        cards.forEach((card, i) => {
+          card.addEventListener(
+            "mouseenter",
+            () => matchMedia("(hover:hover)").matches && activate(i, true)
+          );
+          card.addEventListener("click", () => activate(i, true));
+        });
+
+        let sx = 0,
+          sy = 0;
+        track.addEventListener(
+          "touchstart",
+          (e) => {
+            sx = e.touches[0].clientX;
+            sy = e.touches[0].clientY;
+          },
+          { passive: true }
+        );
+
+        track.addEventListener(
+          "touchend",
+          (e) => {
+            const dx = e.changedTouches[0].clientX - sx;
+            // Deteksi geser horizontal untuk mobile
+            if (Math.abs(dx) > 40) go(dx > 0 ? -1 : 1);
+          },
+          { passive: true }
+        );
+
+        addEventListener("resize", () => center(current));
+
+        toggleUI(0);
+        center(0);
+      })();
+    </script>
+  </body>
+</html>

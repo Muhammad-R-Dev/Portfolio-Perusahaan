@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Premium Horizontal Timeline</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+      :root {
+        --white: #ffffff;
+        --black: #1e293b;
+        --bg-color: #ffffff; 
+        --accent: #0f172a; 
+        --timeline-line: #cbd5e1;
+        --text-muted: #64748b;
+        --timeline-gradient: rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 50%,
+          rgba(255, 255, 255, 0) 100%;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        outline: none;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      body {
+        font: normal 16px/1.5 "Inter", sans-serif;
+        background: var(--bg-color);
+        color: var(--black);
+        margin-bottom: 50px;
+      }
+
+      /* SECTION
+      –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+      .section {
+        padding: 60px 0;
+      }
+
+      .section .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+      }
+
+      .section p {
+        color: var(--text-muted);
+        margin-top: 10px;
+      }
+
+      /* TIMELINE
+      –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+      .timeline {
+        position: relative;
+        white-space: nowrap;
+        max-width: 1400px;
+        padding: 0 10px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 320px auto;
+        grid-gap: 20px;
+      }
+
+      .timeline::before,
+      .timeline::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 30px;
+        width: 100px;
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      .timeline::after {
+        right: 0;
+        background: linear-gradient(270deg, var(--timeline-gradient));
+      }
+
+      .timeline::before {
+        left: 340px;
+        background: linear-gradient(90deg, var(--timeline-gradient));
+      }
+
+      .timeline .info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 30px 40px;
+        color: var(--white);
+        background: var(--accent);
+        white-space: normal;
+        border-radius: 16px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .timeline .info img {
+        margin-bottom: 20px;
+      }
+
+      .timeline .info h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .timeline .info p {
+        margin-top: 10px;
+        color: #94a3b8;
+      }
+
+      .timeline .info a {
+        text-decoration: none;
+        font-weight: 600;
+        color: var(--white);
+        margin-top: 15px;
+        display: inline-block;
+      }
+
+      /* HIDE SCROLLBAR */
+      .timeline ol::-webkit-scrollbar {
+        display: none;
+      }
+
+      .timeline ol {
+        font-size: 0;
+        padding: 250px 0;
+        transition: all 1s;
+        overflow-x: scroll;
+        scroll-snap-type: x mandatory;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .timeline ol li {
+        position: relative;
+        display: inline-block;
+        list-style-type: none;
+        width: 160px;
+        height: 4px;
+        background: var(--timeline-line);
+        scroll-snap-align: start;
+      }
+
+      .timeline ol li:last-child {
+        width: 340px;
+      }
+
+      .timeline ol li:not(:first-child) {
+        margin-left: 14px;
+      }
+
+      .timeline ol li:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: calc(100% + 1px);
+        bottom: 0;
+        width: 14px;
+        height: 14px;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        background: var(--accent);
+        z-index: 1;
+        border: 3px solid var(--white);
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+
+      .timeline ol li div {
+        position: absolute;
+        left: calc(100% + 7px);
+        width: 280px;
+        padding: 20px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        white-space: normal;
+        color: var(--text-muted);
+        background: var(--white);
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+      }
+
+      .timeline ol li div::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+      }
+
+      .timeline ol li:nth-child(odd) div {
+        top: -24px;
+        transform: translateY(-100%);
+        border-radius: 12px 12px 12px 0;
+      }
+
+      .timeline ol li:nth-child(odd) div::before {
+        top: 100%;
+        border-width: 10px 10px 0 0;
+        border-color: var(--white) transparent transparent transparent;
+      }
+
+      .timeline ol li:nth-child(even) div {
+        top: calc(100% + 24px);
+        border-radius: 0 12px 12px 12px;
+      }
+
+      .timeline ol li:nth-child(even) div::before {
+        top: -10px;
+        border-width: 10px 0 0 10px;
+        border-color: transparent transparent transparent var(--white);
+      }
+
+      .timeline time {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--accent);
+      }
+
+      /* ARROW BUTTONS
+      –––––––––––––––––––––––––––––––––––––––––––––––––– */
+      .arrows {
+        position: absolute;
+        top: 50%;
+        left: 340px; 
+        width: calc(100% - 340px);
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+        z-index: 10;
+        pointer-events: none;
+        padding: 0 20px;
+      }
+
+      .arrow {
+        pointer-events: auto;
+        background: var(--white);
+        color: var(--accent);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+      }
+
+      .arrow:hover {
+        background: var(--accent);
+        color: var(--white);
+        transform: scale(1.05);
+      }
+      
+      .arrow:active {
+        transform: scale(0.95);
+      }
+
+      /* MEDIA QUERIES
+      –––––––––––––––––––––––––––––––––––––––––––––––––– */
+      @media screen and (max-width: 800px) {
+        .timeline {
+          display: block;
+        }
+
+        .timeline::before,
+        .timeline::after {
+          width: 50px;
+        }
+
+        .timeline::before {
+          left: 0;
+        }
+
+        .timeline .info {
+          display: none;
+        }
+
+        /* Adjust arrows for mobile */
+        .arrows {
+          left: 0;
+          width: 100%;
+          padding: 0 10px;
+        }
+        
+        .arrow {
+          width: 40px;
+          height: 40px;
+          font-size: 16px;
+        }
+
+        /* Adjust cards and spacing for mobile */
+        .timeline ol {
+          padding: 160px 0; /* Adjusted vertical padding */
+        }
+
+        .timeline ol li {
+          width: 110px; /* Shorter line segment */
+        }
+
+        .timeline ol li:not(:first-child) {
+          margin-left: 25px; /* Added nice gap between sections */
+        }
+
+        .timeline ol li div {
+          width: 210px; /* Smaller card */
+          padding: 15px; 
+          font-size: 0.85rem; 
+        }
+
+        .timeline time {
+          font-size: 1.1rem;
+        }
+
+        
+      }
+    </style>
+  </head>
+    
+  <body>
+    <section class="section intro">
+      <div class="container">
+        <h1>Company Timeline</h1>
+        <p>Scroll using buttons or touch swipe</p>
+      </div>
+    </section>
+
+    <section class="timeline">
+      <div class="info">
+        <img width="50" height="50" src="https://assets.codepen.io/210284/face.svg" alt="" />
+        <h2>Company History</h2>
+        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium</p>
+        <p>
+            <a href="">Learn more &gt;</a>
+        </p>
+      </div>
+
+      <!-- Navigation Arrows -->
+      <div class="arrows">
+        <button class="arrow prev" aria-label="Previous">&#10094;</button>
+        <button class="arrow next" aria-label="Next">&#10095;</button>
+      </div>
+
+      <ol>
+        <li>
+          <div>
+            <time>1934</time> At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1937</time> Proin quam velit, efficitur vel neque vitae, rhoncus commodo mi. Suspendisse finibus mauris.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1940</time> Proin iaculis, nibh eget efficitur varius, libero tellus porta dolor, at pulvinar tortor.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1943</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat mattis.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1946</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1956</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1957</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat mattis.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1967</time> Aenean condimentum odio a bibendum rhoncus. Ut mauris felis, volutpat eget porta.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1977</time> Vestibulum porttitor lorem sed pharetra dignissim. Nulla maximus, dui a tristique iaculis.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>1985</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat mattis.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>2000</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat mattis.
+          </div>
+        </li>
+        <li>
+          <div>
+            <time>2005</time> In mattis elit vitae odio posuere, nec maximus massa varius. Suspendisse varius volutpat mattis.
+          </div>
+        </li>
+        <li></li>
+      </ol>
+    </section>
+
+    <script>
+      // VARIABLES
+      const elH = document.querySelectorAll(".timeline li > div");
+      const timelineList = document.querySelector(".timeline ol");
+      const prevBtn = document.querySelector(".arrow.prev");
+      const nextBtn = document.querySelector(".arrow.next");
+
+      // START
+      window.addEventListener("load", init);
+
+      function init() {
+        setEqualHeights(elH);
+      }
+
+      // SET EQUAL HEIGHTS
+      function setEqualHeights(el) {
+        let counter = 0;
+        for (let i = 0; i < el.length; i++) {
+          const singleHeight = el[i].offsetHeight;
+
+          if (counter < singleHeight) {
+            counter = singleHeight;
+          }
+        }
+
+        for (let i = 0; i < el.length; i++) {
+          el[i].style.height = `${counter}px`;
+        }
+      }
+
+      // SCROLL NAVIGATION
+      const scrollAmount = 300; 
+
+      prevBtn.addEventListener("click", () => {
+        timelineList.scrollBy({
+          left: -scrollAmount,
+          behavior: "smooth"
+        });
+      });
+
+      nextBtn.addEventListener("click", () => {
+        timelineList.scrollBy({
+          left: scrollAmount,
+          behavior: "smooth"
+        });
+      });
+    </script>
+  </body>
+</html>

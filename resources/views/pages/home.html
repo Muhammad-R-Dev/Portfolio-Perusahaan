@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Tab System with GSAP — Osmo</title>
+  <link rel='stylesheet' href='https://slater.app/10324/23333.css'>
+
+  <style>
+    /* ------- Osmo UI Base Styling ------- */
+
+    body {
+      background-color: #ffffff;
+      color: #131313;
+      font-size: 1vw;
+      font-family: arial, sans-serif;
+      /* Kursor bawaan browser / default */
+      cursor: default;
+      margin: 0;
+    }
+
+    a,
+    button {
+      cursor: pointer;
+    }
+
+    .cloneable {
+      padding: var(--container-padding);
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      display: flex;
+      position: relative;
+      font-size: 1.1vw;
+    }
+
+    .tab-layout {
+      z-index: 1;
+      grid-row-gap: 3em;
+      flex-flow: row wrap;
+      width: 100%;
+      min-height: 37em;
+      display: flex;
+      position: relative;
+    }
+
+    .tab-layout-col {
+      width: 50%;
+    }
+
+    .tab-container {
+      grid-column-gap: 3em;
+      grid-row-gap: 3em;
+      flex-flow: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      min-height: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
+      padding-right: 2.5em;
+      display: flex;
+    }
+
+    .tab-layout-container {
+      width: 100%;
+      max-width: 36em;
+      height: 100%;
+      margin-left: auto;
+      margin-right: 0;
+      padding-top: 1em;
+      padding-bottom: 2em;
+    }
+
+    .tab-container-bottom,
+    .tab-container-top {
+      grid-column-gap: 2em;
+      grid-row-gap: 2em;
+      flex-flow: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      display: flex;
+    }
+
+    .tab-content-wrap {
+      width: 100%;
+      min-width: 24em;
+      position: relative;
+      min-height: 6em;
+    }
+
+    .content-button__bg {
+      z-index: -1;
+      background-color: #131313;
+      border-radius: .25em;
+      position: absolute;
+      inset: 0%;
+    }
+
+    .content-p {
+      margin: 0;
+      font-size: 1.25em;
+      line-height: 1.4;
+    }
+
+    .tab-button__bg {
+      z-index: 0;
+      background-color: #1313130d;
+      border: 1px solid #1313131a;
+      border-radius: .25em;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0%;
+    }
+
+    .tab-content-item {
+      z-index: 1;
+      grid-column-gap: 1.25em;
+      grid-row-gap: 1.25em;
+      visibility: hidden;
+      flex-flow: column;
+      display: flex;
+      position: absolute;
+      inset: auto 0% 0%;
+    }
+
+    .tab-content-item.active {
+      visibility: visible;
+    }
+
+    .filter-bar {
+      background-color: #1313130a;
+      border: 1px solid #1313131a;
+      border-radius: .5em;
+      padding: .5em;
+      display: flex;
+    }
+
+    .filter-button {
+      background-color: #0000;
+      border: 1px solid #13131300;
+      padding: 1.125em 1.5em;
+      transition: border-color .2s;
+      position: relative;
+      font-size: inherit;
+    }
+
+    .filter-button.active {
+      border-color: #1313134d;
+      border-radius: .25em;
+    }
+
+    .filter-button__p {
+      z-index: 1;
+      font-size: 1.125em;
+      position: relative;
+      color: #131313;
+    }
+
+    .tab-visual-wrap {
+      border-radius: .5em;
+      width: 100%;
+      height: 42em;
+      max-height: 80vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-visual-item {
+      visibility: hidden;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      position: absolute;
+    }
+
+    .tab-visual-item.active {
+      visibility: visible;
+    }
+
+    .tab-image {
+      object-fit: cover;
+      border-radius: .5em;
+      width: 100%;
+      max-width: none;
+      height: 100%;
+    }
+
+    .tab-content__heading {
+      letter-spacing: -.02em;
+      margin-top: 0;
+      margin-bottom: 0;
+      font-size: 1.75em;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .tab-layout-heading {
+      margin-top: 0;
+      margin-bottom: 0;
+      font-size: 4em;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .tab-content__button {
+      color: #ffffff;
+      justify-content: center;
+      align-items: center;
+      height: 4em;
+      padding-left: 1.5em;
+      padding-right: 1.5em;
+      text-decoration: none;
+      display: flex;
+      position: relative;
+    }
+
+    .osmo-credits {
+      z-index: 999;
+      pointer-events: none;
+      flex-flow: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 4em;
+      padding: 1em;
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+    }
+
+    .osmo-credits__p {
+      pointer-events: auto;
+      color: #13131380;
+      text-align: center;
+      margin: 0;
+      font-family: PP Neue Montreal, Arial, sans-serif;
+      font-size: 1.125em;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .osmo-credits__p-a {
+      color: #131313;
+    }
+
+    @font-face {
+      font-family: 'PP Neue Montreal';
+      src: url('https://cdn.prod.website-files.com/6819ed8312518f61b84824df/6819ed8312518f61b84825ba_PPNeueMontreal-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* ------- Media Queries untuk Tampilan Mobile (Lebih Rapi & Pas) ------- */
+    @media (max-width: 991px) {
+      body {
+        font-size: 14px; /* Font dasar disesuaikan agar ringkas di layar kecil */
+      }
+
+      .cloneable {
+        padding: 1.5em 1em;
+        font-size: 14px;
+        min-height: auto;
+      }
+
+      .tab-layout {
+        flex-direction: column;
+        min-height: auto;
+        gap: 1.5em;
+      }
+
+      .tab-layout-col {
+        width: 100%;
+      }
+
+      .tab-layout-container {
+        max-width: 100%;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      .tab-container {
+        padding-right: 0;
+        gap: 1.5em;
+      }
+
+      .tab-container-top,
+      .tab-container-bottom {
+        gap: 1.25em;
+        width: 100%;
+      }
+
+      .tab-layout-heading {
+        font-size: 1.75em; /* Ukuran judul disesuaikan agar tidak terlalu dominan */
+        line-height: 1.2;
+      }
+
+      .filter-bar {
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: space-between;
+        padding: 0.25em;
+      }
+
+      .filter-button {
+        flex: 1;
+        text-align: center;
+        padding: 0.6em 0.5em;
+      }
+
+      .filter-button__p {
+        font-size: 0.9em;
+      }
+
+      .tab-content-wrap {
+        min-width: 100%;
+        min-height: 5em;
+      }
+
+      .tab-content__heading {
+        font-size: 1.25em;
+      }
+
+      .content-p {
+        font-size: 0.95em;
+        line-height: 1.35;
+      }
+
+      .tab-content__button {
+        height: 3em;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .tab-visual-wrap {
+        height: 18em; /* Tinggi gambar disesuaikan agar proporsional di HP */
+        max-height: 40vh;
+        border-radius: 0.5em;
+      }
+
+      .osmo-credits {
+        position: relative;
+        margin-top: 1.5em;
+        height: auto;
+        padding: 0.5em;
+      }
+
+      .osmo-credits__p {
+        font-size: 0.85em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="cloneable">
+    <div data-tabs="wrapper" class="tab-layout">
+      <!-- Deskripsi / Teks Tampil Pertama di Layar HP -->
+      <div class="tab-layout-col">
+        <div class="tab-layout-container">
+          <div class="tab-container">
+            <div class="tab-container-top">
+              <h1 class="tab-layout-heading">Explore the Layers of Abstract Design and Depth</h1>
+              <div data-flip-button="wrap" data-tabs="nav" class="filter-bar">
+                <button data-tabs="button" data-flip-button="button" class="filter-button active">
+                  <div class="filter-button__p">Shapes</div>
+                  <div data-flip-button="bg" class="tab-button__bg"></div>
+                </button>
+                <button data-tabs="button" data-flip-button="button" class="filter-button">
+                  <div class="filter-button__p">Depth</div>
+                </button>
+                <button data-tabs="button" data-flip-button="button" class="filter-button">
+                  <div class="filter-button__p">Layers</div>
+                </button>
+              </div>
+            </div>
+            <div class="tab-container-bottom">
+              <div data-tabs="content-wrap" class="tab-content-wrap">
+                <div data-tabs="content-item" class="tab-content-item active">
+                  <h2 data-tabs-fade="" class="tab-content__heading">Shifting Perspectives</h2>
+                  <p data-tabs-fade="" class="content-p opacity--80">A dynamic exploration of structure, balance, and creative symmetry.</p>
+                </div>
+                <div data-tabs="content-item" class="tab-content-item">
+                  <h2 data-tabs-fade="" class="tab-content__heading">Fragments of Motion</h2>
+                  <p data-tabs-fade="" class="content-p opacity--80">Where design meets depth—an abstract dance of light and form.</p>
+                </div>
+                <div data-tabs="content-item" class="tab-content-item">
+                  <h2 data-tabs-fade="" class="tab-content__heading">Echoes in Orange</h2>
+                  <p data-tabs-fade="" class="content-p opacity--80">A journey through layered geometry and endless possibilities.</p>
+                </div>
+              </div>
+              <a id="form-button" href="#" class="tab-content__button w-inline-block">
+                <p class="content-p">Become a member</p>
+                <div class="content-button__bg"></div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gambar Tampil di Bawah Deskripsi pada Layar HP -->
+      <div class="tab-layout-col">
+        <div data-tabs="visual-wrap" class="tab-visual-wrap">
+          <div data-tabs="visual-item" class="tab-visual-item active"><img src="https://cdn.prod.website-files.com/67726722d415dc401ae23cf6/677289e14dd4dbca1d8e5930_philip-oroni-IANBrm46bF0-unsplash%20(2).avif" loading="lazy" class="tab-image"></div>
+          <div data-tabs="visual-item" class="tab-visual-item"><img src="https://cdn.prod.website-files.com/67726722d415dc401ae23cf6/677289e19e4d013c6a4c5a1b_philip-oroni-Zx_G3LpNnV4-unsplash%20(1).avif" loading="lazy" class="tab-image"></div>
+          <div data-tabs="visual-item" class="tab-visual-item"><img src="https://cdn.prod.website-files.com/67726722d415dc401ae23cf6/677289e1c88b5b4c14d1e6fd_philip-oroni-h9N7bm-HRCo-unsplash.avif" loading="lazy" class="tab-image"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="osmo-credits">
+    <p class="osmo-credits__p">Resource by <a target="_blank" href="https://www.osmo.supply?utm_source=codepen&utm_medium=pen&utm_campaign=interactive-tab-system" class="osmo-credits__p-a">Osmo</a></p>
+  </div>
+
+  <script src='https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js'></script>
+  <script src='https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js'></script>
+  <script src='https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/CustomEase.min.js'></script>
+
+  <script>
+    gsap.registerPlugin(CustomEase, Flip);
+
+    CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
+
+    gsap.defaults({
+      ease: "osmo-ease",
+      duration: 0.8,
+    });
+
+    function initFlipButtons() {
+      let wrappers = document.querySelectorAll('[data-flip-button="wrap"]');
+
+      wrappers.forEach((wrapper) => {
+        let buttons = wrapper.querySelectorAll('[data-flip-button="button"]');
+        let bg = wrapper.querySelector('[data-flip-button="bg"]');
+
+        buttons.forEach(function (button) {
+          button.addEventListener("mouseenter", function () {
+            const state = Flip.getState(bg);
+            this.appendChild(bg);
+            Flip.from(state, {
+              duration: 0.4,
+            });
+          });
+
+          button.addEventListener("focus", function () {
+            const state = Flip.getState(bg);
+            this.appendChild(bg);
+            Flip.from(state, {
+              duration: 0.4,
+            });
+          });
+
+          button.addEventListener("mouseleave", function () {
+            const state = Flip.getState(bg);
+            const activeLink = wrapper.querySelector(".active");
+            activeLink.appendChild(bg);
+            Flip.from(state, {
+              duration: 0.4,
+            });
+          });
+
+          button.addEventListener("blur", function () {
+            const state = Flip.getState(bg);
+            const activeLink = wrapper.querySelector(".active");
+            activeLink.appendChild(bg);
+            Flip.from(state, {
+              duration: 0.4,
+            });
+          });
+        });
+      });
+    }
+
+    function initTabSystem() {
+      let wrappers = document.querySelectorAll('[data-tabs="wrapper"]');
+
+      wrappers.forEach((wrapper) => {
+        let nav = wrapper.querySelector('[data-tabs="nav"]');
+        let buttons = nav.querySelectorAll('[data-tabs="button"]');
+        let contentWrap = wrapper.querySelector('[data-tabs="content-wrap"]');
+        let contentItems = contentWrap.querySelectorAll('[data-tabs="content-item"]');
+        let visualWrap = wrapper.querySelector('[data-tabs="visual-wrap"]');
+        let visualItems = visualWrap.querySelectorAll('[data-tabs="visual-item"]');
+
+        let activeButton = buttons[0];
+        let activeContent = contentItems[0];
+        let activeVisual = visualItems[0];
+        let isAnimating = false;
+
+        function switchTab(index, initial = false) {
+          if (!initial && (isAnimating || buttons[index] === activeButton)) return;
+          isAnimating = true;
+
+          const outgoingContent = activeContent;
+          const incomingContent = contentItems[index];
+          const outgoingVisual = activeVisual;
+          const incomingVisual = visualItems[index];
+
+          let outgoingLines = outgoingContent.querySelectorAll("[data-tabs-fade]") || [];
+          let incomingLines = incomingContent.querySelectorAll("[data-tabs-fade]");
+
+          const timeline = gsap.timeline({
+            defaults: {
+              ease: "power3.inOut"
+            },
+            onComplete: () => {
+              if (!initial) {
+                outgoingContent && outgoingContent.classList.remove("active");
+                outgoingVisual && outgoingVisual.classList.remove("active");
+              }
+              activeContent = incomingContent;
+              activeVisual = incomingVisual;
+              isAnimating = false;
+            },
+          });
+
+          incomingContent.classList.add("active");
+          incomingVisual.classList.add("active");
+
+          timeline
+            .to(outgoingLines, { y: "-2em", autoAlpha: 0 }, 0)
+            .to(outgoingVisual, { autoAlpha: 0, xPercent: 3 }, 0)
+            .fromTo(incomingLines, { y: "2em", autoAlpha: 0 }, { y: "0em", autoAlpha: 1, stagger: 0.075 }, 0.4)
+            .fromTo(incomingVisual, { autoAlpha: 0, xPercent: 3 }, { autoAlpha: 1, xPercent: 0 }, "<");
+
+          activeButton && activeButton.classList.remove("active");
+          buttons[index].classList.add("active");
+          activeButton = buttons[index];
+        }
+
+        switchTab(0, true);
+
+        buttons.forEach((button, i) => {
+          button.addEventListener("click", () => switchTab(i));
+        });
+
+        contentItems[0].classList.add("active");
+        visualItems[0].classList.add("active");
+        buttons[0].classList.add("active");
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initTabSystem();
+      initFlipButtons();
+    });
+  </script>
+</body>
+
+</html>

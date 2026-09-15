@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Navbar Navigation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Recursive:wght@400;500;600;700;800;900&display=swap');
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Recursive', sans-serif;
+            overflow: hidden;
+            background-color: #131414;
+        }
+
+        .container {
+            min-height: 100vh;
+            width: 100%;
+            background-color: #131414;
+            background-image: linear-gradient(135deg, #131414 0%, #000000 100%);
+            transform-style: preserve-3d;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            height: 5rem;
+        }
+
+        .menu {
+            max-width: 72rem;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            font-size: 1.8rem;
+            margin-left: 5px;
+            color: #e20f2f;
+        }
+
+        .hamburger-menu {
+            height: 4rem;
+            width: 3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 101;
+        }
+
+        .bar {
+            width: 1.9rem;
+            height: 2px;
+            border-radius: 2px;
+            background-color: #eee;
+            transition: 0.5s;
+            position: relative;
+        }
+
+        .bar::before, .bar::after {
+            content: "";
+            position: absolute;
+            width: inherit;
+            height: inherit;
+            background-color: #eee;
+            transition: 0.5s;
+        }
+
+        .bar::before { transform: translateY(-9px); }
+        .bar::after { transform: translateY(9px); }
+
+        .main-container {
+            overflow: hidden;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .main {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            left: 0;
+            z-index: 5;
+            overflow: hidden;
+            transform-origin: left center; 
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        header {
+            min-height: 100vh;
+            width: 100%;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80") no-repeat center / cover;
+            position: relative;
+        }
+
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #fff;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+
+        .title { 
+            font-size: clamp(2rem, 5vw, 3.5rem); 
+            margin-bottom: 1rem;
+        }
+
+        .description { 
+            margin: 0 auto 1.5rem auto;
+            width: 100%;
+            max-width: 600px;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            line-height: 1.5;
+        }
+
+        .btn { 
+            padding: 0.8rem 2rem;
+            background-color: #e20f2f;
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #ff1e3c;
+            transform: translateY(-2px);
+        }
+
+        /* Hamburger Animation */
+        .container.active .bar { 
+            transform: rotate(360deg);
+            background-color: transparent;
+        }
+
+        .container.active .bar::before { 
+            transform: translateY(0) rotate(45deg);
+        }
+
+        .container.active .bar::after {
+            transform: translateY(0) rotate(-45deg);
+        }
+
+        /* Transformasi 3D Saat Aktif (Layar Digeser Lebih Dalam Ke Kiri) */
+        .container.active .main {
+            animation: main-animation 0.5s ease forwards;
+            cursor: pointer;
+            transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(280px) scale(0.45);
+        }
+
+        @keyframes main-animation {
+            from { transform: translate(0); }
+            to {
+                transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(280px) scale(0.45);
+            }
+        }
+
+        .shadow { 
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            transform-style: preserve-3d;
+            transform-origin: left center;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #fff;
+            pointer-events: none;
+        }
+
+        .shadow.one { z-index: -1; opacity: 0.15; }
+        .shadow.two { z-index: -2; opacity: 0.1; }
+
+        .container.active .shadow.one {
+            animation: shadow-one 0.6s ease-out forwards;
+            transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(180px) scale(0.45);
+        }
+
+        @keyframes shadow-one {
+            0% { transform: translate(0); }
+            100% {
+                transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(180px) scale(0.45);
+            }
+        }
+
+        .container.active .shadow.two {
+            animation: shadow-two 0.6s ease-out forwards;
+            transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(90px) scale(0.45);
+        }
+
+        @keyframes shadow-two {
+            0% { transform: translate(0); }
+            100% {
+                transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(90px) scale(0.45);
+            }
+        }
+
+        /* Hover Effect pada Layar Utama */
+        .container.active .main:hover {
+            transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(310px) scale(0.45);
+        }
+
+        .container.active .main:hover + .shadow.one {
+            transform: perspective(1300px) rotateY(25deg) translateX(-120px) translateY(10px) translateZ(200px) scale(0.45);
+        }
+
+        /* Menu Navigasi Samping Kanan */
+        .links { 
+            position: absolute;
+            width: 40%;
+            right: 0;
+            top: 0; 
+            height: 100vh;
+            z-index: 10;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-right: 2rem;
+        }
+
+        ul { list-style: none; }
+
+        ul li { margin: 0.8rem 0; }
+
+        ul li.active a { color: #e20f2f; }
+
+        .links a { 
+            text-decoration: none;
+            color: #eee;
+            padding: 0.5rem 0;
+            display: inline-block;
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: hide 0.5s forwards ease;
+        }
+
+        .links a:hover { color: #e20f2f; }
+
+        .container.active .links a { 
+            animation: appear 0.5s forwards ease var(--i);
+        }
+
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0px); }
+        }
+
+        @keyframes hide {
+            from { opacity: 1; transform: translateY(0px); }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Penyesuaian Responsif Layar HP (Mobile) */
+        @media (max-width: 768px) {
+            .links {
+                width: 50%;
+                padding-right: 1rem;
+            }
+
+            .links a {
+                font-size: 1.2rem;
+                letter-spacing: 1px;
+            }
+
+            .container.active .main {
+                transform: perspective(1300px) rotateY(25deg) translateX(-140px) translateY(10px) translateZ(220px) scale(0.4);
+            }
+
+            .container.active .shadow.one {
+                transform: perspective(1300px) rotateY(25deg) translateX(-140px) translateY(10px) translateZ(140px) scale(0.4);
+            }
+
+            .container.active .shadow.two {
+                transform: perspective(1300px) rotateY(25deg) translateX(-140px) translateY(10px) translateZ(60px) scale(0.4);
+            }
+
+            @keyframes main-animation {
+                from { transform: translate(0); }
+                to {
+                    transform: perspective(1300px) rotateY(25deg) translateX(-140px) translateY(10px) translateZ(220px) scale(0.4);
+                }
+            }
+
+            @keyframes shadow-one {
+                0% { transform: translate(0); }
+                100% {
+                    transform: perspective(1300px) rotateY(25deg) translateX(-140px) translateY(10px) translateZ(140px) scale(0.4);
+                }
+            }
+
+            @keyframes shadow-two {
+                0% { transform: translate(0); }
+                100% {
+                    transform: perspective(1300px) rotateY(25deg) translateX(-140px) translateY(10px) translateZ(60px) scale(0.4);
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="menu">
+                <h3 class="logo">Priyansh<span>Mehta</span></h3>
+                <div class="hamburger-menu">
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="main">
+                <header>
+                    <div class="overlay">
+                        <h2 class="title">Future is here</h2>
+                        <p class="description">
+                            “All our dreams can come true, if we have the courage to pursue them.”
+                        </p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </header>
+            </div>
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+        </div>
+
+        <div class="links">
+            <ul>
+                <li class="active"><a href="#" style="--i: 0.05s">Home</a></li>
+                <li><a href="#" style="--i: 0.1s">About</a></li>
+                <li><a href="#" style="--i: 0.15s">Contact</a></li>
+                <li><a href="#" style="--i: 0.2s">Service</a></li>
+                <li><a href="#" style="--i: 0.25s">Portfolio</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const hamburger_menu = document.querySelector(".hamburger-menu");
+        const container = document.querySelector(".container");
+
+        hamburger_menu.addEventListener("click", () => {
+            container.classList.toggle("active");
+        });
+    </script>
+</body>
+</html>

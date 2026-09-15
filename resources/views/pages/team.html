@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>3D Slider Cards</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+      :root {
+        --card-width: 240px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #fafafa;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        padding: 40px 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 60px;
+        padding: 0 12px;
+      }
+
+      .subtitle {
+        color: #ff6b35;
+        font-size: clamp(11px, 3vw, 14px);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+      }
+
+      .main-title {
+        font-size: clamp(26px, 7vw, 56px);
+        font-weight: 900;
+        color: #0a0a0a;
+        line-height: 1.15;
+      }
+
+      .slider-container {
+        perspective: 1500px;
+        perspective-origin: 50% 50%;
+        cursor: grab;
+        width: 100%;
+        max-width: 1400px;
+        overflow: hidden;
+        touch-action: pan-y;
+      }
+
+      .slider-container.dragging {
+        cursor: grabbing;
+      }
+
+      /* Track sekarang jadi "panggung" relatif; posisi tiap kartu dikontrol
+         penuh lewat transform (bukan urutan DOM/flex), supaya saat digeser
+         tidak ada lompatan/patahan layout ("gap" atau kesan refresh). */
+      .slider-track {
+        position: relative;
+        width: 100%;
+        transform-style: preserve-3d;
+        will-change: transform;
+      }
+
+      .card {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: var(--card-width);
+        background: white;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        cursor: pointer;
+        will-change: transform, clip-path;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.15),
+          transparent 30%,
+          transparent 70%,
+          rgba(0, 0, 0, 0.15)
+        );
+        transform: translateZ(-8px);
+        pointer-events: none;
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #e0e0e0;
+        transform: translateZ(-16px);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
+      }
+
+      .card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        pointer-events: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card .hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+      }
+
+      .card:hover .hover-overlay {
+        opacity: 1;
+      }
+
+      .card .hover-overlay span {
+        color: white;
+        font-size: clamp(11px, 2.5vw, 16px);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-align: center;
+        padding: 0 8px;
+      }
+
+      .slider-track.blurred .card:not(.expanded) {
+        filter: blur(8px);
+        transition: filter 0.6s ease;
+      }
+
+      .card.expanded {
+        z-index: 1000 !important;
+      }
+
+      .card-info {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+        z-index: 1001;
+        width: min(600px, 90vw);
+        padding: 1.5rem;
+        background: #ff6b35;
+        box-shadow: 4px 3px 18px 4px #b7b7b721;
+      }
+
+      .card-info.visible {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .card-info h2 {
+        font-size: clamp(20px, 5vw, 36px);
+        font-weight: 900;
+        color: #0a0a0a;
+        margin-bottom: 16px;
+      }
+
+      .card-info p {
+        font-size: clamp(13px, 3vw, 18px);
+        color: #080808;
+        line-height: 1.7;
+      }
+
+      .close-btn {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        width: 48px;
+        height: 48px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1002;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .close-btn.visible {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .close-btn:hover {
+        background: #ff6b35;
+        color: white;
+        transform: rotate(90deg) scale(1.1);
+      }
+
+      .close-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      @media (min-width: 640px) {
+        .close-btn {
+          top: 40px;
+          right: 40px;
+          width: 60px;
+          height: 60px;
+        }
+        .close-btn svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 28px 12px;
+        }
+        .header {
+          margin-bottom: 32px;
+        }
+        .card-info {
+          bottom: 28px;
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <p class="subtitle">Behind creativity</p>
+      <h1 class="main-title">Curious what else we've created?</h1>
+    </div>
+
+    <div class="slider-container" id="sliderContainer">
+      <div class="slider-track" id="sliderTrack">
+        <div class="card" data-title="Beverage Branding" data-desc="Fresh and vibrant packaging design for premium juice products with natural ingredients">
+          <img src="https://images.unsplash.com/photo-1546548970-71785318a17b?w=600&h=800&fit=crop" alt="Card 1">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Apparel Design" data-desc="Minimalist fashion collection with sustainable materials and modern aesthetics">
+          <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=800&fit=crop" alt="Card 2">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Luxury Packaging" data-desc="Premium product packaging with attention to detail and sophisticated finishes">
+          <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&h=800&fit=crop" alt="Card 3">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Cosmetics Brand" data-desc="Clean beauty brand identity with elegant and timeless design approach">
+          <img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&h=800&fit=crop" alt="Card 4">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Fashion Editorial" data-desc="Editorial photography and art direction for contemporary fashion magazine">
+          <img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&h=800&fit=crop" alt="Card 5">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Botanical Series" data-desc="Natural product line with organic ingredients and eco-friendly packaging">
+          <img src="https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=600&h=800&fit=crop" alt="Card 6">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Product Photography" data-desc="Professional product photography with creative lighting and composition">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=800&fit=crop" alt="Card 7">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Streetwear Brand" data-desc="Urban fashion line with bold graphics and contemporary street style">
+          <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=800&fit=crop" alt="Card 8">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Tech Accessories" data-desc="Minimalist tech product design with user-centered functionality">
+          <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&h=800&fit=crop" alt="Card 9">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Wellness Products" data-desc="Holistic wellness brand with natural and calming visual identity">
+          <img src="https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&h=800&fit=crop" alt="Card 10">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+        <div class="card" data-title="Home Decor" data-desc="Contemporary home accessories with Scandinavian design influence">
+          <img src="https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?w=600&h=800&fit=crop" alt="Card 11">
+          <div class="hover-overlay"><span>Click to see more</span></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="close-btn" id="closeBtn">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+      </svg>
+    </button>
+
+    <div class="card-info" id="cardInfo">
+      <h2 id="cardTitle"></h2>
+      <p id="cardDesc"></p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+      // Posisi dasar per SLOT (bukan per kartu). Slot ini tetap/statis;
+      // yang berubah saat swipe hanyalah kartu MANA yang menempati slot mana
+      // (lewat "offset"), sehingga tidak perlu memindah elemen di DOM.
+      const BASE_POSITIONS = [
+        { height: 620, z: 220, rotateY: 48, y: 0, clip: "polygon(0px 0px, 100% 10%, 100% 90%, 0px 100%)" },
+        { height: 580, z: 165, rotateY: 35, y: 0, clip: "polygon(0px 0px, 100% 8%, 100% 92%, 0px 100%)" },
+        { height: 495, z: 110, rotateY: 15, y: 0, clip: "polygon(0px 0px, 100% 7%, 100% 93%, 0px 100%)" },
+        { height: 420, z: 66, rotateY: 15, y: 0, clip: "polygon(0px 0px, 100% 7%, 100% 93%, 0px 100%)" },
+        { height: 353, z: 46, rotateY: 6, y: 0, clip: "polygon(0px 0px, 100% 7%, 100% 93%, 0px 100%)" },
+        { height: 310, z: 0, rotateY: 0, y: 0, clip: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" },
+        { height: 353, z: 54, rotateY: 348, y: 0, clip: "polygon(0px 7%, 100% 0px, 100% 100%, 0px 93%)" },
+        { height: 420, z: 89, rotateY: -15, y: 0, clip: "polygon(0px 7%, 100% 0px, 100% 100%, 0px 93%)" },
+        { height: 495, z: 135, rotateY: -15, y: 1, clip: "polygon(0px 7%, 100% 0px, 100% 100%, 0px 93%)" },
+        { height: 580, z: 195, rotateY: 325, y: 0, clip: "polygon(0px 8%, 100% 0px, 100% 100%, 0px 92%)" },
+        { height: 620, z: 240, rotateY: 312, y: 0, clip: "polygon(0px 10%, 100% 0px, 100% 100%, 0px 90%)" }
+      ];
+
+      const BASE_CARD_WIDTH = 240;
+      const BASE_GAP = 8;
+      const BASE_PERSPECTIVE = 1500;
+      const CENTER_SLOT = Math.floor(BASE_POSITIONS.length / 2);
+      const MAX_BASE_HEIGHT = Math.max(...BASE_POSITIONS.map((p) => p.height));
+
+      // Menghitung skala berdasarkan lebar layar: 1 untuk desktop besar,
+      // mengecil secara halus (linear) sampai batas minimum untuk HP kecil.
+      function computeScale(width) {
+        const MAX_W = 1200, MIN_W = 320;
+        const MAX_S = 1, MIN_S = 0.42;
+        if (width >= MAX_W) return MAX_S;
+        if (width <= MIN_W) return MIN_S;
+        const t = (width - MIN_W) / (MAX_W - MIN_W);
+        return MIN_S + t * (MAX_S - MIN_S);
+      }
+
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      class CircularSlider {
+        constructor() {
+          this.container = document.getElementById("sliderContainer");
+          this.track = document.getElementById("sliderTrack");
+          this.cards = Array.from(document.querySelectorAll(".card")); // urutan DOM TETAP, tidak pernah diubah
+          this.totalCards = this.cards.length;
+
+          this.isDragging = false;
+          this.isAnimating = false; // Mencegah glitch jika digeser terlalu cepat
+          this.startX = 0;
+          this.dragDistance = 0;
+          this.threshold = 50;
+          this.expandedCard = null;
+
+          // offset = jumlah langkah rotasi bersih. Kartu ke-i selalu berada
+          // di slot ((i - offset) mod total). Karena DOM tidak pernah
+          // diubah, tidak ada lompatan layout saat swipe.
+          this.offset = 0;
+
+          this.cardInfo = document.getElementById("cardInfo");
+          this.cardTitle = document.getElementById("cardTitle");
+          this.cardDesc = document.getElementById("cardDesc");
+          this.closeBtn = document.getElementById("closeBtn");
+
+          // State responsive
+          this.scale = computeScale(window.innerWidth);
+          this.positions = this.getScaledPositions(this.scale);
+
+          // Efek "rubber band" halus mengikuti jari saat drag (GSAP quickTo)
+          this.trackXTo = gsap.quickTo(this.track, "x", { duration: 0.4, ease: "power3.out" });
+
+          this.init();
+        }
+
+        getScaledPositions(scale) {
+          const cardW = BASE_CARD_WIDTH * scale;
+          const gap = BASE_GAP * scale;
+          const step = cardW + gap;
+
+          return BASE_POSITIONS.map((p, slot) => ({
+            height: p.height * scale,
+            z: p.z * scale,
+            rotateY: p.rotateY,
+            y: p.y * scale,
+            clip: p.clip,
+            x: (slot - CENTER_SLOT) * step
+          }));
+        }
+
+        // Slot yang sedang ditempati kartu pada index DOM tetap `i`.
+        getSlot(i) {
+          return ((i - this.offset) % this.totalCards + this.totalCards) % this.totalCards;
+        }
+
+        buildTransform(pos) {
+          return `translate(-50%, -50%) translateX(${pos.x}px) translateZ(${pos.z}px) rotateY(${pos.rotateY}deg) translateY(${pos.y}px)`;
+        }
+
+        init() {
+          this.applyResponsiveSizing();
+          this.applyPositions();
+          this.attachEvents();
+        }
+
+        applyResponsiveSizing() {
+          document.documentElement.style.setProperty("--card-width", `${BASE_CARD_WIDTH * this.scale}px`);
+          this.container.style.perspective = `${Math.max(600, BASE_PERSPECTIVE * this.scale)}px`;
+          this.track.style.height = `${MAX_BASE_HEIGHT * this.scale}px`;
+        }
+
+        applyPositions(animate = false) {
+          this.cards.forEach((card, index) => {
+            const pos = this.positions[this.getSlot(index)];
+            const transform = this.buildTransform(pos);
+
+            if (animate) {
+              gsap.to(card, {
+                height: pos.height,
+                clipPath: pos.clip,
+                transform,
+                duration: 0.5,
+                ease: "power2.out",
+                overwrite: "auto"
+              });
+            } else {
+              gsap.set(card, {
+                height: pos.height,
+                clipPath: pos.clip,
+                transform
+              });
+            }
+          });
+        }
+
+        handleResize() {
+          const newScale = computeScale(window.innerWidth);
+          if (Math.abs(newScale - this.scale) < 0.001) return;
+
+          this.scale = newScale;
+          this.positions = this.getScaledPositions(this.scale);
+          this.applyResponsiveSizing();
+
+          // Reposisikan tanpa animasi kasar saat resize/orientasi berubah
+          if (!this.expandedCard) {
+            this.applyPositions(false);
+          }
+        }
+
+        expandCard(card) {
+          if (this.expandedCard || this.isAnimating) return;
+
+          this.expandedCard = card;
+          const title = card.dataset.title;
+          const desc = card.dataset.desc;
+
+          this.cardTitle.textContent = title;
+          this.cardDesc.textContent = desc;
+
+          const rect = card.getBoundingClientRect();
+          const clone = card.cloneNode(true);
+          const overlay = clone.querySelector(".hover-overlay");
+          if (overlay) overlay.remove();
+
+          clone.style.position = "fixed";
+          clone.style.left = rect.left + "px";
+          clone.style.top = rect.top + "px";
+          clone.style.width = rect.width + "px";
+          clone.style.height = rect.height + "px";
+          clone.style.margin = "0";
+          clone.style.zIndex = "1000";
+          clone.classList.add("clone");
+
+          document.body.appendChild(clone);
+          this.cardClone = clone;
+
+          gsap.set(card, { opacity: 0 });
+          this.track.classList.add("blurred");
+
+          // Ukuran akhir menyesuaikan viewport supaya tidak overflow di layar kecil
+          const maxHeight = window.innerHeight * 0.8;
+          const finalWidth = Math.min(500, window.innerWidth * 0.9);
+          const finalHeight = Math.min(650, maxHeight);
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+
+          gsap.to(clone, {
+            width: finalWidth,
+            height: finalHeight,
+            left: centerX - finalWidth / 2,
+            top: centerY - finalHeight / 2,
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+            transform: "translateZ(0) rotateY(0deg)",
+            duration: 0.8,
+            ease: "power2.out",
+            onComplete: () => {
+              this.cardInfo.classList.add("visible");
+              this.closeBtn.classList.add("visible");
+            }
+          });
+        }
+
+        closeCard() {
+          if (!this.expandedCard) return;
+
+          this.cardInfo.classList.remove("visible");
+          this.closeBtn.classList.remove("visible");
+
+          const card = this.expandedCard;
+          const clone = this.cardClone;
+          const rect = card.getBoundingClientRect();
+          const index = this.cards.indexOf(card);
+          const pos = this.positions[this.getSlot(index)];
+
+          gsap.to(clone, {
+            width: rect.width,
+            height: rect.height,
+            left: rect.left,
+            top: rect.top,
+            clipPath: pos.clip,
+            duration: 0.8,
+            ease: "power2.out",
+            onComplete: () => {
+              clone.remove();
+              gsap.set(card, { opacity: 1 });
+              this.track.classList.remove("blurred");
+              this.expandedCard = null;
+              this.cardClone = null;
+            }
+          });
+        }
+
+        rotate(direction) {
+          if (this.expandedCard || this.isAnimating) return;
+
+          this.isAnimating = true;
+
+          const oldOffset = this.offset;
+
+          // Cukup update offset logis. Tidak ada elemen yang dipindah di DOM,
+          // jadi tidak ada lompatan posisi/gap — semua kartu menganimasikan
+          // transform-nya sendiri secara mulus ke slot barunya.
+          this.offset = (this.offset + (direction === "next" ? 1 : -1) + this.totalCards) % this.totalCards;
+
+          const lastSlot = this.totalCards - 1;
+
+          this.cards.forEach((card, index) => {
+            const oldSlot = ((index - oldOffset) % this.totalCards + this.totalCards) % this.totalCards;
+            const newSlot = this.getSlot(index);
+            const pos = this.positions[newSlot];
+
+            // Kartu yang "meloncat" dari ujung terakhir ke ujung pertama slot
+            // (atau sebaliknya) harus menempuh jarak-x terjauh sekaligus berada
+            // di z yang dekat kamera, sehingga secara visual ia menyapu lewat
+            // DEPAN kartu tengah. Untuk kartu ini, sembunyikan dulu (opacity 0),
+            // pindahkan langsung ke posisi barunya, baru munculkan lagi (fade in)
+            // supaya tidak terlihat "melewati depan".
+            const isWrap =
+              (oldSlot === 0 && newSlot === lastSlot) ||
+              (oldSlot === lastSlot && newSlot === 0);
+
+            if (isWrap) {
+              gsap.to(card, {
+                opacity: 0,
+                duration: 0.18,
+                ease: "power1.out",
+                overwrite: "auto",
+                onComplete: () => {
+                  gsap.set(card, {
+                    height: pos.height,
+                    clipPath: pos.clip,
+                    transform: this.buildTransform(pos)
+                  });
+                  gsap.to(card, {
+                    opacity: 1,
+                    duration: 0.27,
+                    ease: "power1.in",
+                    onComplete: () => {
+                      if (index === this.cards.length - 1) {
+                        this.isAnimating = false;
+                      }
+                    }
+                  });
+                }
+              });
+            } else {
+              gsap.set(card, { clipPath: pos.clip });
+
+              gsap.to(card, {
+                height: pos.height,
+                transform: this.buildTransform(pos),
+                opacity: 1,
+                duration: 0.45,
+                ease: "power2.out",
+                overwrite: "auto",
+                onComplete: () => {
+                  if (index === this.cards.length - 1) {
+                    this.isAnimating = false;
+                  }
+                }
+              });
+            }
+          });
+
+          // Setiap langkah rotasi commit, reset offset rubber-band ke 0 dengan halus
+          this.trackXTo(0);
+        }
+
+        attachEvents() {
+          this.cards.forEach((card) => {
+            card.addEventListener("click", () => {
+              if (!this.isDragging && !this.expandedCard) {
+                this.expandCard(card);
+              }
+            });
+          });
+
+          this.closeBtn.addEventListener("click", () => this.closeCard());
+
+          // Mouse & Touch Drag Events
+          this.container.addEventListener("mousedown", (e) => this.handleDragStart(e));
+          this.container.addEventListener("touchstart", (e) => this.handleDragStart(e), { passive: false });
+
+          document.addEventListener("mousemove", (e) => this.handleDragMove(e));
+          document.addEventListener("touchmove", (e) => this.handleDragMove(e), { passive: false });
+
+          document.addEventListener("mouseup", () => this.handleDragEnd());
+          document.addEventListener("touchend", () => this.handleDragEnd());
+
+          // Wheel scroll support (Untuk scroll melalui touchpad/mouse)
+          this.container.addEventListener("wheel", (e) => {
+            if (this.expandedCard || this.isAnimating) return;
+            e.preventDefault();
+            const direction = e.deltaY > 0 || e.deltaX > 0 ? "next" : "prev";
+            this.rotate(direction);
+          }, { passive: false });
+
+          // Keyboard Events
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && this.expandedCard) {
+              this.closeCard();
+            } else if (e.key === "ArrowLeft" && !this.expandedCard) {
+              this.rotate("prev");
+            } else if (e.key === "ArrowRight" && !this.expandedCard) {
+              this.rotate("next");
+            }
+          });
+
+          // Responsive: recalculate ukuran & posisi tiap kali layar berubah
+          // (resize window maupun ganti orientasi HP), dengan debounce ringan.
+          let resizeTimer;
+          const onResize = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => this.handleResize(), 120);
+          };
+          window.addEventListener("resize", onResize);
+          window.addEventListener("orientationchange", onResize);
+        }
+
+        handleDragStart(e) {
+          if (this.expandedCard) return;
+
+          this.isDragging = true;
+          this.container.classList.add("dragging");
+          this.startX = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
+          this.dragDistance = 0;
+        }
+
+        handleDragMove(e) {
+          if (!this.isDragging) return;
+
+          e.preventDefault();
+          const currentX = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
+          this.dragDistance = currentX - this.startX;
+
+          // Feedback visual halus: track mengikuti jari sedikit (rubber-band)
+          // sebelum langkah rotasi penuh terjadi -> terasa smooth via GSAP.
+          const liveOffset = clamp(this.dragDistance, -this.threshold, this.threshold) * 0.5;
+          this.trackXTo(liveOffset);
+
+          // Periksa apakah melewati threshold geseran, JIKA TIDAK sedang dalam animasi
+          if (Math.abs(this.dragDistance) > this.threshold) {
+            const direction = this.dragDistance > 0 ? "prev" : "next";
+
+            if (!this.isAnimating) {
+              this.rotate(direction);
+              // Reset nilai startX ke posisi saat ini agar slide berlanjut secara smooth
+              // ke slide berikutnya jika tetap ditarik tanpa di-lepas
+              this.startX = currentX;
+              this.dragDistance = 0;
+            }
+          }
+        }
+
+        handleDragEnd() {
+          if (!this.isDragging) return;
+
+          this.isDragging = false;
+          this.container.classList.remove("dragging");
+
+          // Jika dilepas sebelum threshold tercapai, kembalikan track dengan halus
+          this.trackXTo(0);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        new CircularSlider();
+      });
+    </script>
+  </body>
+</html>
