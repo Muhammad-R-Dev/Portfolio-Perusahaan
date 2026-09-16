@@ -4,19 +4,16 @@
 
 @section('content')
 <div class="page-wrapper">
-    <!-- Full-page Particle Technology Background -->
     <div class="particle-background" aria-hidden="true">
         <div id="particle-canvas"></div>
     </div>
 
-    <!-- Header -->
     <div class="about-header reveal">
         <span class="eyebrow">Tentang Perusahaan</span>
         <h1>PT Astabrata Teknologi</h1>
         <p class="subtitle">Membangun inovasi masa depan melalui solusi teknologi yang andal, estetis, dan berdampak nyata bagi pertumbuhan bisnis Anda.</p>
     </div>
 
-    <!-- Pengertian -->
     <section class="about-section reveal">
         <div class="about-content">
             <div class="about-text">
@@ -30,7 +27,6 @@
         </div>
     </section>
 
-    <!-- Tim Kami -->
     <section class="team-section reveal">
         <div class="th-card-wrapper">
             <div class="section-heading text-center">
@@ -68,7 +64,6 @@
         </div>
     </section>
 
-    <!-- Galeri -->
     <section class="gallery-section reveal">
         <div class="section-heading text-center">
             <h2>Galeri Kegiatan</h2>
@@ -76,7 +71,6 @@
         </div>
         <div class="gallery-grid">
             @forelse($galleries as $gallery)
-                <!-- Class gallery-item dan data-caption untuk fitur Lightbox -->
                 <img src="{{ $gallery->foto_url }}" class="gallery-item" data-caption="{{ $gallery->judul }}" alt="{{ $gallery->judul }}">
             @empty
                 <img src="{{ asset('image/asta1.png') }}" class="gallery-item" data-caption="Galeri Astabrata" alt="Galeri Astabrata">
@@ -85,7 +79,6 @@
     </section>
 </div>
 
-<!-- Modal Zoom Gambar (Lightbox) dengan fitur Slide -->
 <div id="imageModal" class="custom-modal">
     <span class="close-modal">&times;</span>
     <button class="modal-nav-btn prev-btn" id="modalPrev" aria-label="Previous image">&#10094;</button>
@@ -93,18 +86,32 @@
     
     <div class="modal-content-wrapper">
         <img class="modal-content" id="zoomedImage">
-        <!-- Teks deskripsi melayang di atas gambar -->
         <div id="modalCaption" class="modal-caption"></div>
     </div>
 </div>
 
 @push('styles')
 <style>
+    /* RESET PENTING UNTUK MENCEGAH MENGGESER KE KANAN */
+    html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important; /* MENGUNCI LAYAR KANAN KIRI */
+        margin: 0;
+        padding: 0;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
     .page-wrapper {
         position: relative;
         padding: 90px 5% 80px;
         min-height: 100vh;
-        overflow: hidden;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
         isolation: isolate;
         background:
             radial-gradient(circle at 8% 10%, rgba(126, 190, 207, 0.16) 0%, rgba(126, 190, 207, 0) 30%),
@@ -132,6 +139,7 @@
         position: relative;
         z-index: 5;
     }
+    
     .about-header {
         text-align: center;
         margin-bottom: 60px;
@@ -178,13 +186,13 @@
     /* About Section */
     .about-section {
         position: relative;
-        width: 100vw;
-        max-width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        margin-right: calc(-50vw + 50%);
-        margin-bottom: 80px;
-        padding: 55px 0;
-        overflow: visible;
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 60px;
+        padding: 20px 0;
+        overflow: hidden;
         background: transparent;
         border: 0;
         box-shadow: none;
@@ -219,11 +227,12 @@
         z-index: 5;
         display: flex;
         align-items: center;
-        gap: 55px;
-        max-width: 1300px;
+        gap: 30px; /* Diperkecil agar tidak bocel ke kanan */
+        max-width: 1200px;
         width: 100%;
         margin: 0 auto;
-        padding: 48px 52px;
+        padding: 48px 40px; /* Disesuaikan */
+        box-sizing: border-box !important;
         background: rgba(255, 255, 255, 0.94);
         border: 1px solid rgba(9, 67, 86, 0.08);
         border-radius: 32px;
@@ -296,12 +305,13 @@
     }
 
     .team-section {
-        max-width: 100vw;
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        margin-right: calc(-50vw + 50%);
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
         margin-bottom: 100px;
         position: relative;
+        overflow: hidden; /* Mencegah slider tumpah ke kanan */
     }
 
     .th-card-wrapper .section-heading {
@@ -314,8 +324,8 @@
 
     .th-card-wrapper {
         position: relative;
-        width: calc(100% - 32px);
-        max-width: none;
+        width: 100%;
+        max-width: 1200px;
         margin: 0 auto;
         background: #FEFEFE;
         border-radius: 32px;
@@ -323,6 +333,7 @@
         border: 1px solid rgba(9, 67, 86, 0.08);
         padding: 56px 20px 50px;
         overflow: hidden;
+        box-sizing: border-box;
     }
 
     .th-slider-container {
@@ -542,26 +553,6 @@
         line-height: 1.5;
     }
 
-    @media (max-width: 480px) {
-        .about-content,
-        .th-card-wrapper {
-            width: calc(100% - 16px);
-            border-radius: 22px;
-        }
-        .th-card-wrapper {
-            padding: 36px 16px 32px;
-        }
-        .th-card-wrapper .section-heading {
-            margin-bottom: 28px;
-        }
-        .th-card-wrapper .section-heading h2 {
-            font-size: 1.8rem;
-        }
-        .th-card-wrapper .section-heading p {
-            font-size: 0.95rem;
-        }
-    }
-
     /* Gallery Section */
     .gallery-section {
         max-width: 1200px;
@@ -586,27 +577,27 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
+    /* ===== MOBILE RESPONSIVE TWEAKS ===== */
     @media (max-width: 768px) {
-        .about-content { flex-direction: column; }
-        .about-header h1 { font-size: 2.5rem; }
+        .about-content { 
+            flex-direction: column; 
+            padding: 30px 20px; 
+            border-radius: 22px; 
+            gap: 20px;
+        }
+        .about-header h1 { font-size: 2.2rem; }
         .page-wrapper { padding-top: 70px; }
 
         .about-section {
-            padding: 35px 5%;
-        }
-
-        .about-content {
-            padding: 30px 24px;
-            gap: 30px;
-            border-radius: 22px;
+            padding: 20px 5%;
         }
 
         .about-text h2 {
-            font-size: 2.2rem;
+            font-size: 2rem;
         }
 
         .about-text p {
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .about-image {
@@ -616,8 +607,14 @@
         }
 
         .about-image img {
-            min-height: 280px;
-            max-height: 360px;
+            min-height: 250px;
+            max-height: 300px;
+        }
+        
+        .th-card-wrapper {
+            padding: 30px 15px;
+            border-radius: 20px;
+            width: calc(100% - 10px);
         }
     }
 
@@ -656,16 +653,15 @@
 
     .modal-content {
         max-width: 100%;
-        max-height: 80vh; /* Sedikit dilebarkan biar puas */
+        max-height: 80vh;
         border-radius: 12px;
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
         object-fit: contain;
     }
 
-    /* Teks Caption diubah posisinya melayang (di atas/overlapping bagian bawah gambar) */
     .modal-caption {
         position: absolute;
-        bottom: 25px; /* Naik numpuk ke atas gambar */
+        bottom: 25px;
         left: 50%;
         transform: translateX(-50%);
         color: #ffffff;
@@ -673,13 +669,13 @@
         font-size: 0.95rem;
         font-weight: 600;
         text-align: center;
-        background: rgba(30, 36, 44, 0.85); /* Warna gelap estetik buat pill */
+        background: rgba(30, 36, 44, 0.85);
         padding: 8px 24px;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, 0.15);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
         z-index: 10;
-        pointer-events: none; /* Biar ngga ganggu kalau ngeklik */
+        pointer-events: none;
     }
 
     .close-modal {
@@ -699,7 +695,6 @@
         transform: scale(1.1);
     }
 
-    /* Tombol Geser Kiri-Kanan */
     .modal-nav-btn {
         position: absolute;
         top: 50%;
@@ -1108,7 +1103,6 @@
                 }, { passive: false });
 
                 document.addEventListener('keydown', (e) => {
-                    // Cek biar ga bentrok sama slider Galeri Lightbox kalau lagi kebuka
                     if (document.getElementById('imageModal').classList.contains('show')) return;
 
                     if (e.key === 'Escape' && this.expandedCard) {
@@ -1232,8 +1226,8 @@
             });
         }
 
-        // Kontrol Keyboard (Kiri-Kanan) khusus Lightbox
-        document.addEventLisatener('keydown', function(e) {
+        // Kontrol Keyboard (Kiri-Kanan) khusus Lightbox (PERBAIKAN TYPO DI SINI)
+        document.addEventListener('keydown', function(e) {
             if (!modal.classList.contains('show')) return;
             
             if (e.key === 'Escape') modal.classList.remove("show");

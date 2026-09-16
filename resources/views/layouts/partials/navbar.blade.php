@@ -438,7 +438,12 @@
 
       .menu {
         padding-top: calc(6 * var(--menu-padding));
+        padding-bottom: calc(3 * var(--menu-padding));
         width: 100%;
+      }
+
+      .menu-details {
+        margin-bottom: 1em;
       }
 
       .bg-panel {
@@ -463,15 +468,16 @@
         font-size: 1em;
       }
 
+      .nav-brand { gap: 9px; }
       .nav-brand img { width: 32px; height: 32px; }
-      .nav-brand-text { font-size: 1rem; }
+      .nav-brand-text { font-size: 1rem; margin-left: -2px; }
       .nav-brand-text span { font-size: 0.6rem; }
     }
 
     @media screen and (max-width: 479px) {
       .menu {
         padding-top: calc(7 * var(--menu-padding));
-        padding-bottom: calc(2 * var(--menu-padding));
+        padding-bottom: calc(4 * var(--menu-padding));
       }
     }
 
