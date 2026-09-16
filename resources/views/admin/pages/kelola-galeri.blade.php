@@ -419,49 +419,187 @@
 			}
 		}
 
+		/* GALLERY TABLE LIST */
+		#content main .table-section {
+			margin-top: 40px;
+		}
+		#content main .table-responsive {
+			background: var(--light);
+			border-radius: 16px;
+			overflow-x: auto;
+			padding: 8px;
+		}
+		#content main .gallery-table {
+			width: 100%;
+			border-collapse: collapse;
+			min-width: 620px;
+		}
+		#content main .gallery-table caption {
+			text-align: left;
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--dark);
+			padding: 14px 16px 18px;
+			caption-side: top;
+		}
+		#content main .gallery-table thead th {
+			text-align: left;
+			font-size: 13px;
+			font-weight: 600;
+			color: var(--dark-grey);
+			text-transform: uppercase;
+			letter-spacing: .02em;
+			padding: 14px 16px;
+			border-bottom: 1px solid var(--grey);
+			white-space: nowrap;
+		}
+		#content main .gallery-table tbody td {
+			padding: 12px 16px;
+			border-bottom: 1px solid var(--grey);
+			color: var(--dark);
+			font-size: 14px;
+			vertical-align: middle;
+		}
+		#content main .gallery-table tbody tr:last-child td {
+			border-bottom: none;
+		}
+		#content main .gallery-table tbody tr:hover {
+			background: var(--light-blue);
+		}
+		#content main .gallery-table .table-thumb {
+			width: 64px;
+			height: 64px;
+			object-fit: cover;
+			border-radius: 10px;
+			cursor: zoom-in;
+			display: block;
+			transition: transform .2s ease, box-shadow .2s ease;
+		}
+		#content main .gallery-table .table-thumb:hover {
+			transform: scale(1.06);
+			box-shadow: 0 6px 16px rgba(0,0,0,.15);
+		}
+		#content main .gallery-table .table-category-tag {
+			display: inline-block;
+			background: var(--light-blue);
+			color: var(--blue);
+			font-size: 12px;
+			font-weight: 600;
+			padding: 4px 14px;
+			border-radius: 20px;
+			white-space: nowrap;
+		}
+		#content main .gallery-table .table-actions {
+			display: flex;
+			grid-gap: 8px;
+		}
+		#content main .gallery-table .table-actions button {
+			width: 32px;
+			height: 32px;
+			border-radius: 8px;
+			border: none;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			font-size: 15px;
+		}
+		#content main .gallery-table .table-actions .btn-edit {
+			background: var(--light-blue);
+			color: var(--blue);
+		}
+		#content main .gallery-table .table-actions .btn-delete {
+			background: var(--light-orange);
+			color: var(--red);
+		}
+		#content main .gallery-table .table-empty {
+			text-align: center;
+			padding: 40px 16px;
+			color: var(--dark-grey);
+		}
+		#content main .gallery-table tbody tr.row-hidden {
+			display: none;
+		}
+
+		/* ZOOM MODE MODAL */
+		.zoom-modal-overlay {
+			display: none;
+			position: fixed;
+			inset: 0;
+			background: rgba(0,0,0,.85);
+			z-index: 4000;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			cursor: zoom-out;
+		}
+		.zoom-modal-overlay.show {
+			display: flex;
+		}
+		.zoom-modal-overlay .zoom-stage {
+			max-width: 90vw;
+			max-height: 82vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			transform: scale(.94);
+			transition: transform .25s ease;
+		}
+		.zoom-modal-overlay.show .zoom-stage {
+			transform: scale(1);
+		}
+		.zoom-modal-overlay img {
+			max-width: 90vw;
+			max-height: 72vh;
+			border-radius: 12px;
+			box-shadow: 0 20px 60px rgba(0,0,0,.5);
+			cursor: default;
+		}
+		.zoom-modal-overlay .zoom-caption {
+			margin-top: 14px;
+			text-align: center;
+			cursor: default;
+		}
+		.zoom-modal-overlay .zoom-caption h4 {
+			color: var(--light);
+			font-size: 16px;
+			margin-bottom: 6px;
+		}
+		.zoom-modal-overlay .zoom-caption span {
+			display: inline-block;
+			background: var(--light);
+			color: var(--blue);
+			font-size: 12px;
+			font-weight: 600;
+			padding: 4px 14px;
+			border-radius: 20px;
+		}
+		.zoom-modal-overlay .btn-zoom-close {
+			position: absolute;
+			top: 24px;
+			right: 28px;
+			width: 42px;
+			height: 42px;
+			border-radius: 50%;
+			border: none;
+			background: rgba(255,255,255,.15);
+			color: var(--light);
+			font-size: 22px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.zoom-modal-overlay .btn-zoom-close:hover {
+			background: rgba(255,255,255,.28);
+		}
+
 		@media screen and (max-width: 576px) {
-			#content nav .notification-menu,
-			#content nav .profile-menu {
-				width: 150px;
-			}
-			#content nav form .form-input input {
-				display: none;
-			}
-
-			#content nav form .form-input button {
-				width: auto;
-				height: auto;
-				background: transparent;
-				border-radius: none;
-				color: var(--dark);
-			}
-
-			#content nav form.show .form-input input {
-				display: block;
-				width: 100%;
-			}
-
-			#content nav form.show .form-input button {
-				width: 36px;
-				height: 100%;
-				border-radius: 0 36px 36px 0;
-				color: var(--light);
-				background: var(--red);
-			}
-
-			#content nav form.show ~ .notification,
-			#content nav form.show ~ .profile {
-				display: none;
-			}
-
-			#content main .box-info {
-				grid-template-columns: 1fr;
-			}
-
-			#content main .gallery-grid {
-				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+			#content main .gallery-table {
+				min-width: 560px;
 			}
 		}
+
 </style>
 @endpush
 
@@ -509,40 +647,10 @@
 				</li>
 			</ul>
 
-			<div class="gallery-filter" id="galleryFilter">
-				<button class="filter-btn active" data-filter="all">Semua</button>
-				<button class="filter-btn" data-filter="kegiatan">Kegiatan</button>
-				<button class="filter-btn" data-filter="fasilitas">Fasilitas</button>
-				<button class="filter-btn" data-filter="tim">Tim</button>
-				<button class="filter-btn" data-filter="acara">Acara</button>
-			</div>
-
-			<div class="gallery-grid" id="galleryGrid">
+			<!-- Form hapus tersembunyi (dipakai tombol Hapus pada tabel) -->
+			<div style="display:none;">
 				@forelse($galleries as $gallery)
-				<div class="gallery-card" data-id="{{ $gallery->id }}" data-category="{{ $gallery->kategori }}" data-title="{{ $gallery->judul }}">
-					<div class="thumb">
-						<span class="category-tag">{{ $gallery->kategori_label }}</span>
-						<div class="card-actions">
-							<button type="button" class="btn-edit" title="Edit"
-								data-id="{{ $gallery->id }}"
-								data-judul="{{ $gallery->judul }}"
-								data-kategori="{{ $gallery->kategori }}"
-								data-foto="{{ $gallery->foto_url }}"
-								data-url="{{ route('admin.kelola-galeri.update', $gallery->id) }}">
-								<i class='bx bx-edit'></i>
-							</button>
-							<button type="button" class="btn-delete" title="Hapus" onclick="confirmDeleteGaleri('{{ $gallery->id }}')">
-								<i class='bx bx-trash'></i>
-							</button>
-						</div>
-						<img src="{{ $gallery->foto_url }}" alt="{{ $gallery->judul }}">
-					</div>
-					<div class="info">
-						<h4>{{ $gallery->judul }}</h4>
-						<p>Diunggah {{ $gallery->created_at->translatedFormat('d M Y') }}</p>
-					</div>
-				</div>
-				<form id="deleteFormGaleri{{ $gallery->id }}" action="{{ route('admin.kelola-galeri.destroy', $gallery->id) }}" method="POST" style="display:none;">
+				<form id="deleteFormGaleri{{ $gallery->id }}" action="{{ route('admin.kelola-galeri.destroy', $gallery->id) }}" method="POST">
 					@csrf
 					@method('DELETE')
 				</form>
@@ -553,6 +661,70 @@
 			<div class="empty-state" id="emptyState">
 				<i class='bx bx-image-alt'></i>
 				<p>Tidak ada foto pada kategori ini.</p>
+			</div>
+
+			<!-- Daftar Galeri (Tabel) -->
+			<div class="table-section">
+				<div class="table-responsive">
+					<table class="gallery-table" id="galleryTable">
+						<caption>Daftar Foto Galeri</caption>
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>Gambar</th>
+								<th>Judul</th>
+								<th>Kategori</th>
+								<th>Aksi</th>
+							</tr>
+						</thead>
+						<tbody>
+							@forelse($galleries as $index => $gallery)
+							<tr class="gallery-row" data-category="{{ $gallery->kategori }}" data-title="{{ $gallery->judul }}">
+								<td>{{ $index + 1 }}</td>
+								<td>
+									<img src="{{ $gallery->foto_url }}" alt="{{ $gallery->judul }}" class="table-thumb"
+										data-zoom
+										data-zoom-title="{{ $gallery->judul }}"
+										data-zoom-category="{{ $gallery->kategori_label }}">
+								</td>
+								<td>{{ $gallery->judul }}</td>
+								<td><span class="table-category-tag">{{ $gallery->kategori_label }}</span></td>
+								<td>
+									<div class="table-actions">
+										<button type="button" class="btn-edit" title="Edit"
+											data-id="{{ $gallery->id }}"
+											data-judul="{{ $gallery->judul }}"
+											data-kategori="{{ $gallery->kategori }}"
+											data-foto="{{ $gallery->foto_url }}"
+											data-url="{{ route('admin.kelola-galeri.update', $gallery->id) }}">
+											<i class='bx bx-edit'></i>
+										</button>
+										<button type="button" class="btn-delete" title="Hapus" onclick="confirmDeleteGaleri('{{ $gallery->id }}')">
+											<i class='bx bx-trash'></i>
+										</button>
+									</div>
+								</td>
+							</tr>
+							@empty
+							<tr>
+								<td colspan="5" class="table-empty">Belum ada foto galeri.</td>
+							</tr>
+							@endforelse
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Modal Zoom Mode Foto -->
+			<div class="zoom-modal-overlay" id="zoomModal">
+				<button type="button" class="btn-zoom-close" id="btnZoomClose" aria-label="Tutup">&times;</button>
+				<div class="zoom-stage">
+					<img src="" alt="" id="zoomImage">
+					<div class="zoom-caption">
+						<h4 id="zoomTitle"></h4>
+						<span id="zoomCategory"></span>
+					</div>
+				</div>
 			</div>
 
 			<!-- Modal Tambah/Edit Foto Galeri -->
@@ -626,38 +798,22 @@
 <script>
 		/* ================= KELOLA GALERI (khusus halaman ini) ================= */
 
-		const galleryGrid = document.getElementById('galleryGrid');
-		const galleryCards = () => Array.from(galleryGrid.querySelectorAll('.gallery-card'));
+		const galleryTableRows = () => Array.from(document.querySelectorAll('#galleryTable tbody .gallery-row'));
 		const emptyState = document.getElementById('emptyState');
-		const filterButtons = document.querySelectorAll('#galleryFilter .filter-btn');
 		const gallerySearch = document.getElementById('gallerySearch');
-
-		let activeFilter = 'all';
 
 		function applyFilters() {
 			const keyword = gallerySearch ? gallerySearch.value.trim().toLowerCase() : '';
 			let visibleCount = 0;
 
-			galleryCards().forEach(card => {
-				const matchesCategory = activeFilter === 'all' || card.dataset.category === activeFilter;
-				const matchesKeyword = card.dataset.title.toLowerCase().includes(keyword);
-				const isVisible = matchesCategory && matchesKeyword;
-				card.style.display = isVisible ? '' : 'none';
+			galleryTableRows().forEach(row => {
+				const isVisible = row.dataset.title.toLowerCase().includes(keyword);
+				row.classList.toggle('row-hidden', !isVisible);
 				if (isVisible) visibleCount++;
 			});
 
 			emptyState.classList.toggle('show', visibleCount === 0);
 		}
-
-		// Filter kategori
-		filterButtons.forEach(btn => {
-			btn.addEventListener('click', function () {
-				filterButtons.forEach(b => b.classList.remove('active'));
-				this.classList.add('active');
-				activeFilter = this.dataset.filter;
-				applyFilters();
-			});
-		});
 
 		// Pencarian
 		if (gallerySearch) {
@@ -773,8 +929,8 @@
 		btnAddGallery.addEventListener('click', () => openModal('add'));
 		btnCancelModal.addEventListener('click', closeModal);
 
-		// Edit foto (delegasi event)
-		galleryGrid.addEventListener('click', function (e) {
+		// Edit foto (delegasi event, berlaku untuk grid & tabel)
+		document.addEventListener('click', function (e) {
 			const editBtn = e.target.closest('.btn-edit');
 			if (!editBtn) return;
 			openModal('edit', {
@@ -797,6 +953,42 @@
 				uploadLabel.textContent = file.name;
 			};
 			reader.readAsDataURL(file);
+		});
+
+		/* ---------- ZOOM MODE FOTO ---------- */
+		const zoomModal    = document.getElementById('zoomModal');
+		const zoomImage    = document.getElementById('zoomImage');
+		const zoomTitle    = document.getElementById('zoomTitle');
+		const zoomCategory = document.getElementById('zoomCategory');
+		const btnZoomClose = document.getElementById('btnZoomClose');
+
+		function openZoom(src, title, category) {
+			zoomImage.src = src;
+			zoomImage.alt = title || '';
+			zoomTitle.textContent = title || '';
+			zoomCategory.textContent = category || '';
+			zoomModal.classList.add('show');
+		}
+
+		function closeZoom() {
+			zoomModal.classList.remove('show');
+			zoomImage.src = '';
+		}
+
+		document.addEventListener('click', function (e) {
+			const zoomTarget = e.target.closest('[data-zoom]');
+			if (!zoomTarget) return;
+			openZoom(zoomTarget.src, zoomTarget.dataset.zoomTitle, zoomTarget.dataset.zoomCategory);
+		});
+
+		if (btnZoomClose) btnZoomClose.addEventListener('click', closeZoom);
+		if (zoomModal) {
+			zoomModal.addEventListener('click', function (e) {
+				if (e.target === zoomModal) closeZoom();
+			});
+		}
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && zoomModal.classList.contains('show')) closeZoom();
 		});
 
 		// Inisialisasi awal

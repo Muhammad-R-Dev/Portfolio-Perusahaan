@@ -9,7 +9,8 @@
 <div class="page-wrapper">
     <div class="page-header">
         <div class="page-header-media">
-            <img class="page-header-img" src="https://images.unsplash.com/photo-1711025372958-db48a4fe0ba1?fm=jpg&q=80&w=2000&auto=format&fit=crop" alt="Wawasan Kami">
+            <!-- Background diganti ke Abstract 3D Dark Wave (Premium UI/UX vibe) -->
+            <img class="page-header-img" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop" alt="Wawasan Kami">
         </div>
         <div class="page-header-text">
             <h1>Wawasan <em>Kami</em></h1>
@@ -90,23 +91,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
     :root {
-        --ink: #0A0A0A;
-        --forest: #141414;
-        --deep-teal: #1A1A1A;
-        --primary: #111111;
-        --primary-soft: #2E2E2E;
-        --mint: #E5E5E5;
+        --ink: #094356;
+        --forest: #0A3547;
+        --deep-teal: #0d5978;
+        --primary: #094356;
+        --primary-soft: #0d5978;
+        --mint: #E7F1F3;
         --mint-bright: #FFFFFF;
-        --sage: #8A8A8A;
-        --gold: #000000;
-        --gold-soft: #4D4D4D;
-        --cream: #F5F5F5;
-        --cream-warm: #EFEFEF;
+        --sage: #6B7280;
+        --gold: #094356;
+        --gold-soft: #0d5978;
+        --cream: #FAFAFA;
+        --cream-warm: #F2F6F7;
         --ivory: #FFFFFF;
-        --stone: #E2E2E2;
-        --muted: #6E6E6E;
-        --text: #111111;
-        --text-soft: rgba(17, 17, 17, 0.68);
+        --stone: #E7E9EE;
+        --muted: #6B7280;
+        --text: #171923;
+        --text-soft: rgba(23, 25, 35, 0.68);
         --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.06);
         --shadow-lift: 0 22px 48px rgba(0, 0, 0, 0.12);
         --font-display: 'Inter', sans-serif;
@@ -164,6 +165,7 @@
         inset: 0;
         overflow: hidden;
         z-index: 0;
+        background-color: #0b0f19; /* Fallback gelap premium */
     }
     .page-header-img {
         position: absolute;
@@ -171,13 +173,15 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        opacity: 0.85; /* Sedikit dimming agar lebih menyatu dengan overlay */
     }
     .page-header::after {
         content: '';
         position: absolute;
         inset: 0;
         z-index: 1;
-        background: linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.25) 45%, transparent 72%);
+        /* Overlay gradient pekat di kiri, memudar di kanan */
+        background: linear-gradient(90deg, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.6) 45%, transparent 100%);
         pointer-events: none;
     }
     .page-header-text {

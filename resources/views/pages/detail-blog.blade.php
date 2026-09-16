@@ -105,7 +105,7 @@
             font-weight: 700;
             line-height: 1.28;
             margin: 0 0 16px;
-            color: var(--text);
+            color: var(--primary);
         }
 
         /* 2. Tanggal + kategori sejajar, dengan ikon, rata kiri */
@@ -248,7 +248,7 @@
         .tab-label {
             display: inline-block;
             vertical-align: top;
-            background: var(--text);
+            background: var(--primary);
             color: #FFFFFF;
             font-family: var(--font-heading);
             font-size: 0.82rem;
@@ -257,16 +257,10 @@
             padding: 9px 18px;
             border-radius: 4px 4px 0 0;
         }
-        .sidebar-heading.sidebar-subsep .tab-label {
-            background: var(--primary);
-        }
         .tab-line {
             display: block;
             width: 100%;
             height: 2px;
-            background: var(--text);
-        }
-        .sidebar-heading.sidebar-subsep .tab-line {
             background: var(--primary);
         }
         .sidebar-block-body {

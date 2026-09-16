@@ -467,105 +467,191 @@ main {
   margin: 0;
 }
 
-/* section Mengapa Memilih Kami */
+/* section FAQ (Pertanyaan Umum) */
 .project {
   position: relative;
   z-index: 1;
-  background: #084b5f;
-  color: #EDEDED;
+  background: #FFFFFF;
+  color: #111111;
   padding: 5rem 1.5rem 6.5rem;
-  border-top: 1px solid rgba(124, 155, 166, 0.08);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
-/* ===== Mengapa Memilih Kami: layout teks kiri + card kanan ===== */
-.mk-layout {
+/* ===== FAQ (Pertanyaan Umum): layout teks kiri + accordion kanan ===== */
+.faq-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 3.5rem;
+}
+.faq-text {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+}
+.faq-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #0a6b86;
+  background: rgba(8, 75, 95, 0.06);
+  border: 1px solid rgba(8, 75, 95, 0.18);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+.faq-text h3 { margin-bottom: 1rem; color: #111111; }
+.faq-desc { margin-bottom: 2.25rem; color: rgba(17, 17, 17, 0.62); }
+
+.faq-cta {
+  background: #FAFAFA;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 1.75rem 1.75rem 2rem;
+}
+.faq-cta h4 {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 0.6rem;
+}
+.faq-cta p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.6);
+  margin-bottom: 1.4rem;
+}
+.faq-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #084b5f;
+  color: #FFFFFF;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+.faq-cta-btn:hover {
+  background: #0a6b86;
+  transform: translateY(-2px);
+}
+
+.faq-list {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+}
+.faq-item {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+.faq-item:first-child {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+.faq-item.active {
+  background: transparent;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.faq-item.active .faq-question {
+  color: #084b5f;
+}
+.faq-question {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 3rem;
-}
-.mk-text {
-  flex: 0 0 auto;
-  width: 100%;
-  max-width: 340px;
-}
-.mk-text h3 { margin-bottom: 1rem; }
-.mk-desc { margin-bottom: 0; max-width: none; }
-
-/* ===== Mengapa Memilih Kami: 3D Card Slider (dari memilih_kami.html) ===== */
-.mk-showcase {
-  position: relative;
-  width: 100%;
-  max-width: 620px;
-  height: 480px;
-  margin: 0 0 2rem auto;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 10px;
-  perspective: 300px;
-  perspective-origin: 50% 50%;
-  flex: 1 1 auto;
-}
-.mk-slider {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  gap: 1rem;
+  background: none;
+  border: none;
   cursor: pointer;
+  text-align: left;
+  padding: 1.35rem 0;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111111;
+  transition: color 0.2s ease;
 }
-.mk-card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 400px;
-  border-radius: 10px;
+.faq-question:hover {
+  color: #084b5f;
+}
+.faq-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #111111;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.faq-item.active .faq-icon {
+  background: #084b5f;
+  border-color: #084b5f;
+  color: #FFFFFF;
+  transform: rotate(45deg);
+}
+.faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+.faq-item.active .faq-answer {
+  grid-template-rows: 1fr;
+}
+.faq-answer-inner {
   overflow: hidden;
-  transform: translate3d(-50%, -50%, 0);
-  background-color: #000;
 }
-.mk-card img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.75;
-}
-.mk-copy {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-}
-.mk-copy h1 {
-  position: relative;
-  text-align: center;
-  font-size: 2.6rem;
-  font-weight: 300;
-  letter-spacing: -0.05em;
-  text-transform: uppercase;
-  color: #dfe1c8;
-  font-family: 'Outfit', sans-serif;
+.faq-answer p {
+  padding: 0 2.4rem 1.5rem 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.62);
   margin: 0;
 }
-.mk-copy h1 span { position: relative; display: inline-block; }
 
 @media (max-width: 900px) {
-  .mk-layout { flex-direction: column; align-items: stretch; gap: 2rem; }
-  .mk-text { max-width: 100%; }
-  .mk-showcase { margin: 0 auto 1.5rem; }
+  .faq-layout { flex-direction: column; align-items: stretch; gap: 2rem; }
+  .faq-text { max-width: 100%; }
+  .faq-list { max-width: 100%; }
 }
 
 @media (min-width: 901px) {
-  .mk-desc { font-size: 1.15rem; }
+  .faq-desc { font-size: 1.15rem; }
 }
 
 @media (max-width: 500px) {
-  .mk-showcase { height: 360px; }
-  .mk-card { height: 300px; }
-  .mk-copy h1 { font-size: 1.8rem; }
+  .faq-question { padding: 1.1rem 0; font-size: 0.92rem; }
+  .faq-answer p { padding: 0 0 1.35rem; }
+  .faq-cta { padding: 1.5rem 1.4rem 1.75rem; }
 }
 
 /* media queries */
@@ -763,27 +849,27 @@ main {
 
 <main>
   <div class="vignette"></div>
-  <img src="img/background.png" loading="eager" data-speedx="0.3" data-distance="-200" data-rotation="0" data-speedy="0.38" data-speedz="0" alt="" class="parallax bg-img">
+  <img src="img/bg.png" loading="eager" data-speedx="0.3" data-distance="-200" data-rotation="0" data-speedy="0.38" data-speedz="0" alt="" class="parallax bg-img">
   <img src="img/fog_7.png" loading="lazy" data-speedx="0.27" data-distance="850" data-rotation="0" data-speedz="0" data-speedy="0.32" alt="" class="parallax fog-7">
-  <img src="img/mountain_10.png" data-speedx="0.195" data-distance="1100" data-rotation="0" data-speedz="0" data-speedy="0.305" alt="" class="parallax mountain-10">
-  <img src="img/fog_6.png" data-speedx="0.25" data-distance="1400" data-rotation="0" data-speedz="0" data-speedy="0.28" alt="" class="parallax fog-6">
-  <img src="img/mountain_9.png" data-speedx="0.125" data-distance="1700" data-rotation="0.02" data-speedz="0.15" data-speedy="0.155" alt="" class="parallax mountain-9">
-  <img src="img/k1.png" data-speedx="0.1" data-distance="1800" data-rotation="0.02" data-speedz="0" data-speedy="0.11" alt="" class="parallax mountain-8">
-  <img src="img/fog_5.png" data-speedx="0.16" data-distance="1900" data-rotation="0" data-speedz="0" data-speedy="0.105" alt="" class="parallax fog-5">
+  <img src="img/g10v2.png" data-speedx="0.195" data-distance="1100" data-rotation="0" data-speedz="0" data-speedy="0.305" alt="" class="parallax mountain-10">
+  <img src="img/fo_6.png" data-speedx="0.25" data-distance="1400" data-rotation="0" data-speedz="0" data-speedy="0.28" alt="" class="parallax fog-6">
+  <img src="img/g9v2.png" data-speedx="0.125" data-distance="1700" data-rotation="0.02" data-speedz="0.15" data-speedy="0.155" alt="" class="parallax mountain-9">
+  <img src="img/g8v3.png" data-speedx="0.1" data-distance="1800" data-rotation="0.02" data-speedz="0" data-speedy="0.11" alt="" class="parallax mountain-8">
+  <img src="img/fo_5.png" data-speedx="0.16" data-distance="1900" data-rotation="0" data-speedz="0" data-speedy="0.105" alt="" class="parallax fog-5">
   <img src="img/mountain.jpeg" data-speedx="0.1" data-distance="2000" data-rotation="0.09" data-speedz="0" data-speedy="0.1" alt="" class="parallax mountain-7">
   <div class="text parallax" data-speedx="0.07" data-rotation="0.11" data-speedz="0" data-speedy="0.07">
     <h1>Astabrata </h1>
     <h2>Teknologi</h2>
   </div>
-  <img src="img/mountain_6.png" data-speedx="0.065" data-distance="2300" data-rotation="0.12" data-speedz="0.05" data-speedy="0.05" alt="" class="parallax mountain-6">
-  <img src="img/fog_4.png" data-speedx="0.135" data-distance="2400" data-rotation="0" data-speedz="0" data-speedy="0.04" alt="" class="parallax fog-4">
-  <img src="img/mountain_5.png" data-speedx="0.08" data-distance="2550" data-rotation="0.1" data-speedz="0.13" data-speedy="0.03" alt="" class="parallax mountain-5">
-  <img src="img/fog_3.png" data-speedx="0.11" data-distance="2800" data-rotation="0" data-speedz="0" data-speedy="0.018" alt="" class="parallax fog-3">
-  <img src="img/mountain_4.png" data-speedx="0.059" data-distance="3200" data-rotation="0.14" data-speedz="0" data-speedy="0.024" alt="" class="parallax mountain-4">
-  <img src="img/mountain_3.png" data-speedx="0.04" data-distance="3400" data-rotation="0.05" data-speedz="0.32" data-speedy="0.018" alt="" class="parallax mountain-3">
+  <img src="img/mountai_6.png" data-speedx="0.065" data-distance="2300" data-rotation="0.12" data-speedz="0.05" data-speedy="0.05" alt="" class="parallax mountain-6">
+  <img src="img/fo_4.png" data-speedx="0.135" data-distance="2400" data-rotation="0" data-speedz="0" data-speedy="0.04" alt="" class="parallax fog-4">
+  <img src="img/mountai_5.png" data-speedx="0.08" data-distance="2550" data-rotation="0.1" data-speedz="0.13" data-speedy="0.03" alt="" class="parallax mountain-5">
+  <img src="img/fo_3.png" data-speedx="0.11" data-distance="2800" data-rotation="0" data-speedz="0" data-speedy="0.018" alt="" class="parallax fog-3">
+  <img src="img/mountai_4.png" data-speedx="0.059" data-distance="3200" data-rotation="0.14" data-speedz="0" data-speedy="0.024" alt="" class="parallax mountain-4">
+  <img src="img/mountai_3.png" data-speedx="0.04" data-distance="3400" data-rotation="0.05" data-speedz="0.32" data-speedy="0.018" alt="" class="parallax mountain-3">
   <img src="img/fog_2.png" data-speedx="0.15" data-distance="3600" data-rotation="0" data-speedz="0" data-speedy="0.0115" alt="" class="parallax fog-2">
-  <img src="img/mountain_2.png" data-speedx="0.0235" data-distance="3800" data-rotation="0.15" data-speedz="0" data-speedy="0.013" alt="" class="parallax mountain-2">
-  <img src="img/mountain_1.png" data-speedx="0.027" data-distance="4000" data-rotation="0.2" data-speedz="0.53" data-speedy="0.018" alt="" class="parallax mountain-1">
+  <img src="img/mountai_2.png" data-speedx="0.0235" data-distance="3800" data-rotation="0.15" data-speedz="0" data-speedy="0.013" alt="" class="parallax mountain-2">
+  <img src="img/.png" data-speedx="0.027" data-distance="4000" data-rotation="0.2" data-speedz="0.53" data-speedy="0.018" alt="" class="parallax mountain-1">
   <img src="img/sun_rays.png" alt="" class="sun-rays">
   <img src="img/black_shadow.png" alt="" class="black-shadow">
   <img src="img/fog_1.png" data-speedx="0.12" data-distance="4200" data-rotation="0" data-speedz="0" data-speedy="0.01" alt="" class="parallax fog-1">
@@ -817,7 +903,7 @@ main {
     <p>Solusi teknologi modern yang telah dipercaya banyak klien di berbagai industri.</p>
     <div class="trust-rating">
       <span class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
-      <span><b>5/5</b> <span class="count">(500+ Klien)</span></span>
+      <span><b>4,6/5</b> <span class="count">(200+ Klien)</span></span>
     </div>
   </div>
 
@@ -1163,7 +1249,7 @@ main {
 
 <section class="tentang-kami-cloneable">
   <div class="tentang-kami-top">
-    <span class="eyebrow reveal">Tentang Kami</span>
+    <span class="eyebrow reveal">Selamat Datang di </span>
   </div>
   <div data-tabs="wrapper" class="tab-layout">
     <!-- Deskripsi / Teks Tampil Pertama di Layar HP -->
@@ -1184,27 +1270,7 @@ main {
                   digital yang berkesan bagi penggunanya.
                 </p>
               </div>
-              <div data-tabs="content-item" class="tab-content-item">
-                <h2 data-tabs-fade="" class="tab-content__heading">Delapan Unsur Kepemimpinan</h2>
-                <p data-tabs-fade="" class="content-p">
-                  Nama "Astabrata" diambil dari filosofi kepemimpinan delapan unsur alam &mdash; matahari,
-                  bulan, bintang, angin, awan, api, bumi, dan air &mdash; yang menjadi landasan nilai kami
-                  dalam bekerja: konsisten, adaptif, dan senantiasa memberi manfaat.
-                </p>
-              </div>
-              <div data-tabs="content-item" class="tab-content-item">
-                <h2 data-tabs-fade="" class="tab-content__heading">Tim &amp; Kualitas</h2>
-                <p data-tabs-fade="" class="content-p">
-                  Didukung tenaga profesional berpengalaman, kami merancang solusi custom sesuai
-                  kebutuhan klien dengan standar pengembangan yang rapi, teruji, dan didukung
-                  pendampingan berkelanjutan pasca peluncuran.
-                </p>
-              </div>
             </div>
-            <a id="form-button" href="{{ url('/kontak') }}" class="tab-content__button w-inline-block">
-              <p class="content-p">Hubungi Kami</p>
-              <div class="content-button__bg"></div>
-            </a>
           </div>
         </div>
       </div>
@@ -1213,9 +1279,9 @@ main {
     <!-- Gambar Tampil di Bawah Deskripsi pada Layar HP -->
     <div class="tab-layout-col">
       <div data-tabs="visual-wrap" class="tab-visual-wrap">
-        <div data-tabs="visual-item" class="tab-visual-item active"><img src="https://cdn.prod.website-files.com/67726722d415dc401ae23cf6/677289e14dd4dbca1d8e5930_philip-oroni-IANBrm46bF0-unsplash%20(2).avif" loading="lazy" alt="Tim PT Astabrata Teknologi berkolaborasi" class="tab-image"></div>
-        <div data-tabs="visual-item" class="tab-visual-item"><img src="https://cdn.prod.website-files.com/67726722d415dc401ae23cf6/677289e19e4d013c6a4c5a1b_philip-oroni-Zx_G3LpNnV4-unsplash%20(1).avif" loading="lazy" alt="Diskusi tim Astabrata Teknologi" class="tab-image"></div>
-        <div data-tabs="visual-item" class="tab-visual-item"><img src="https://cdn.prod.website-files.com/67726722d415dc401ae23cf6/677289e1c88b5b4c14d1e6fd_philip-oroni-h9N7bm-HRCo-unsplash.avif" loading="lazy" alt="Proses pengembangan produk digital" class="tab-image"></div>
+      <div data-tabs="visual-item" class="tab-visual-item active">
+    <img src="{{ asset('image/beranda.jpeg') }}" loading="lazy" alt="Tim PT Astabrata Teknologi berkolaborasi" class="tab-image">
+</div>
       </div>
     </div>
   </div>
@@ -1895,67 +1961,83 @@ if ('paintWorklet' in CSS) {
 </script>
 @endpush
 
-<section class="project">
+<section class="project" id="faq">
   <div class="project-inner">
-    <div class="mk-layout">
-      <div class="mk-text">
-        <h3 class="reveal">Mengapa Memilih Kami</h3>
-        <p class="section-subtitle reveal mk-desc">
-          Kami membantu bisnis Anda berkembang lewat solusi digital yang dikerjakan tim berpengalaman, berkualitas, dan didukung penuh dari awal hingga selesai.
+    <div class="faq-layout">
+      <div class="faq-text">
+        <span class="faq-eyebrow reveal">FAQ</span>
+        <h3 class="reveal">Pertanyaan Umum</h3>
+        <p class="section-subtitle reveal faq-desc">
+          Beberapa hal yang paling sering ditanyakan calon klien sebelum memulai proyek bersama kami.
         </p>
-      </div>
-      <div class="mk-showcase reveal">
-      <div class="mk-slider">
-        <div class="mk-card">
-          <img
-            src="https://images.unsplash.com/photo-1689602037070-fec2eca3f5b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Tim Berpengalaman"
-          />
-          <div class="mk-copy">
-            <h1>Tim Berpengalaman</h1>
-          </div>
-        </div>
 
-        <div class="mk-card">
-          <img
-            src="https://images.unsplash.com/photo-1718125188885-7ce699512931?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Kualitas Terjamin"
-          />
-          <div class="mk-copy">
-            <h1>Kualitas Terjamin</h1>
-          </div>
-        </div>
-
-        <div class="mk-card">
-          <img
-            src="https://images.unsplash.com/photo-1718116088537-212b192d1ad9?q=80&w=2075&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Harga Kompetitif"
-          />
-          <div class="mk-copy">
-            <h1>Harga Kompetitif</h1>
-          </div>
-        </div>
-
-        <div class="mk-card">
-          <img
-            src="https://images.unsplash.com/photo-1718194822494-47de8fb7922c?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Dukungan Purna Jual"
-          />
-          <div class="mk-copy">
-            <h1>Dukungan Purna Jual</h1>
-          </div>
-        </div>
-
-        <div class="mk-card">
-          <img
-            src="https://images.unsplash.com/photo-1713970700051-556d05c59fce?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Solusi Custom"
-          />
-          <div class="mk-copy">
-            <h1>Solusi Custom</h1>
-          </div>
+        <div class="faq-cta reveal">
+          <h4>Masih punya pertanyaan?</h4>
+          <p>Tidak menemukan jawaban yang Anda cari? Hubungi kami dan tim kami akan membalas secepat mungkin.</p>
+          <a href="{{ url('/contact') }}" class="faq-cta-btn">Hubungi</a>
         </div>
       </div>
+
+      <div class="faq-list reveal">
+        <div class="faq-item active">
+          <button class="faq-question" type="button" aria-expanded="true">
+            <span>Berapa lama estimasi waktu pengerjaan proyek?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <p>Tergantung kompleksitas dan scope pekerjaan, umumnya proyek website atau aplikasi selesai dalam 2–6 minggu. Kami akan memberikan timeline yang jelas setelah kebutuhan Anda dibahas di awal.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            <span>Bagaimana sistem pembayarannya?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <p>Pembayaran dilakukan secara bertahap, biasanya 50% di awal sebagai DP untuk memulai pengerjaan dan 50% sisanya setelah proyek selesai dan disetujui. Untuk proyek besar, tahapan pembayaran bisa disesuaikan.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            <span>Apakah tersedia revisi setelah pengerjaan?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <p>Ya, setiap paket sudah termasuk sejumlah revisi gratis selama masa pengerjaan agar hasil akhir sesuai dengan kebutuhan Anda. Revisi tambahan di luar ketentuan dapat didiskusikan lebih lanjut.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            <span>Apakah ada garansi atau dukungan setelah proyek selesai?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <p>Tentu. Kami menyediakan dukungan purna jual untuk perbaikan bug dan pendampingan setelah website atau aplikasi Anda live, sehingga Anda tidak dibiarkan berjalan sendiri.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            <span>Bagaimana cara memulai proyek dengan kami?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              <p>Cukup hubungi kami melalui email atau form kontak dengan kebutuhan proyek Anda. Tim kami akan menjadwalkan diskusi awal untuk memahami kebutuhan dan memberikan penawaran yang sesuai.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1964,78 +2046,26 @@ if ('paintWorklet' in CSS) {
 @push('scripts')
 <script>
 (function () {
-  const mkSlider = document.querySelector('.mk-slider');
-  if (!mkSlider) return;
+  const faqItems = document.querySelectorAll('.faq-item');
+  if (!faqItems.length) return;
 
-  // Buat easing khusus (gsap & CustomEase sudah dimuat/registrasi sebelumnya di halaman ini)
-  if (typeof CustomEase !== "undefined" && !CustomEase.get("mk-cubic")) {
-    CustomEase.create("mk-cubic", "0.83, 0, 0.17, 1");
-  }
-  const mkEase = (typeof CustomEase !== "undefined") ? "mk-cubic" : "power3.inOut";
+  faqItems.forEach((item) => {
+    const question = item.querySelector('.faq-question');
+    if (!question) return;
 
-  let mkAnimating = false;
+    question.addEventListener('click', () => {
+      const isActive = item.classList.contains('active');
 
-  function mkSplitTextIntoSpans(selector) {
-    document.querySelectorAll(selector).forEach(element => {
-      let text = element.innerText;
-      element.innerHTML = text
-        .split("")
-        .map(char => `<span>${char === " " ? "&nbsp;&nbsp;" : char}</span>`)
-        .join("");
-    });
-  }
+      faqItems.forEach((other) => {
+        other.classList.remove('active');
+        const otherBtn = other.querySelector('.faq-question');
+        if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+      });
 
-  function mkInitializeCards() {
-    let cards = Array.from(mkSlider.querySelectorAll(".mk-card"));
-    gsap.to(cards, {
-      y: i => -15 + 15 * i + "%",
-      z: i => 15 * i,
-      duration: 1,
-      ease: mkEase,
-      stagger: -0.1
-    });
-  }
-
-  mkSplitTextIntoSpans(".mk-copy h1");
-  mkInitializeCards();
-
-  gsap.set(".mk-slider h1 span", { y: -200 });
-  gsap.set(".mk-slider .mk-card:last-child h1 span", { y: 0 });
-
-  mkSlider.addEventListener("click", () => {
-    if (mkAnimating) return;
-    mkAnimating = true;
-
-    let cards = Array.from(mkSlider.querySelectorAll(".mk-card"));
-    let lastCard = cards.pop();
-    let nextCard = cards[cards.length - 1];
-
-    gsap.to(lastCard.querySelectorAll("h1 span"), {
-      y: 200,
-      duration: 0.75,
-      ease: mkEase
-    });
-
-    gsap.to(lastCard, {
-      y: "+=150%",
-      duration: 0.75,
-      ease: mkEase,
-      onComplete: () => {
-        mkSlider.prepend(lastCard);
-        mkInitializeCards();
-        gsap.set(lastCard.querySelectorAll("h1 span"), { y: -200 });
-
-        setTimeout(() => {
-          mkAnimating = false;
-        }, 1000);
+      if (!isActive) {
+        item.classList.add('active');
+        question.setAttribute('aria-expanded', 'true');
       }
-    });
-
-    gsap.to(nextCard.querySelectorAll("h1 span"), {
-      y: 0,
-      duration: 1,
-      ease: mkEase,
-      stagger: 0.05
     });
   });
 })();

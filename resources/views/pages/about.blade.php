@@ -76,12 +76,26 @@
         </div>
         <div class="gallery-grid">
             @forelse($galleries as $gallery)
-                <img src="{{ $gallery->foto_url }}" alt="{{ $gallery->judul }}">
+                <!-- Class gallery-item dan data-caption untuk fitur Lightbox -->
+                <img src="{{ $gallery->foto_url }}" class="gallery-item" data-caption="{{ $gallery->judul }}" alt="{{ $gallery->judul }}">
             @empty
-                <img src="{{ asset('image/asta1.png') }}" alt="Galeri Astabrata">
+                <img src="{{ asset('image/asta1.png') }}" class="gallery-item" data-caption="Galeri Astabrata" alt="Galeri Astabrata">
             @endforelse
         </div>
     </section>
+</div>
+
+<!-- Modal Zoom Gambar (Lightbox) dengan fitur Slide -->
+<div id="imageModal" class="custom-modal">
+    <span class="close-modal">&times;</span>
+    <button class="modal-nav-btn prev-btn" id="modalPrev" aria-label="Previous image">&#10094;</button>
+    <button class="modal-nav-btn next-btn" id="modalNext" aria-label="Next image">&#10095;</button>
+    
+    <div class="modal-content-wrapper">
+        <img class="modal-content" id="zoomedImage">
+        <!-- Teks deskripsi melayang di atas gambar -->
+        <div id="modalCaption" class="modal-caption"></div>
+    </div>
 </div>
 
 @push('styles')
@@ -290,8 +304,6 @@
         position: relative;
     }
 
-    /* Judul "Tim Kami" sekarang di DALAM kartu, jadi cukup dikasih jarak
-       bawah yang nyaman dari slider-nya, lebar dibatasi supaya tetap rapi */
     .th-card-wrapper .section-heading {
         max-width: 640px;
         margin-left: auto;
@@ -336,7 +348,6 @@
         will-change: transform;
     }
 
-    /* ===== CARD PROFIL - Kotak sudut lengkung (semua sudut) ===== */
     .th-card {
         position: absolute;
         top: 50%;
@@ -347,7 +358,7 @@
         transform-style: preserve-3d;
         cursor: pointer;
         will-change: transform, clip-path;
-        border-radius: 20px;
+        border-radius: 6px;
         box-shadow: 
             0 18px 40px rgba(9, 67, 86, 0.14),
             0 6px 16px rgba(9, 67, 86, 0.06);
@@ -361,7 +372,7 @@
         min-height: 0;
         overflow: hidden;
         background: #eef3f3;
-        border-radius: 20px 20px 0 0;
+        border-radius: 6px 6px 0 0;
     }
 
     .th-card-photo img {
@@ -380,9 +391,14 @@
         flex: 0 0 auto;
         padding: 14px 12px 16px;
         text-align: center;
-        background: #ffffff;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)),
+            url('{{ asset('image/bg-batik.png') }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         border-top: 1px solid rgba(9, 67, 86, 0.06);
-        border-radius: 0 0 20px 20px;
+        border-radius: 0 0 6px 6px;
     }
 
     .th-card-name h3 {
@@ -393,6 +409,8 @@
         line-height: 1.25;
         font-weight: 800;
         word-break: break-word;
+        position: relative;
+        z-index: 1;
     }
 
     .th-card-name p {
@@ -403,6 +421,8 @@
         line-height: 1.3;
         font-weight: 500;
         word-break: break-word;
+        position: relative;
+        z-index: 1;
     }
 
     .th-card::before,
@@ -420,7 +440,7 @@
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: 2;
-        border-radius: 20px 20px 0 0;
+        border-radius: 6px 6px 0 0;
     }
 
     .th-card:hover .th-card-photo .th-hover-overlay {
@@ -600,6 +620,125 @@
             max-height: 360px;
         }
     }
+
+    /* ===== LIGHTBOX MODAL CSS ===== */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: rgba(11, 15, 25, 0.92);
+        backdrop-filter: blur(6px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .custom-modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+    }
+
+    .modal-content-wrapper {
+        position: relative;
+        max-width: 90%;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: zoomIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .modal-content {
+        max-width: 100%;
+        max-height: 80vh; /* Sedikit dilebarkan biar puas */
+        border-radius: 12px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        object-fit: contain;
+    }
+
+    /* Teks Caption diubah posisinya melayang (di atas/overlapping bagian bawah gambar) */
+    .modal-caption {
+        position: absolute;
+        bottom: 25px; /* Naik numpuk ke atas gambar */
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ffffff;
+        font-family: var(--font-body, 'Poppins', sans-serif);
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-align: center;
+        background: rgba(30, 36, 44, 0.85); /* Warna gelap estetik buat pill */
+        padding: 8px 24px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        z-index: 10;
+        pointer-events: none; /* Biar ngga ganggu kalau ngeklik */
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #ffffff;
+        font-size: 40px;
+        font-weight: 300;
+        cursor: pointer;
+        z-index: 10000;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .close-modal:hover {
+        color: #ff6b35;
+        transform: scale(1.1);
+    }
+
+    /* Tombol Geser Kiri-Kanan */
+    .modal-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff; 
+        border: none;
+        font-size: 2.5rem;
+        padding: 15px 20px;
+        cursor: pointer;
+        border-radius: 12px;
+        z-index: 10001;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-nav-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .prev-btn { left: 4%; }
+    .next-btn { right: 4%; }
+
+    @media (max-width: 768px) {
+        .modal-nav-btn { font-size: 1.8rem; padding: 10px 15px; }
+        .prev-btn { left: 2%; }
+        .next-btn { right: 2%; }
+        .modal-caption { bottom: 15px; font-size: 0.85rem; padding: 6px 18px; }
+    }
+
+    @keyframes zoomIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
 </style>
 @endpush
 
@@ -723,10 +862,6 @@
                 }));
             }
 
-            // Posisi relatif kartu (belum di-clamp ke rentang slot template) terhadap
-            // kartu yang sedang jadi fokus (offsetVal). Nilai ini yang dipakai untuk
-            // mendeteksi kapan sebuah kartu "melewati batas belakang" (wrap), terlepas
-            // dari berapa pun jumlah kartunya.
             computeRel(i, offsetVal) {
                 const half = Math.floor(this.totalCards / 2);
                 let rel = ((i - offsetVal) % this.totalCards + this.totalCards) % this.totalCards;
@@ -734,13 +869,6 @@
                 return rel;
             }
 
-            // Menghitung slot posisi (index ke BASE_POSITIONS) berdasarkan jarak relatif
-            // kartu terhadap kartu yang sedang fokus (offsetVal), lalu dipusatkan di
-            // CENTER_SLOT. Ini membuat carousel tetap tampil benar walau jumlah kartu
-            // (this.totalCards) jauh lebih sedikit dari BASE_POSITIONS.length (11),
-            // karena sebelumnya slot dihitung modulo totalCards sehingga kartu-kartu
-            // dengan jumlah sedikit selalu jatuh di slot 0/1 (posisi ekstrem kiri,
-            // bukan di tengah) dan jadi terlihat seperti tidak tampil.
             computeSlot(i, offsetVal) {
                 const rel = this.computeRel(i, offsetVal);
                 const slot = CENTER_SLOT + rel;
@@ -915,14 +1043,6 @@
                     const newRel = this.computeRel(index, this.offset);
                     const pos = this.positions[this.getSlot(index)];
 
-                    // FIX: wrap dideteksi dari lompatan posisi RELATIF (bukan slot 0/10
-                    // yang di-hardcode). Sebelumnya, untuk jumlah anggota tim yang sedikit,
-                    // kartu yang seharusnya "muter ke belakang layar" tidak pernah menyentuh
-                    // slot 0/10 sehingga efek fade-nya tidak pernah aktif — kartu itu malah
-                    // digeser paksa lewat tengah dan kelihatan lompat/glitch. Sekarang, kartu
-                    // manapun yang lompat lebih dari 1 posisi otomatis dianggap wrap dan
-                    // di-fade dulu (jadi tak terlihat) sebelum muncul lagi di sisi
-                    // seberangnya — persis efek "lewat belakang layar" yang diinginkan.
                     const isWrap = Math.abs(newRel - oldRel) > 1;
 
                     if (isWrap) {
@@ -988,6 +1108,9 @@
                 }, { passive: false });
 
                 document.addEventListener('keydown', (e) => {
+                    // Cek biar ga bentrok sama slider Galeri Lightbox kalau lagi kebuka
+                    if (document.getElementById('imageModal').classList.contains('show')) return;
+
                     if (e.key === 'Escape' && this.expandedCard) {
                         this.closeCard();
                     } else if (e.key === 'ArrowLeft' && !this.expandedCard) {
@@ -1047,6 +1170,77 @@
             new TeamHtmlSlider();
         });
     })();
+
+    /* ===== LIGHTBOX MODAL JS (Dengan Fitur Slide) ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("zoomedImage");
+        const captionText = document.getElementById("modalCaption");
+        const closeBtn = document.querySelector(".close-modal");
+        const prevBtn = document.getElementById("modalPrev");
+        const nextBtn = document.getElementById("modalNext");
+        
+        // Ambil semua gambar galeri jadikan array
+        const images = Array.from(document.querySelectorAll(".gallery-item"));
+        let currentIndex = 0;
+
+        // Buka gambar sesuai index
+        function openModal(index) {
+            currentIndex = index;
+            updateModalContent();
+            modal.classList.add("show");
+        }
+
+        // Update gambar & caption pas digeser
+        function updateModalContent() {
+            const img = images[currentIndex];
+            modalImg.src = img.src;
+            
+            let caption = img.getAttribute("data-caption");
+            captionText.innerHTML = caption ? caption : "Galeri PT Astabrata Teknologi";
+        }
+
+        // Fungsi Tombol Prev & Next
+        function showPrev(e) {
+            if (e) e.stopPropagation();
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            updateModalContent();
+        }
+
+        function showNext(e) {
+            if (e) e.stopPropagation();
+            currentIndex = (currentIndex + 1) % images.length;
+            updateModalContent();
+        }
+
+        // Pasang event klik di semua gambar
+        images.forEach((img, index) => {
+            img.addEventListener("click", () => openModal(index));
+        });
+
+        // Event Tombol Navigasi Modal
+        if (prevBtn) prevBtn.addEventListener("click", showPrev);
+        if (nextBtn) nextBtn.addEventListener("click", showNext);
+        if (closeBtn) closeBtn.addEventListener("click", () => modal.classList.remove("show"));
+
+        // Tutup Modal kalau background luar di-klik
+        if (modal) {
+            modal.addEventListener("click", function(e) {
+                if (e.target === modal || e.target.classList.contains('modal-content-wrapper')) {
+                    modal.classList.remove("show");
+                }
+            });
+        }
+
+        // Kontrol Keyboard (Kiri-Kanan) khusus Lightbox
+        document.addEventLisatener('keydown', function(e) {
+            if (!modal.classList.contains('show')) return;
+            
+            if (e.key === 'Escape') modal.classList.remove("show");
+            if (e.key === 'ArrowLeft') showPrev();
+            if (e.key === 'ArrowRight') showNext();
+        });
+    });
 </script>
 @endpush
 @endsection

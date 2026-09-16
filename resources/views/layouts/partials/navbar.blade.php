@@ -113,6 +113,14 @@
         backdrop-filter: none !important;
     }
 
+    /* Halaman selain Beranda (About, Blog, Contact, dll): navbar putih solid dari atas,
+       tidak transparan, tampilannya sama seperti kondisi sudah discroll */
+    .header.header--pinned {
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+        backdrop-filter: blur(10px);
+    }
+
     /* ------- Side Navigation Menu ------- */
     .nav {
       z-index: 2000;
@@ -268,10 +276,60 @@
     }
 
     .socials-row {
-      grid-column-gap: 1.5em;
-      grid-row-gap: 1.5em;
+      grid-column-gap: 1em;
+      grid-row-gap: 1em;
       flex-flow: row;
+      align-items: center;
       display: flex;
+    }
+
+    /* ------- Social Media Icons ------- */
+    .social-icon-link {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #FFFFFF;
+      border: 1px solid rgba(11, 74, 86, 0.16);
+      color: #093B45;
+      box-shadow: 0 2px 10px rgba(9, 59, 69, 0.08);
+      transition: background-color 0.3s ease, color 0.3s ease,
+                  border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .social-icon-link svg {
+      width: 19px;
+      height: 19px;
+      transition: transform 0.35s cubic-bezier(.65, .05, 0, 1);
+    }
+
+    @media (hover: hover) {
+      .social-icon-link:hover {
+        background-color: #0B4A56;
+        border-color: #0B4A56;
+        color: #FFFFFF;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(9, 59, 69, 0.28);
+      }
+
+      .social-icon-link:hover svg {
+        transform: scale(1.12);
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      .social-icon-link {
+        width: 38px;
+        height: 38px;
+      }
+
+      .social-icon-link svg {
+        width: 16px;
+        height: 16px;
+      }
     }
 
     .p-large {
@@ -483,7 +541,7 @@
 </style>
 
 <div class="osmo-ui">
-  <header class="header" id="navHeader">
+  <header class="header @unless (request()->routeIs('home')) header--pinned @endunless" id="navHeader">
       <nav class="nav-row">
         <div class="nav-left">
           @unless (request()->routeIs('home'))
@@ -573,9 +631,23 @@
       <div class="menu-details">
         <p data-menu-fade="" class="p-small">Socials</p>
         <div class="socials-row">
-          <a data-menu-fade="" href="#" class="p-large text-link">Instagram</a>
-          <a data-menu-fade="" href="#" class="p-large text-link">LinkedIn</a>
-          <a data-menu-fade="" href="#" class="p-large text-link">X/Twitter</a>
+          <a data-menu-fade="" href="#" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+          <a data-menu-fade="" href="#" class="social-icon-link" aria-label="LinkedIn" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.446-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.266 2.37 4.266 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452z"></path>
+            </svg>
+          </a>
+          <a data-menu-fade="" href="#" class="social-icon-link" aria-label="X / Twitter" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
