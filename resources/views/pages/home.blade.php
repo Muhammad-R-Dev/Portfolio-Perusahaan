@@ -596,6 +596,8 @@ main {
 .faq-question:hover {
   color: #084b5f;
 }
+
+/* Modifikasi Ikon FAQ menjadi Ikon SVG Pesawat Kertas */
 .faq-icon {
   flex-shrink: 0;
   width: 28px;
@@ -607,17 +609,18 @@ main {
   background: transparent;
   border: 1px solid rgba(0, 0, 0, 0.15);
   color: #111111;
-  font-size: 1.05rem;
-  font-weight: 400;
-  line-height: 1;
-  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
+
+/* Animasi Pesawat Kertas saat aktif */
 .faq-item.active .faq-icon {
   background: #084b5f;
   border-color: #084b5f;
   color: #FFFFFF;
-  transform: rotate(45deg);
+  /* Pesawat menukik tajam ke arah atas */
+  transform: rotate(-45deg) scale(1.1); 
 }
+
 .faq-answer {
   display: grid;
   grid-template-rows: 0fr;
@@ -1982,7 +1985,13 @@ if ('paintWorklet' in CSS) {
         <div class="faq-item active">
           <button class="faq-question" type="button" aria-expanded="true">
             <span>Berapa lama estimasi waktu pengerjaan proyek?</span>
-            <span class="faq-icon">+</span>
+            <span class="faq-icon">
+              <!-- SVG Pesawat Kertas Pengganti (+) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </span>
           </button>
           <div class="faq-answer">
             <div class="faq-answer-inner">
@@ -1994,7 +2003,12 @@ if ('paintWorklet' in CSS) {
         <div class="faq-item">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Bagaimana sistem pembayarannya?</span>
-            <span class="faq-icon">+</span>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </span>
           </button>
           <div class="faq-answer">
             <div class="faq-answer-inner">
@@ -2006,7 +2020,12 @@ if ('paintWorklet' in CSS) {
         <div class="faq-item">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Apakah tersedia revisi setelah pengerjaan?</span>
-            <span class="faq-icon">+</span>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </span>
           </button>
           <div class="faq-answer">
             <div class="faq-answer-inner">
@@ -2018,7 +2037,12 @@ if ('paintWorklet' in CSS) {
         <div class="faq-item">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Apakah ada garansi atau dukungan setelah proyek selesai?</span>
-            <span class="faq-icon">+</span>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </span>
           </button>
           <div class="faq-answer">
             <div class="faq-answer-inner">
@@ -2030,7 +2054,12 @@ if ('paintWorklet' in CSS) {
         <div class="faq-item">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Bagaimana cara memulai proyek dengan kami?</span>
-            <span class="faq-icon">+</span>
+            <span class="faq-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </span>
           </button>
           <div class="faq-answer">
             <div class="faq-answer-inner">

@@ -1,8 +1,11 @@
 <!-- SIDEBAR -->
 <section id="sidebar">
 	<a href="#" class="brand">
-		<i class='bx bxs-smile  bx-lg'></i>
-		<span class="text">AdminHub</span>
+		<img src="{{ asset('img/logo asta.png') }}" alt="Logo" class="brand-logo">
+		<span class="text brand-text">
+			<span class="brand-astabrata">Astabrata</span>
+			<span class="brand-teknologi">Teknologi</span>
+		</span>
 	</a>
 	<ul class="side-menu top">
 		<li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">

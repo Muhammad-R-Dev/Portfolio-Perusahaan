@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@yield('title', 'AdminHub Admin')</title>
+	<link rel="icon" type="image/png" href="{{ asset('img/logo asta.png') }}">
 
 	<!-- Boxicons (pakai cdnjs, lebih jarang diblokir Shields/ad-blocker dibanding unpkg) -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css">
@@ -41,6 +42,7 @@
 			--light-yellow: #FFF2C6;
 			--orange: #FD7238;
 			--light-orange: #FFE0D3;
+			--brand-accent: #084154;
 		}
 
 		html {
@@ -51,6 +53,7 @@
 			--light: #0C0C1E;
 			--grey: #060714;
 			--dark: #FBFBFB;
+			--brand-accent: #3FA7C7;
 		}
 
 		body {
@@ -81,7 +84,7 @@
 		#sidebar .brand {
 			font-size: 24px;
 			font-weight: 700;
-			height: 56px;
+			height: 64px;
 			display: flex;
 			align-items: center;
 			color: var(--blue);
@@ -98,9 +101,47 @@
 			display: flex;
 			justify-content: center;
 		}
+		#sidebar .brand .brand-logo {
+			min-width: 56px;
+			max-width: 60px;
+			height: 42px;
+			width: auto;
+			object-fit: contain;
+			display: flex;
+			justify-content: center;
+			padding: 0 8px;
+		}
+		#sidebar.hide .brand .brand-logo {
+			max-width: 40px;
+			height: 30px;
+			padding: 0 6px;
+		}
+		#sidebar .brand .brand-text {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			line-height: 1;
+			gap: 1px;
+		}
+		#sidebar .brand .brand-astabrata,
+		#sidebar .brand .brand-teknologi {
+			font-size: 13px;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+		#sidebar .brand .brand-astabrata {
+			color: var(--dark);
+		}
+		#sidebar .brand .brand-teknologi {
+			color: var(--brand-accent);
+			letter-spacing: .5px;
+		}
+		#sidebar.hide .brand .brand-text {
+			display: none;
+		}
 		#sidebar .side-menu {
 			width: 100%;
-			margin-top: 48px;
+			margin-top: 24px;
 		}
 		#sidebar .side-menu li {
 			height: 48px;
@@ -586,21 +627,26 @@
 		window.addEventListener('resize', adjustSidebar);
 
 		// Toggle tombol pencarian (mobile)
+		// Catatan: div .form-input saat ini kosong (tidak ada <input>/<button> di dalamnya),
+		// jadi querySelector di bawah ini bisa saja mengembalikan null. Diberi pengecekan
+		// null supaya tidak melempar error yang menghentikan sisa script (termasuk dark/light mode).
 		const searchButton = document.querySelector('#content nav form .form-input button');
 		const searchButtonIcon = document.querySelector('#content nav form .form-input button .bx');
 		const searchForm = document.querySelector('#content nav form');
 
-		searchButton.addEventListener('click', function (e) {
-			if (window.innerWidth < 768) {
-				e.preventDefault();
-				searchForm.classList.toggle('show');
-				if (searchForm.classList.contains('show')) {
-					searchButtonIcon.classList.replace('bx-search', 'bx-x');
-				} else {
-					searchButtonIcon.classList.replace('bx-x', 'bx-search');
+		if (searchButton) {
+			searchButton.addEventListener('click', function (e) {
+				if (window.innerWidth < 768) {
+					e.preventDefault();
+					searchForm.classList.toggle('show');
+					if (searchForm.classList.contains('show')) {
+						searchButtonIcon.classList.replace('bx-search', 'bx-x');
+					} else {
+						searchButtonIcon.classList.replace('bx-x', 'bx-search');
+					}
 				}
-			}
-		})
+			})
+		}
 
 		// Dark Mode Switch (disimpan di localStorage supaya konsisten di semua halaman)
 		const switchMode = document.getElementById('switch-mode');

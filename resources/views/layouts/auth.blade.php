@@ -6,6 +6,9 @@
     <title>@yield('title', 'PT Astabrata Teknologi')</title>
 
     <link rel="icon" href="{{ asset('image/logo asta.png') }}">
+    
+    <!-- Tambahkan Favicon Logo Asta di sini -->
+    <link rel="icon" type="image/png" href="{{ asset('img/logo asta.png') }}">
 
     <!-- Fonts & Icons (sesuaikan dengan yang dipakai layouts.app) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
