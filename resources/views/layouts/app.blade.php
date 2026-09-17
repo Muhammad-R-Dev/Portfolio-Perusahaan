@@ -24,5 +24,16 @@
     @include('layouts.partials.footer')
 
     @stack('scripts')
+
+    <!-- TAMBAHKAN SCRIPT INI UNTUK MENDAFTARKAN SERVICE WORKER (OFFLINE MODE) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                console.log('Service Worker berhasil didaftarkan!', reg);
+            }).catch(function(err) {
+                console.log('Service Worker gagal didaftarkan: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
