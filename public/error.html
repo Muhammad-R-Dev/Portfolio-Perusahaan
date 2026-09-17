@@ -4,42 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Koneksi Terputus - Astabrata Teknologi</title>
-    
-    <!-- External CSS (Bootstrap & Font) -->
+
+    <!--
+        CATATAN PERBAIKAN:
+        1. Ilustrasi tidak lagi memanggil gambar dari server luar (Dribbble),
+           karena saat user offline gambar itu TIDAK AKAN pernah bisa dimuat.
+           Diganti dengan SVG inline yang ikut tersimpan di dalam file ini,
+           jadi tetap tampil walau tidak ada koneksi internet sama sekali.
+        2. Google Font & Bootstrap CDN tetap dipakai jika ada internet,
+           tapi sudah diberi font fallback (serif) supaya halaman tidak
+           berantakan kalau font gagal dimuat.
+        3. Ditambahkan media query supaya ukuran teks & ilustrasi
+           menyesuaikan di layar HP (responsive).
+    -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arvo">
 
-    <!-- CSS Internal / Gabungan -->
     <style>
         /*======================
             Error / Offline page
         =======================*/
-        .page_404 { 
-            padding: 40px 0; 
-            background: #fff; 
-            font-family: 'Arvo', serif;
+        * { box-sizing: border-box; }
+
+        .page_404 {
+            padding: 40px 20px;
+            background: #fff;
+            font-family: 'Arvo', Georgia, 'Times New Roman', serif;
         }
 
-        .page_404 img { 
+        .page_404 img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Ilustrasi sekarang berupa SVG inline, bukan background-image
+           dari URL luar, supaya tetap tampil saat offline */
+        .four_zero_four_bg {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 100%;
         }
 
-        .four_zero_four_bg {
-            background-image: url(https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif);
-            height: 400px;
-            background-position: center;
-            background-repeat: no-repeat;
+        .four_zero_four_bg svg {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
         }
 
         .four_zero_four_bg h1 {
             font-size: 80px;
+            margin: 0;
         }
 
-        .four_zero_four_bg h3 {
-            font-size: 80px;
+        .contant_box_404 h3 {
+            font-size: 32px;
+            margin-top: 10px;
         }
 
-        .link_404 {            
+        .contant_box_404 p {
+            font-size: 16px;
+        }
+
+        .link_404 {
             color: #fff !important;
             padding: 10px 20px;
             background: #39ac31;
@@ -49,8 +77,45 @@
             text-decoration: none !important;
         }
 
-        .contant_box_404 { 
-            margin-top: -50px;
+        .contant_box_404 {
+            margin-top: 0;
+        }
+
+        /* ===== Responsive: tablet ===== */
+        @media (max-width: 768px) {
+            .four_zero_four_bg h1 {
+                font-size: 56px;
+            }
+            .contant_box_404 h3 {
+                font-size: 26px;
+            }
+            .four_zero_four_bg svg {
+                max-width: 300px;
+            }
+        }
+
+        /* ===== Responsive: HP kecil ===== */
+        @media (max-width: 480px) {
+            .page_404 {
+                padding: 24px 12px;
+            }
+            .four_zero_four_bg h1 {
+                font-size: 40px;
+            }
+            .contant_box_404 h3 {
+                font-size: 20px;
+            }
+            .contant_box_404 p {
+                font-size: 14px;
+                padding: 0 8px;
+            }
+            .four_zero_four_bg svg {
+                max-width: 220px;
+            }
+            .link_404 {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -58,21 +123,31 @@
 <body>
     <section class="page_404">
         <div class="container">
-            <div class="row">   
+            <div class="row">
                 <div class="col-sm-12">
                     <div class="col-sm-10 col-sm-offset-1 text-center">
-                        
+
                         <div class="four_zero_four_bg">
-                            <h1 class="text-center">Error</h1>
+                            <!-- Ilustrasi "orang offline" versi SVG inline,
+                                 sehingga tetap muncul tanpa koneksi internet -->
+                            <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi koneksi terputus">
+                                <!-- Wifi terputus -->
+                                <path d="M70 90 a115 115 0 0 1 160 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                                <path d="M100 125 a72 72 0 0 1 100 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                                <path d="M130 158 a30 30 0 0 1 40 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                                <circle cx="150" cy="180" r="10" fill="#cfd4da"/>
+                                <line x1="55" y1="60" x2="245" y2="170" stroke="#e74c3c" stroke-width="10" stroke-linecap="round"/>
+                            </svg>
                         </div>
-                        
+
                         <div class="contant_box_404">
+                            <h1 class="text-center">Error</h1>
                             <h3 class="h2">
                                 Sepertinya kamu sedang offline
                             </h3>
-                            
+
                             <p>Koneksi internet kamu terputus. Periksa jaringan kamu dan coba muat ulang halaman.</p>
-                            
+
                             <a href="/" class="link_404">Kembali ke Beranda</a>
                         </div>
 
