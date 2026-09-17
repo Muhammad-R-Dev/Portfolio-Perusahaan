@@ -9,8 +9,7 @@
 <div class="page-wrapper">
     <div class="page-header">
         <div class="page-header-media">
-            <!-- Background diganti ke Abstract 3D Dark Wave (Premium UI/UX vibe) -->
-            <img class="page-header-img" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop" alt="Wawasan Kami">
+            <!-- Background Premium Matte Dark + Grain Murni CSS -->
         </div>
         <div class="page-header-text">
             <h1>Wawasan <em>Kami</em></h1>
@@ -160,30 +159,39 @@
         isolation: isolate;
         z-index: 5;
     }
+
+    /* ===== PREMIUM MATTE DARK + GRAIN TEXTURE ===== */
     .page-header-media {
         position: absolute;
         inset: 0;
         overflow: hidden;
         z-index: 0;
-        background-color: #0b0f19; /* Fallback gelap premium */
+        
+        /* Warna Dasar Very Deep Navy (Hampir Hitam) */
+        background-color: #03151c; 
+        
+        /* 
+           Kombinasi 3 Layer:
+           1. Spotlight tosca halus di kiri atas
+           2. Spotlight navy di kanan bawah
+           3. SVG Noise/Grain tipis untuk efek "Matte/Premium Material"
+        */
+        background-image: 
+            radial-gradient(circle at 15% 0%, rgba(13, 89, 120, 0.35), transparent 45%),
+            radial-gradient(circle at 85% 100%, rgba(9, 67, 86, 0.4), transparent 50%),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
     }
-    .page-header-img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.85; /* Sedikit dimming agar lebih menyatu dengan overlay */
-    }
+
     .page-header::after {
         content: '';
         position: absolute;
         inset: 0;
         z-index: 1;
-        /* Overlay gradient pekat di kiri, memudar di kanan */
-        background: linear-gradient(90deg, rgba(11, 15, 25, 0.95) 0%, rgba(11, 15, 25, 0.6) 45%, transparent 100%);
+        /* Vignette super tipis di pinggiran untuk memfokuskan teks ke tengah */
+        background: radial-gradient(circle, transparent 50%, rgba(3, 21, 28, 0.6) 100%);
         pointer-events: none;
     }
+
     .page-header-text {
         position: relative;
         z-index: 2;
@@ -233,29 +241,7 @@
             #fff 70%
         );
     }
-    .page-header .eyebrow {
-        font-family: var(--font-heading);
-        color: #FFFFFF;
-        font-weight: 600;
-        letter-spacing: 0.24em;
-        text-transform: uppercase;
-        font-size: 0.76rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-        padding: 9px 18px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.28);
-        backdrop-filter: blur(8px);
-    }
-    .page-header .eyebrow::before {
-        content: '';
-        width: 18px;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #FFFFFF, transparent);
-    }
+    
     .page-header-text h1 {
         font-family: var(--font-display);
         font-size: clamp(2.1rem, 3.6vw, 3rem);
@@ -657,7 +643,7 @@
         transition: none;
     }
 
-    /* Category label styled as a ribbon banner, flush with the card's left edge */
+    /* Category label styled as a ribbon banner */
     .project-card .badge {
         position: absolute;
         top: 20px;
