@@ -324,11 +324,12 @@
 
     .th-card-wrapper {
         position: relative;
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
+        width: calc(100% + 10vw);
+        max-width: none;
+        margin-left: -5vw;
+        margin-right: -5vw;
         background: #FEFEFE;
-        border-radius: 32px;
+        border-radius: 0;
         box-shadow: 0 25px 60px rgba(9, 67, 86, 0.12);
         border: 1px solid rgba(9, 67, 86, 0.08);
         padding: 56px 20px 50px;

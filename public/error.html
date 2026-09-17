@@ -11,15 +11,17 @@
            karena saat user offline gambar itu TIDAK AKAN pernah bisa dimuat.
            Diganti dengan SVG inline yang ikut tersimpan di dalam file ini,
            jadi tetap tampil walau tidak ada koneksi internet sama sekali.
-        2. Google Font & Bootstrap CDN tetap dipakai jika ada internet,
-           tapi sudah diberi font fallback (serif) supaya halaman tidak
-           berantakan kalau font gagal dimuat.
+        2. Bootstrap & Google Fonts CDN DIHAPUS total. Halaman ini adalah
+           halaman OFFLINE ERROR — justru pada saat halaman ini muncul,
+           koneksi internet user sedang mati, jadi CDN apapun pasti gagal
+           dimuat. Sebelumnya centering (container/row/col/text-center)
+           bergantung ke class Bootstrap yang datang dari CDN itu, makanya
+           di HP asli yang offline tampilannya jadi mepet kiri (class-nya
+           kosong tanpa efek). Sekarang semua layout & centering ditulis
+           sendiri di bawah, tidak butuh internet sama sekali.
         3. Ditambahkan media query supaya ukuran teks & ilustrasi
            menyesuaikan di layar HP (responsive).
     -->
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arvo">
 
     <style>
         /*======================
@@ -27,10 +29,28 @@
         =======================*/
         * { box-sizing: border-box; }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
         .page_404 {
             padding: 40px 20px;
             background: #fff;
-            font-family: 'Arvo', Georgia, 'Times New Roman', serif;
+            font-family: Georgia, 'Times New Roman', serif;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .page_404 .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
         }
 
         .page_404 img {
@@ -123,37 +143,26 @@
 <body>
     <section class="page_404">
         <div class="container">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="col-sm-10 col-sm-offset-1 text-center">
 
-                        <div class="four_zero_four_bg">
-                            <!-- Ilustrasi "orang offline" versi SVG inline,
-                                 sehingga tetap muncul tanpa koneksi internet -->
-                            <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi koneksi terputus">
-                                <!-- Wifi terputus -->
-                                <path d="M70 90 a115 115 0 0 1 160 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
-                                <path d="M100 125 a72 72 0 0 1 100 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
-                                <path d="M130 158 a30 30 0 0 1 40 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
-                                <circle cx="150" cy="180" r="10" fill="#cfd4da"/>
-                                <line x1="55" y1="60" x2="245" y2="170" stroke="#e74c3c" stroke-width="10" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-
-                        <div class="contant_box_404">
-                            <h1 class="text-center">Error</h1>
-                            <h3 class="h2">
-                                Sepertinya kamu sedang offline
-                            </h3>
-
-                            <p>Koneksi internet kamu terputus. Periksa jaringan kamu dan coba muat ulang halaman.</p>
-
-                            <a href="/" class="link_404">Kembali ke Beranda</a>
-                        </div>
-
-                    </div>
-                </div>
+            <div class="four_zero_four_bg">
+                <!-- Ilustrasi wifi terputus, SVG inline sehingga tetap
+                     muncul tanpa koneksi internet -->
+                <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi koneksi terputus">
+                    <path d="M70 90 a115 115 0 0 1 160 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <path d="M100 125 a72 72 0 0 1 100 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <path d="M130 158 a30 30 0 0 1 40 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <circle cx="150" cy="180" r="10" fill="#cfd4da"/>
+                    <line x1="55" y1="60" x2="245" y2="170" stroke="#e74c3c" stroke-width="10" stroke-linecap="round"/>
+                </svg>
             </div>
+
+            <div class="contant_box_404">
+                <h1>Error</h1>
+                <h3>Sepertinya kamu sedang offline</h3>
+                <p>Koneksi internet kamu terputus. Periksa jaringan kamu dan coba muat ulang halaman.</p>
+                <a href="/" class="link_404">Kembali ke Beranda</a>
+            </div>
+
         </div>
     </section>
 </body>
