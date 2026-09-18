@@ -4,10 +4,6 @@
 
 @section('content')
 <div class="page-wrapper">
-    <div class="particle-background" aria-hidden="true">
-        <div id="particle-canvas"></div>
-    </div>
-
     <div class="about-header reveal">
         <span class="eyebrow">Tentang Perusahaan</span>
         <h1>PT Astabrata Teknologi</h1>
@@ -16,19 +12,31 @@
 
     <section class="about-section reveal">
         <div class="about-content">
-            <div class="about-text">
-                <h2>Siapa Kami?</h2>
-                <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi untuk mentransformasi ide menjadi solusi digital tingkat tinggi. Kami percaya bahwa setiap masalah bisnis memiliki jawaban teknologi yang tepat. Dengan perpaduan keahlian rekayasa perangkat lunak dan desain UI/UX yang modern, kami hadir sebagai mitra strategis untuk akselerasi digital Anda.</p>
-                <p>Filosofi "Astabrata" yang melambangkan 8 sifat alam semesta menjadi pedoman kami dalam berkarya: adaptif seperti air, kokoh seperti bumi, dan menerangi seperti matahari. Kami berkomitmen memberikan layanan terbaik dengan standar profesionalisme tertinggi.</p>
-            </div>
-            <div class="about-image">
-                <img src="{{ asset('image/kantor.jpeg') }}" alt="Tentang Astabrata">
+            <div class="about-container">
+                <div class="about-text">
+                    <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi untuk mentransformasi ide menjadi solusi digital tingkat tinggi. Kami percaya bahwa setiap masalah bisnis memiliki jawaban teknologi yang tepat. Dengan perpaduan keahlian rekayasa perangkat lunak dan desain UI/UX yang modern, kami hadir sebagai mitra strategis untuk akselerasi digital Anda.</p>
+                    <p>Filosofi "Astabrata" yang melambangkan 8 sifat alam semesta menjadi pedoman kami dalam berkarya: adaptif seperti air, kokoh seperti bumi, dan menerangi seperti matahari. Kami berkomitmen memberikan layanan terbaik dengan standar profesionalisme tertinggi.</p>
+                </div>
+                <div class="about-image">
+                    <img src="{{ asset('image/kantor.jpeg') }}" alt="Tentang Astabrata">
+                </div>
+
+                <div class="about-social">
+                    <a href="#" title="Facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="bx bxl-facebook"></i></a>
+                    <a href="#" title="Instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="bx bxl-instagram"></i></a>
+                    <a href="#" title="Twitter" aria-label="Twitter" target="_blank" rel="noopener"><i class="bx bxl-twitter"></i></a>
+                    <a href="#" title="YouTube" aria-label="YouTube" target="_blank" rel="noopener"><i class="bx bxl-youtube"></i></a>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="team-section reveal">
+    <section class="team-section reveal" id="tim-kami">
         <div class="th-card-wrapper">
+            <div class="particle-background" aria-hidden="true">
+                <div id="particle-canvas"></div>
+            </div>
+
             <div class="section-heading text-center">
                 <h2>Tim Kami</h2>
                 <p>Orang-orang hebat di balik setiap baris kode dan desain yang kami buat.</p>
@@ -64,33 +72,111 @@
         </div>
     </section>
 
+    @php
+        // Data untuk filter galeri
+        $galleryList = collect($galleries ?? []);
+        $galleryCategories = $galleryList
+            ->map(fn ($g) => trim((string) ($g->kategori ?? '')))
+            ->filter()
+            ->unique()
+            ->values();
+        $hasCategories = $galleryCategories->isNotEmpty();
+        $hasUncategorized = $hasCategories && $galleryList->contains(fn ($g) => trim((string) ($g->kategori ?? '')) === '');
+    @endphp
+
     <section class="gallery-section reveal">
-        <div class="section-heading text-center">
-            <h2>Galeri Kegiatan</h2>
-            <p>Momen-momen di balik layar tim Astabrata Teknologi.</p>
-        </div>
-        <div class="gallery-grid">
-            @forelse($galleries as $gallery)
-                <img src="{{ $gallery->foto_url }}" class="gallery-item" data-caption="{{ $gallery->judul }}" alt="{{ $gallery->judul }}">
-            @empty
-                <img src="{{ asset('image/asta1.png') }}" class="gallery-item" data-caption="Galeri Astabrata" alt="Galeri Astabrata">
-            @endforelse
+        <div class="gallery-inner">
+            <div class="section-heading text-center">
+                <h2>Galeri Kegiatan</h2>
+                <p>Momen-momen di balik layar tim Astabrata Teknologi.</p>
+            </div>
+
+            @if($galleryList->count() > 1)
+            <div class="gallery-filter" role="group" aria-label="Filter galeri">
+                <div class="gallery-filter-track">
+                    <button type="button" class="gallery-filter-btn is-active" data-type="all" data-filter="all" aria-pressed="true">Semua</button>
+                    @if($hasCategories)
+                        @foreach($galleryCategories as $galleryCat)
+                            <button type="button" class="gallery-filter-btn" data-type="category" data-filter="{{ \Illuminate\Support\Str::slug($galleryCat) }}" aria-pressed="false">{{ $galleryCat }}</button>
+                        @endforeach
+                        @if($hasUncategorized)
+                            <button type="button" class="gallery-filter-btn" data-type="category" data-filter="lainnya" aria-pressed="false">Lainnya</button>
+                        @endif
+                    @else
+                        {{-- Belum ada kolom "kategori" di data galeri: filter berdasarkan bentuk foto --}}
+                        <button type="button" class="gallery-filter-btn" data-type="orientation" data-filter="landscape" aria-pressed="false">Lanskap</button>
+                        <button type="button" class="gallery-filter-btn" data-type="orientation" data-filter="portrait" aria-pressed="false">Potret</button>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            <div class="gallery-grid" id="galleryGrid">
+                @forelse($galleries as $gallery)
+                    @php
+                        $itemCat = trim((string) ($gallery->kategori ?? ''));
+                        $itemCatSlug = $hasCategories ? ($itemCat !== '' ? \Illuminate\Support\Str::slug($itemCat) : 'lainnya') : '';
+                        $itemTitle = trim((string) ($gallery->judul ?? ''));
+                    @endphp
+                    <figure class="gallery-card" data-category="{{ $itemCatSlug }}" tabindex="0" role="button" aria-label="Lihat foto{{ $itemTitle !== '' ? ': ' . $itemTitle : '' }}">
+                        <img src="{{ $gallery->foto_url }}" class="gallery-item" data-caption="{{ $itemTitle }}" data-category-label="{{ $itemCat }}" alt="{{ $itemTitle !== '' ? $itemTitle : 'Foto galeri' }}" decoding="async" @if($hasCategories) loading="lazy" @endif>
+                        @if($itemCat !== '' || $itemTitle !== '')
+                            <figcaption class="gallery-overlay">
+                                @if($itemTitle !== '')<span class="gallery-title">{{ $itemTitle }}</span>@endif
+                                @if($itemCat !== '')<span class="gallery-cat">{{ $itemCat }}</span>@endif
+                            </figcaption>
+                        @endif
+                        <span class="gallery-zoom" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+                        </span>
+                    </figure>
+                @empty
+                    <figure class="gallery-card" data-category="" tabindex="0" role="button" aria-label="Lihat foto: Galeri Astabrata">
+                        <img src="{{ asset('image/asta1.png') }}" class="gallery-item" data-caption="Galeri Astabrata" alt="Galeri Astabrata" decoding="async">
+                        <figcaption class="gallery-overlay">
+                            <span class="gallery-title">Galeri Astabrata</span>
+                        </figcaption>
+                        <span class="gallery-zoom" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+                        </span>
+                    </figure>
+                @endforelse
+            </div>
+
+            <p class="gallery-empty" id="galleryEmpty" hidden>Belum ada foto pada kategori ini.</p>
         </div>
     </section>
 </div>
 
 <div id="imageModal" class="custom-modal">
-    <span class="close-modal">&times;</span>
-    <button class="modal-nav-btn prev-btn" id="modalPrev" aria-label="Previous image">&#10094;</button>
-    <button class="modal-nav-btn next-btn" id="modalNext" aria-label="Next image">&#10095;</button>
-    
     <div class="modal-content-wrapper">
-        <img class="modal-content" id="zoomedImage">
-        <div id="modalCaption" class="modal-caption"></div>
+        <div class="modal-photo">
+            <img class="modal-content" id="zoomedImage" alt="">
+
+            <div class="modal-info" id="modalInfo" hidden>
+                <h3 class="modal-info-title" id="modalTitle"></h3>
+                <p class="modal-info-cat" id="modalCategory"></p>
+            </div>
+
+            <button type="button" class="close-modal" aria-label="Tutup">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+
+        <button type="button" class="modal-nav-btn prev-btn" id="modalPrev" aria-label="Foto sebelumnya">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button type="button" class="modal-nav-btn next-btn" id="modalNext" aria-label="Foto berikutnya">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
     </div>
 </div>
 
 @push('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 <style>
     /* RESET PENTING UNTUK MENCEGAH MENGGESER KE KANAN */
     html, body {
@@ -107,35 +193,16 @@
 
     .page-wrapper {
         position: relative;
-        padding: 90px 5% 80px;
+        padding: 90px 5% 0;
         min-height: 100vh;
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
         isolation: isolate;
-        background:
-            radial-gradient(circle at 8% 10%, rgba(126, 190, 207, 0.16) 0%, rgba(126, 190, 207, 0) 30%),
-            radial-gradient(circle at 92% 24%, rgba(159, 214, 185, 0.12) 0%, rgba(159, 214, 185, 0) 28%),
-            radial-gradient(circle at 48% 88%, rgba(113, 166, 190, 0.10) 0%, rgba(113, 166, 190, 0) 32%),
-            linear-gradient(135deg, #f8fbfc 0%, #f2f6f7 48%, #f7f9f8 100%);
+        background: #ffffff;
     }
 
-    .page-wrapper::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background:
-            linear-gradient(
-                120deg,
-                rgba(255, 255, 255, 0.48) 0%,
-                rgba(255, 255, 255, 0.12) 42%,
-                rgba(255, 255, 255, 0.34) 100%
-            );
-    }
-
-    .page-wrapper > *:not(.particle-background) {
+    .page-wrapper > * {
         position: relative;
         z-index: 5;
     }
@@ -188,11 +255,8 @@
         position: relative;
         width: 100%;
         max-width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 60px;
-        padding: 20px 0;
-        overflow: hidden;
+        margin: 0;
+        padding: 0;
         background: transparent;
         border: 0;
         box-shadow: none;
@@ -222,82 +286,217 @@
         opacity: 1;
     }
 
+    /* ===== Siapa Kami (gaya mengikuti about.html: Roboto, biru teal, teks putih) ===== */
+    .about-section {
+        --about-font: "Roboto", ui-sans-serif, sans-serif;
+        --about-white: #ffffff;
+        --about-bg: #0d4358;
+        --about-blue-300: hsl(217, 80%, 55%);
+        --about-shadow-medium: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
+                               rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+    }
+
+    /* Band penuh selebar layar */
     .about-content {
         position: relative;
         z-index: 5;
-        display: flex;
+        width: calc(100% + 10vw);
+        max-width: none;
+        margin-left: -5vw;
+        margin-right: -5vw;
+        padding: 6rem 5vw 5rem;
+        box-sizing: border-box;
+        background-color: var(--about-bg);
+        color: var(--about-white);
+        font-family: var(--about-font);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    .about-container {
+        position: relative;
+        display: grid;
         align-items: center;
-        gap: 30px; /* Diperkecil agar tidak bocel ke kanan */
-        max-width: 1200px;
-        width: 100%;
-        margin: 0 auto;
-        padding: 48px 40px; /* Disesuaikan */
-        box-sizing: border-box !important;
-        background: rgba(255, 255, 255, 0.94);
-        border: 1px solid rgba(9, 67, 86, 0.08);
-        border-radius: 32px;
-        box-shadow:
-            0 24px 55px rgba(9, 67, 86, 0.10),
-            0 4px 14px rgba(9, 67, 86, 0.04);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        row-gap: 3rem;
+        column-gap: 2rem;
+        max-width: 75rem;
+        margin-inline: auto;
     }
 
     .about-text {
-        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        row-gap: 1.5rem;
         position: relative;
         z-index: 5;
-        font-family: 'Poppins', sans-serif;
+        font-family: var(--about-font);
     }
 
     .about-text::before {
         content: 'TENTANG KAMI';
         display: block;
-        margin-bottom: 15px;
-        font-family: 'Poppins', sans-serif;
+        font-family: var(--about-font);
         font-size: 0.85rem;
-        font-weight: 700;
+        font-weight: 500;
         letter-spacing: 0.18em;
-        color: #4d8b78;
+        color: rgba(255, 255, 255, 0.7);
     }
 
     .about-text h2 {
-        font-family: 'Sora', sans-serif;
-        font-size: 2.8rem;
-        line-height: 1.15;
-        margin-bottom: 25px;
-        color: #094356;
+        margin: 0;
+        font-family: var(--about-font);
+        font-size: clamp(2.65rem, 6vw, 4rem);
         font-weight: 700;
-        letter-spacing: -0.03em;
+        line-height: 1.15;
+        letter-spacing: normal;
+        color: var(--about-white);
+        text-wrap: balance;
     }
 
     .about-text p {
-        font-family: 'Poppins', sans-serif;
-        font-size: 1.05rem;
-        line-height: 1.85;
-        color: #53666d;
-        margin-bottom: 20px;
+        margin: 0;
+        font-family: var(--about-font);
+        font-size: clamp(1rem, 2vw, 1.125rem);
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--about-white);
+        text-wrap: pretty;
+    }
+
+    .about-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        column-gap: 0.35rem;
+        padding: 0.5rem 1.25rem;
+        font-family: var(--about-font);
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 1.5;
+        white-space: nowrap;
+        text-decoration: none;
+        color: var(--about-white);
+        background-color: var(--about-blue-300);
+        border: none;
+        border-radius: 3rem;
+        box-shadow: var(--about-shadow-medium);
+        transition: all 0.25s ease;
+    }
+
+    .about-btn:hover {
+        color: var(--about-white);
+        filter: brightness(1.1);
+        transform: translateY(-2px);
     }
 
     .about-image {
-        flex: 0 0 46%;
         position: relative;
         z-index: 5;
-        overflow: hidden;
-        border-radius: 22px;
-        box-shadow: 0 18px 38px rgba(9, 67, 86, 0.16);
-        border: 1px solid rgba(9, 67, 86, 0.08);
-        background: #f5f8f8;
+        width: 100%;
+        max-width: 28rem;
+        justify-self: center;
     }
 
     .about-image img {
-        width: 100%;
-        height: 100%;
-        min-height: 390px;
-        max-height: 470px;
-        object-fit: cover;
         display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 1rem;
+        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
     }
+
+    /* Tablet: 2 kolom */
+    @media screen and (min-width: 48rem) {
+        .about-container {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            justify-content: center;
+        }
+        .about-image {
+            max-width: 100%;
+        }
+    }
+
+    /* ===== Ikon sosial media =====
+       Mobile & tablet : baris horizontal di bawah gambar, diapit 2 garis (kiri & kanan)
+       Desktop (>=64rem): kolom vertikal di sisi kanan, diapit 2 garis (atas & bawah) */
+    .about-social {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        column-gap: 1.25rem;
+        width: 100%;
+        position: relative;
+        z-index: 5;
+    }
+
+    .about-social > a {
+        font-size: 1.5rem;
+        line-height: 1;
+        text-decoration: none;
+        color: var(--about-white);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .about-social > a:hover {
+        opacity: 0.7;
+        transform: translateY(-2px);
+    }
+
+    .about-social::before,
+    .about-social::after {
+        content: "";
+        flex: 1 1 0;
+        height: 1.5px;
+        background: var(--about-white);
+    }
+
+    /* Desktop */
+    @media screen and (min-width: 64rem) {
+        .about-container {
+            grid-template-columns: 1fr minmax(0, 30rem);
+            column-gap: 4rem;
+            padding-right: 4rem; /* ruang untuk ikon sosial media */
+        }
+
+        .about-social {
+            grid-column: auto;
+            position: absolute;
+            display: grid;
+            top: 30%;
+            right: 0.5rem;
+            width: auto;
+            justify-items: center;
+            column-gap: 0;
+            row-gap: 0.5rem;
+        }
+
+        .about-social > a {
+            font-size: 1.25rem;
+            line-height: inherit;
+        }
+
+        .about-social > a:hover {
+            transform: translateX(-2px);
+        }
+
+        .about-social::before,
+        .about-social::after {
+            position: absolute;
+            flex: none;
+            width: 4rem;
+            transform: rotate(90deg);
+        }
+
+        .about-social::before { top: -3rem; }
+        .about-social::after { bottom: -3rem; }
+    }
+
+    #tim-kami { scroll-margin-top: 90px; }
 
     /* ===== Tim Kami ===== */
     :root {
@@ -307,14 +506,14 @@
     .team-section {
         width: 100%;
         max-width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-        margin-bottom: 100px;
+        margin: 0;
+        padding: 0;
         position: relative;
-        overflow: hidden; /* Mencegah slider tumpah ke kanan */
     }
 
     .th-card-wrapper .section-heading {
+        position: relative;
+        z-index: 5;
         max-width: 640px;
         margin-left: auto;
         margin-right: auto;
@@ -328,10 +527,7 @@
         max-width: none;
         margin-left: -5vw;
         margin-right: -5vw;
-        background: #FEFEFE;
-        border-radius: 0;
-        box-shadow: 0 25px 60px rgba(9, 67, 86, 0.12);
-        border: 1px solid rgba(9, 67, 86, 0.08);
+        background: transparent;
         padding: 56px 20px 50px;
         overflow: hidden;
         box-sizing: border-box;
@@ -339,6 +535,7 @@
 
     .th-slider-container {
         position: relative;
+        z-index: 5;
         perspective: 1500px;
         perspective-origin: 50% 50%;
         cursor: grab;
@@ -556,66 +753,308 @@
 
     /* Gallery Section */
     .gallery-section {
+        position: relative;
+        width: calc(100% + 10vw);
+        max-width: none;
+        margin: 0 -5vw;
+        padding: 70px 5vw 80px;
+        box-sizing: border-box;
+        /* Atur kepekatan lapisan putih di atas gambar: 0 = gambar penuh, 1 = putih polos */
+        --gallery-overlay: 0.78;
+        background-color: #ffffff; /* cadangan bila gambar gagal dimuat */
+        background-image:
+            linear-gradient(rgba(255, 255, 255, var(--gallery-overlay)), rgba(255, 255, 255, var(--gallery-overlay))),
+            url('{{ asset('image/bg 1.jpg') }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .gallery-inner {
         max-width: 1200px;
         margin: 0 auto;
     }
-    .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
+    /* ===== Galeri: filter + masonry ===== */
+    .gallery-section .section-heading { margin-bottom: 28px; }
+
+    /* Navbar filter: teks menu + garis bawah pada menu aktif */
+    .gallery-filter {
+        --gf-text: #094356;
+        --gf-accent: #094356;
+        display: flex;
+        justify-content: center;
+        margin: 0 auto 40px;
     }
-    .gallery-grid img {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-        border-radius: 15px;
-        transition: transform 0.4s ease, filter 0.4s ease;
+
+    .gallery-filter-track {
+        display: flex;
+        gap: 2.5rem;
+        max-width: 100%;
+        padding: 4px 4px 0;
+        overflow-x: auto;
+        background: none;
+        border: 0;
+        border-radius: 0;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .gallery-filter-track::-webkit-scrollbar { display: none; }
+
+    .gallery-filter-btn {
+        position: relative;
+        flex: 0 0 auto;
+        padding: 8px 2px 14px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.4;
+        white-space: nowrap;
+        color: var(--gf-text);
+        background: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
         cursor: pointer;
+        transition: color 0.25s ease;
     }
-    .gallery-grid img:hover {
-        transform: scale(1.03);
-        z-index: 10;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    /* Garis bawah */
+    .gallery-filter-btn::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--gf-accent);
+        transform: scaleX(0);
+        opacity: 1;
+        transform-origin: center;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .gallery-filter-btn:hover::after {
+        transform: scaleX(1);
+        opacity: 0.35;
+    }
+
+    .gallery-filter-btn.is-active {
+        color: var(--gf-accent);
+        background: none;
+        box-shadow: none;
+    }
+
+    .gallery-filter-btn.is-active::after {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+
+    .gallery-filter-btn:focus-visible {
+        outline: 2px solid var(--gf-accent);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* Grid masonry: tinggi tiap kartu dihitung JS dari rasio foto (potret / lanskap) */
+    .gallery-grid {
+        --g-gap: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: 4px;
+        column-gap: var(--g-gap);
+        row-gap: 0;
+    }
+
+    @media (min-width: 640px) {
+        .gallery-grid {
+            --g-gap: 16px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (min-width: 1100px) {
+        .gallery-grid {
+            --g-gap: 18px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    .gallery-card {
+        position: relative;
+        align-self: start;
+        min-width: 0;
+        height: 240px; /* sementara, diatur ulang oleh JS */
+        margin: 0;
+        overflow: hidden;
+        border-radius: 16px;
+        background: #e6eef0;
+        box-shadow: 0 6px 18px rgba(9, 67, 86, 0.08);
+        cursor: pointer;
+        transition: box-shadow 0.35s ease;
+    }
+
+    /* Skeleton shimmer selama foto belum termuat */
+    .gallery-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(110deg, #e6eef0 30%, #f4f9fa 50%, #e6eef0 70%);
+        background-size: 200% 100%;
+        animation: galleryShimmer 1.4s linear infinite;
+    }
+
+    .gallery-card.is-loaded::before { display: none; }
+
+    .gallery-card:hover { box-shadow: 0 16px 34px rgba(9, 67, 86, 0.2); }
+
+    .gallery-card:focus-visible {
+        outline: 3px solid #4d8b78;
+        outline-offset: 3px;
+    }
+
+    .gallery-card .gallery-item {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .gallery-card:hover .gallery-item { transform: scale(1.06); }
+
+    .gallery-overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        padding: 44px 16px 14px;
+        background: linear-gradient(to top, rgba(6, 40, 52, 0.88) 0%, rgba(6, 40, 52, 0.5) 55%, transparent 100%);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
+    }
+
+    .gallery-card:hover .gallery-overlay,
+    .gallery-card:focus-visible .gallery-overlay {
+        opacity: 1;
+        transform: none;
+    }
+
+    .gallery-title {
+        font-family: 'Sora', sans-serif;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.25;
+        color: #ffffff;
+    }
+
+    /* kategori: teks polos di bawah judul (tanpa card) */
+    .gallery-cat {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 500;
+        line-height: 1.4;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .gallery-zoom {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        color: #094356;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 50%;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: scale(0.85);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
+    }
+
+    .gallery-card:hover .gallery-zoom {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* Layar sentuh (tanpa hover): caption selalu terlihat, ikon zoom disembunyikan */
+    @media (hover: none) {
+        .gallery-overlay { opacity: 1; transform: none; padding-top: 36px; }
+        .gallery-zoom { display: none; }
+    }
+
+    .gallery-card.is-hidden { display: none !important; }
+
+    .gallery-card.is-entering {
+        animation: galleryCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .gallery-empty {
+        padding: 40px 0 10px;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        color: #57676D;
+    }
+
+    @keyframes galleryShimmer {
+        from { background-position: 200% 0; }
+        to   { background-position: -200% 0; }
+    }
+
+    @keyframes galleryCardIn {
+        from { opacity: 0; transform: translateY(16px) scale(0.97); }
+        to   { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 480px) {
+        .gallery-filter-track { gap: 1.5rem; }
+        .gallery-filter-btn { padding: 8px 2px 12px; font-size: 0.85rem; }
+        .gallery-card { border-radius: 12px; }
+        .gallery-title { font-size: 0.85rem; }
+        .gallery-cat { font-size: 0.72rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .gallery-card,
+        .gallery-card .gallery-item,
+        .gallery-overlay,
+        .gallery-zoom,
+        .gallery-filter-btn,
+        .gallery-filter-btn::after { transition: none; }
+        .gallery-card::before,
+        .gallery-card.is-entering { animation: none; }
     }
 
     /* ===== MOBILE RESPONSIVE TWEAKS ===== */
     @media (max-width: 768px) {
-        .about-content { 
-            flex-direction: column; 
-            padding: 30px 20px; 
-            border-radius: 22px; 
-            gap: 20px;
+        .about-content {
+            padding: 4rem 5vw 3.5rem;
         }
         .about-header h1 { font-size: 2.2rem; }
         .page-wrapper { padding-top: 70px; }
 
-        .about-section {
-            padding: 20px 5%;
-        }
-
-        .about-text h2 {
-            font-size: 2rem;
-        }
-
-        .about-text p {
-            font-size: 0.95rem;
-        }
-
-        .about-image {
-            width: 100%;
-            flex: 0 0 auto;
-            border-radius: 18px;
-        }
-
-        .about-image img {
-            min-height: 250px;
-            max-height: 300px;
-        }
-        
         .th-card-wrapper {
-            padding: 30px 15px;
-            border-radius: 20px;
-            width: calc(100% - 10px);
+            width: calc(100% + 10vw);
+            max-width: none;
+            margin-left: -5vw;
+            margin-right: -5vw;
+            padding: 30px 15px 40px;
+            border-radius: 0;
         }
     }
 
@@ -642,93 +1081,145 @@
         opacity: 1;
     }
 
+    /* Pembungkus mengikuti ukuran foto, jadi tombol bisa menempel di foto */
     .modal-content-wrapper {
         position: relative;
-        max-width: 90%;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        display: block;
         animation: zoomIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .modal-content {
-        max-width: 100%;
-        max-height: 80vh;
-        border-radius: 12px;
+    .modal-photo {
+        position: relative;
+        overflow: hidden;
+        line-height: 0;
+        background: #0b0f19;
+        border-radius: 14px;
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: calc(100vw - 170px); /* sisakan ruang untuk tombol kiri & kanan */
+        max-height: 84vh;
         object-fit: contain;
     }
 
-    .modal-caption {
+    /* Judul + kategori di bawah foto (gradien gelap, seperti kartu tim) */
+    .modal-info {
         position: absolute;
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: #ffffff;
-        font-family: var(--font-body, 'Poppins', sans-serif);
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-align: center;
-        background: rgba(30, 36, 44, 0.85);
-        padding: 8px 24px;
-        border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-        z-index: 10;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 56px 22px 20px;
+        text-align: left;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.55) 55%, transparent 100%);
         pointer-events: none;
     }
 
+    .modal-info-title {
+        margin: 0;
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(18px, 4vw, 26px);
+        font-weight: 800;
+        line-height: 1.25;
+        color: #ffffff;
+    }
+
+    .modal-info-cat {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        font-size: clamp(12px, 2.5vw, 15px);
+        font-weight: 500;
+        line-height: 1.5;
+        color: #f0f0f0;
+    }
+
+    .modal-info[hidden],
+    .modal-info-title[hidden],
+    .modal-info-cat[hidden],
+    .modal-nav-btn[hidden] { display: none; }
+
+    /* Tombol silang: kanan atas foto, merah */
     .close-modal {
         position: absolute;
-        top: 20px;
-        right: 35px;
-        color: #ffffff;
-        font-size: 40px;
-        font-weight: 300;
-        cursor: pointer;
-        z-index: 10000;
-        transition: color 0.2s ease, transform 0.2s ease;
-    }
-
-    .close-modal:hover {
-        color: #ff6b35;
-        transform: scale(1.1);
-    }
-
-    .modal-nav-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff; 
-        border: none;
-        font-size: 2.5rem;
-        padding: 15px 20px;
-        cursor: pointer;
-        border-radius: 12px;
-        z-index: 10001;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(4px);
+        top: 12px;
+        right: 12px;
+        z-index: 3;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        color: #e53935;
+        background: rgba(255, 255, 255, 0.92);
+        border: 0;
+        border-radius: 50%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
     }
+
+    .close-modal svg { width: 18px; height: 18px; }
+
+    .close-modal:hover {
+        color: #ffffff;
+        background: #e53935;
+        transform: rotate(90deg) scale(1.08);
+    }
+
+    /* Tombol kiri/kanan: menempel di samping foto */
+    .modal-nav-btn {
+        position: absolute;
+        top: 50%;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 50%;
+        backdrop-filter: blur(4px);
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: background-color 0.25s ease, transform 0.25s ease;
+    }
+
+    .modal-nav-btn svg { width: 22px; height: 22px; }
 
     .modal-nav-btn:hover {
-        background: rgba(255, 255, 255, 0.25);
-        color: #ffffff;
-        transform: translateY(-50%) scale(1.1);
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.08);
     }
 
-    .prev-btn { left: 4%; }
-    .next-btn { right: 4%; }
+    .prev-btn { left: -60px; }
+    .next-btn { right: -60px; }
 
+    /* Mobile: foto hampir selebar layar, tombol pindah ke dalam foto (kiri & kanan) */
     @media (max-width: 768px) {
-        .modal-nav-btn { font-size: 1.8rem; padding: 10px 15px; }
-        .prev-btn { left: 2%; }
-        .next-btn { right: 2%; }
-        .modal-caption { bottom: 15px; font-size: 0.85rem; padding: 6px 18px; }
+        .modal-content { max-width: calc(100vw - 24px); max-height: 78vh; }
+        .modal-info { padding: 44px 16px 16px; }
+        .close-modal { top: 10px; right: 10px; width: 36px; height: 36px; }
+        .close-modal svg { width: 16px; height: 16px; }
+        .modal-nav-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.45);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        .modal-nav-btn svg { width: 18px; height: 18px; }
+        .prev-btn { left: 8px; }
+        .next-btn { right: 8px; }
     }
 
     @keyframes zoomIn {
@@ -1166,17 +1657,140 @@
         });
     })();
 
+    /* ===== Galeri: filter + masonry ===== */
+    document.addEventListener('DOMContentLoaded', function () {
+        const grid = document.getElementById('galleryGrid');
+        if (!grid) return;
+
+        const cards = Array.from(grid.querySelectorAll('.gallery-card'));
+        const buttons = Array.from(document.querySelectorAll('.gallery-filter-btn'));
+        const emptyEl = document.getElementById('galleryEmpty');
+        let active = { type: 'all', value: 'all' };
+        let rafId = null;
+
+        // Hitung tinggi tiap kartu dari rasio foto (potret tinggi, lanskap pendek)
+        function layout() {
+            const cs = getComputedStyle(grid);
+            const rowH = parseFloat(cs.gridAutoRows) || 4;
+            const gap = parseFloat(cs.columnGap) || 0;
+
+            cards.forEach((card) => {
+                if (card.classList.contains('is-hidden')) return;
+                const w = card.offsetWidth;
+                if (!w) return;
+                const ratio = parseFloat(card.dataset.ratio) || 0.75;
+                const span = Math.max(1, Math.round((w * ratio + gap) / rowH));
+                card.style.gridRowEnd = 'span ' + span;
+                card.style.height = (span * rowH - gap) + 'px';
+            });
+        }
+
+        function scheduleLayout() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(function () {
+                rafId = null;
+                layout();
+            });
+        }
+
+        function matches(card) {
+            if (active.type === 'category') return card.dataset.category === active.value;
+            if (active.type === 'orientation') return card.dataset.orientation === active.value;
+            return true;
+        }
+
+        function applyFilter(animate) {
+            let shown = 0;
+
+            cards.forEach((card) => {
+                const ok = matches(card);
+                card.classList.toggle('is-hidden', !ok);
+                card.classList.remove('is-entering');
+
+                if (ok) {
+                    if (animate) {
+                        void card.offsetWidth; // restart animasi
+                        card.style.animationDelay = Math.min(shown, 12) * 35 + 'ms';
+                        card.classList.add('is-entering');
+                    }
+                    shown++;
+                }
+            });
+
+            if (emptyEl) emptyEl.hidden = shown !== 0;
+            layout();
+        }
+
+        // Rasio & orientasi foto diambil setelah foto termuat
+        function onImageReady(card, img) {
+            if (img.naturalWidth && img.naturalHeight) {
+                const raw = img.naturalHeight / img.naturalWidth;
+                // dibatasi supaya foto ekstrem (panorama / sangat tinggi) tetap proporsional
+                card.dataset.ratio = Math.min(1.6, Math.max(0.55, raw)).toFixed(4);
+                card.dataset.orientation = raw > 1.05 ? 'portrait' : 'landscape';
+            }
+            card.classList.add('is-loaded');
+
+            if (active.type === 'orientation') applyFilter(false);
+            else scheduleLayout();
+        }
+
+        cards.forEach((card) => {
+            const img = card.querySelector('.gallery-item');
+            if (!img) return;
+
+            if (img.complete && img.naturalWidth) {
+                onImageReady(card, img);
+            } else {
+                img.addEventListener('load', () => onImageReady(card, img), { once: true });
+                img.addEventListener('error', () => {
+                    card.classList.add('is-loaded');
+                    scheduleLayout();
+                }, { once: true });
+            }
+        });
+
+        buttons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                active = { type: btn.dataset.type, value: btn.dataset.filter };
+
+                buttons.forEach((b) => {
+                    const on = b === btn;
+                    b.classList.toggle('is-active', on);
+                    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                });
+
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                applyFilter(true);
+            });
+        });
+
+        window.addEventListener('resize', scheduleLayout);
+        window.addEventListener('load', scheduleLayout);
+
+        applyFilter(false);
+    });
+
     /* ===== LIGHTBOX MODAL JS (Dengan Fitur Slide) ===== */
     document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById("imageModal");
         const modalImg = document.getElementById("zoomedImage");
-        const captionText = document.getElementById("modalCaption");
+        const modalInfo = document.getElementById("modalInfo");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalCat = document.getElementById("modalCategory");
         const closeBtn = document.querySelector(".close-modal");
         const prevBtn = document.getElementById("modalPrev");
         const nextBtn = document.getElementById("modalNext");
         
-        // Ambil semua gambar galeri jadikan array
-        const images = Array.from(document.querySelectorAll(".gallery-item"));
+        // Daftar foto = hanya kartu yang sedang tampil (mengikuti filter aktif)
+        function getImages() {
+            return Array.from(document.querySelectorAll(".gallery-card"))
+                .filter((card) => !card.classList.contains("is-hidden"))
+                .map((card) => card.querySelector(".gallery-item"))
+                .filter(Boolean);
+        }
+
+        let images = [];
         let currentIndex = 0;
 
         // Buka gambar sesuai index
@@ -1189,29 +1803,62 @@
         // Update gambar & caption pas digeser
         function updateModalContent() {
             const img = images[currentIndex];
-            modalImg.src = img.src;
-            
-            let caption = img.getAttribute("data-caption");
-            captionText.innerHTML = caption ? caption : "Galeri PT Astabrata Teknologi";
+            if (!img) return;
+            modalImg.src = img.currentSrc || img.src;
+            modalImg.alt = img.alt || "";
+
+            // Judul (tebal) + kategori (polos di bawahnya)
+            const title = (img.getAttribute("data-caption") || "").trim();
+            const cat = (img.getAttribute("data-category-label") || "").trim();
+            modalTitle.textContent = title;
+            modalTitle.hidden = !title;
+            modalCat.textContent = cat;
+            modalCat.hidden = !cat;
+            modalInfo.hidden = !title && !cat;
+
+            // Tombol kiri/kanan disembunyikan kalau hanya ada 1 foto
+            const single = images.length < 2;
+            if (prevBtn) prevBtn.hidden = single;
+            if (nextBtn) nextBtn.hidden = single;
         }
 
         // Fungsi Tombol Prev & Next
         function showPrev(e) {
             if (e) e.stopPropagation();
+            if (!images.length) return;
             currentIndex = (currentIndex - 1 + images.length) % images.length;
             updateModalContent();
         }
 
         function showNext(e) {
             if (e) e.stopPropagation();
+            if (!images.length) return;
             currentIndex = (currentIndex + 1) % images.length;
             updateModalContent();
         }
 
-        // Pasang event klik di semua gambar
-        images.forEach((img, index) => {
-            img.addEventListener("click", () => openModal(index));
-        });
+        // Klik / Enter pada kartu galeri (delegasi event)
+        const galleryGrid = document.getElementById("galleryGrid");
+        if (galleryGrid) {
+            const openFromCard = (card) => {
+                images = getImages();
+                const idx = images.indexOf(card.querySelector(".gallery-item"));
+                if (idx > -1) openModal(idx);
+            };
+
+            galleryGrid.addEventListener("click", (e) => {
+                const card = e.target.closest(".gallery-card");
+                if (card) openFromCard(card);
+            });
+
+            galleryGrid.addEventListener("keydown", (e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                const card = e.target.closest(".gallery-card");
+                if (!card) return;
+                e.preventDefault();
+                openFromCard(card);
+            });
+        }
 
         // Event Tombol Navigasi Modal
         if (prevBtn) prevBtn.addEventListener("click", showPrev);

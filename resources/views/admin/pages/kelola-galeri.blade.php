@@ -326,16 +326,41 @@
 			color: var(--light);
 		}
 
-		.modal-box .preview-img {
+		.modal-box .preview-wrap {
+			position: relative;
 			display: none;
+			margin-top: 12px;
+		}
+		.modal-box .preview-wrap.show {
+			display: block;
+		}
+		.modal-box .preview-img {
+			display: block;
 			width: 100%;
 			max-height: 180px;
 			object-fit: cover;
 			border-radius: 12px;
-			margin-top: 12px;
 		}
-		.modal-box .preview-img.show {
-			display: block;
+		.modal-box .btn-remove-preview {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			border: none;
+			background: rgba(0, 0, 0, .55);
+			color: var(--light);
+			font-size: 16px;
+			line-height: 1;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: background .15s ease;
+		}
+		.modal-box .btn-remove-preview:hover {
+			background: var(--red);
 		}
 		.modal-box .form-error {
 			color: var(--red);
@@ -361,6 +386,14 @@
 		.modal-box .btn-cancel {
 			background: var(--grey);
 			color: var(--dark);
+		}
+		/* Khusus tombol Batal di form Tambah/Edit Galeri -> merah */
+		#galleryModal .btn-cancel {
+			background: var(--red);
+			color: var(--light);
+		}
+		#galleryModal .btn-cancel:hover {
+			filter: brightness(.9);
 		}
 		.modal-box .btn-save {
 			background: var(--blue);
@@ -422,12 +455,66 @@
 		/* GALLERY TABLE LIST */
 		#content main .table-section {
 			margin-top: 40px;
+			background: var(--light);
+			border-radius: 20px;
+			padding: 24px;
+		}
+		#content main .table-section .table-toolbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			grid-gap: 12px;
+			margin-bottom: 20px;
+		}
+		#content main .table-section .table-toolbar h3 {
+			margin-right: auto;
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--dark);
+		}
+		#content main .table-section .table-toolbar .toolbar-controls {
+			display: flex;
+			align-items: center;
+			grid-gap: 10px;
+			flex-wrap: wrap;
+		}
+		#content main .table-section .search-box {
+			display: flex;
+			align-items: center;
+			grid-gap: 8px;
+			background: var(--grey);
+			border-radius: 36px;
+			padding: 0 16px;
+			height: 38px;
+		}
+		#content main .table-section .search-box .bx {
+			font-size: 16px;
+			color: var(--dark-grey);
+		}
+		#content main .table-section .search-box input {
+			border: none;
+			background: transparent;
+			outline: none;
+			font-family: var(--poppins);
+			font-size: 13px;
+			color: var(--dark);
+			width: 180px;
+		}
+		#content main .table-section select.filter-select {
+			height: 38px;
+			padding: 0 14px;
+			border-radius: 36px;
+			border: none;
+			background: var(--grey);
+			color: var(--dark);
+			font-family: var(--poppins);
+			font-size: 13px;
+			outline: none;
+			cursor: pointer;
 		}
 		#content main .table-responsive {
-			background: var(--light);
-			border-radius: 16px;
 			overflow-x: auto;
-			padding: 8px;
 		}
 		#content main .gallery-table {
 			width: 100%;
@@ -521,6 +608,42 @@
 			display: none;
 		}
 
+		/* PAGINATION */
+		#content main .table-section .table-pagination {
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			grid-gap: 6px;
+			flex-wrap: wrap;
+			margin-top: 20px;
+		}
+		#content main .table-section .table-pagination .page-btn {
+			min-width: 32px;
+			height: 32px;
+			padding: 0 8px;
+			border-radius: 8px;
+			border: none;
+			background: var(--grey);
+			color: var(--dark);
+			font-family: var(--poppins);
+			font-size: 13px;
+			cursor: pointer;
+			transition: background .15s ease, color .15s ease;
+		}
+		#content main .table-section .table-pagination .page-btn:hover:not(:disabled) {
+			background: var(--light-blue);
+			color: var(--blue);
+		}
+		#content main .table-section .table-pagination .page-btn.active {
+			background: var(--blue);
+			color: var(--light);
+			font-weight: 600;
+		}
+		#content main .table-section .table-pagination .page-btn:disabled {
+			opacity: .4;
+			cursor: not-allowed;
+		}
+
 		/* ZOOM MODE MODAL */
 		.zoom-modal-overlay {
 			display: none;
@@ -538,7 +661,7 @@
 		}
 		.zoom-modal-overlay .zoom-stage {
 			max-width: 90vw;
-			max-height: 82vh;
+			max-height: 85vh;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
@@ -548,22 +671,38 @@
 		.zoom-modal-overlay.show .zoom-stage {
 			transform: scale(1);
 		}
+		.zoom-modal-overlay .zoom-image-wrap {
+			position: relative;
+			display: inline-flex;
+			max-width: 90vw;
+			max-height: 85vh;
+		}
 		.zoom-modal-overlay img {
 			max-width: 90vw;
-			max-height: 72vh;
+			max-height: 85vh;
 			border-radius: 12px;
 			box-shadow: 0 20px 60px rgba(0,0,0,.5);
 			cursor: default;
+			display: block;
 		}
 		.zoom-modal-overlay .zoom-caption {
-			margin-top: 14px;
-			text-align: center;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			padding: 32px 20px 16px;
+			border-radius: 0 0 12px 12px;
+			background: linear-gradient(to top, rgba(0, 0, 0, .85) 0%, rgba(0, 0, 0, .55) 55%, rgba(0, 0, 0, 0) 100%);
+			text-align: left;
 			cursor: default;
+			pointer-events: none;
 		}
 		.zoom-modal-overlay .zoom-caption h4 {
 			color: var(--light);
-			font-size: 16px;
-			margin-bottom: 6px;
+			font-family: var(--poppins);
+			font-size: 17px;
+			font-weight: 600;
+			margin: 0 0 6px;
 		}
 		.zoom-modal-overlay .zoom-caption span {
 			display: inline-block;
@@ -573,25 +712,27 @@
 			font-weight: 600;
 			padding: 4px 14px;
 			border-radius: 20px;
+			pointer-events: auto;
 		}
 		.zoom-modal-overlay .btn-zoom-close {
 			position: absolute;
-			top: 24px;
-			right: 28px;
-			width: 42px;
-			height: 42px;
+			top: -14px;
+			right: -14px;
+			width: 34px;
+			height: 34px;
 			border-radius: 50%;
-			border: none;
-			background: rgba(255,255,255,.15);
+			border: 2px solid var(--light);
+			background: var(--dark);
 			color: var(--light);
-			font-size: 22px;
+			font-size: 18px;
 			cursor: pointer;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			box-shadow: 0 4px 12px rgba(0,0,0,.35);
 		}
 		.zoom-modal-overlay .btn-zoom-close:hover {
-			background: rgba(255,255,255,.28);
+			background: var(--red);
 		}
 
 		@media screen and (max-width: 576px) {
@@ -665,9 +806,30 @@
 
 			<!-- Daftar Galeri (Tabel) -->
 			<div class="table-section">
+				<div class="table-toolbar">
+					<h3>Daftar Foto Galeri</h3>
+					<div class="toolbar-controls">
+						<div class="search-box">
+							<i class='bx bx-search'></i>
+							<input type="text" id="galleryTableSearch" placeholder="Cari judul foto...">
+						</div>
+						<select id="galleryFilterKategori" class="filter-select">
+							<option value="">Semua Kategori</option>
+							<option value="kegiatan">Kegiatan</option>
+							<option value="fasilitas">Fasilitas</option>
+							<option value="tim">Tim</option>
+							<option value="acara">Acara</option>
+						</select>
+						<select id="galleryFilterPerPage" class="filter-select">
+							<option value="">Semua</option>
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="20">20</option>
+						</select>
+					</div>
+				</div>
 				<div class="table-responsive">
 					<table class="gallery-table" id="galleryTable">
-						<caption>Daftar Foto Galeri</caption>
 						<thead>
 							<tr>
 								<th>No</th>
@@ -713,16 +875,19 @@
 						</tbody>
 					</table>
 				</div>
+				<div class="table-pagination" id="galleryPagination"></div>
 			</div>
 
 			<!-- Modal Zoom Mode Foto -->
 			<div class="zoom-modal-overlay" id="zoomModal">
-				<button type="button" class="btn-zoom-close" id="btnZoomClose" aria-label="Tutup">&times;</button>
 				<div class="zoom-stage">
-					<img src="" alt="" id="zoomImage">
-					<div class="zoom-caption">
-						<h4 id="zoomTitle"></h4>
-						<span id="zoomCategory"></span>
+					<div class="zoom-image-wrap">
+						<img src="" alt="" id="zoomImage">
+						<button type="button" class="btn-zoom-close" id="btnZoomClose" aria-label="Tutup">&times;</button>
+						<div class="zoom-caption">
+							<h4 id="zoomTitle"></h4>
+							<span id="zoomCategory"></span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -757,7 +922,11 @@
 								<span id="uploadLabel">Klik atau seret foto ke sini</span>
 								<input type="file" name="foto" id="photoInput" accept="image/*">
 							</div>
-							<img src="" alt="Preview" class="preview-img" id="previewImg">
+							<div class="preview-wrap" id="previewWrap">
+								<img src="" alt="Preview" class="preview-img" id="previewImg">
+								<button type="button" class="btn-remove-preview" id="btnRemovePreview" title="Batal foto">&times;</button>
+							</div>
+							<input type="hidden" name="hapus_gambar" id="hapusGambarInput" value="0">
 						</div>
 
 						<div class="modal-actions">
@@ -801,29 +970,111 @@
 		const galleryTableRows = () => Array.from(document.querySelectorAll('#galleryTable tbody .gallery-row'));
 		const emptyState = document.getElementById('emptyState');
 		const gallerySearch = document.getElementById('gallerySearch');
+		const galleryTableSearch = document.getElementById('galleryTableSearch');
+		const galleryFilterKategori = document.getElementById('galleryFilterKategori');
+		const galleryFilterPerPage = document.getElementById('galleryFilterPerPage');
+		const galleryPagination = document.getElementById('galleryPagination');
 
-		function applyFilters() {
-			const keyword = gallerySearch ? gallerySearch.value.trim().toLowerCase() : '';
-			let visibleCount = 0;
+		let galleryCurrentPage = 1;
 
-			galleryTableRows().forEach(row => {
-				const isVisible = row.dataset.title.toLowerCase().includes(keyword);
-				row.classList.toggle('row-hidden', !isVisible);
-				if (isVisible) visibleCount++;
+		function getGalleryFilteredRows() {
+			const keywordNav = gallerySearch ? gallerySearch.value.trim().toLowerCase() : '';
+			const keywordTabel = galleryTableSearch ? galleryTableSearch.value.trim().toLowerCase() : '';
+			const keyword = keywordTabel || keywordNav;
+			const kategori = galleryFilterKategori ? galleryFilterKategori.value.toLowerCase() : '';
+
+			return galleryTableRows().filter(row => {
+				const cocokJudul = row.dataset.title.toLowerCase().includes(keyword);
+				const cocokKategori = kategori === '' || row.dataset.category.toLowerCase() === kategori;
+				return cocokJudul && cocokKategori;
 			});
-
-			emptyState.classList.toggle('show', visibleCount === 0);
 		}
 
-		// Pencarian
+		function applyFilters(resetPage) {
+			if (resetPage) {
+				galleryCurrentPage = 1;
+			}
+
+			const allRows      = galleryTableRows();
+			const filteredRows = getGalleryFilteredRows();
+			const perPageValue = galleryFilterPerPage ? galleryFilterPerPage.value : '';
+			const perPage      = perPageValue === '' ? filteredRows.length : parseInt(perPageValue, 10);
+			const totalPages   = perPage > 0 ? Math.max(1, Math.ceil(filteredRows.length / perPage)) : 1;
+
+			if (galleryCurrentPage > totalPages) {
+				galleryCurrentPage = totalPages;
+			}
+			if (galleryCurrentPage < 1) {
+				galleryCurrentPage = 1;
+			}
+
+			// Sembunyikan semua baris dahulu
+			allRows.forEach(row => row.classList.add('row-hidden'));
+
+			// Tampilkan hanya baris pada halaman aktif
+			const start = perPage > 0 ? (galleryCurrentPage - 1) * perPage : 0;
+			const end   = perPage > 0 ? start + perPage : filteredRows.length;
+
+			filteredRows.slice(start, end).forEach(row => row.classList.remove('row-hidden'));
+
+			emptyState.classList.toggle('show', filteredRows.length === 0);
+
+			renderGalleryPagination(filteredRows.length, perPage, totalPages);
+		}
+
+		function renderGalleryPagination(totalItems, perPage, totalPages) {
+			if (!galleryPagination) return;
+			galleryPagination.innerHTML = '';
+
+			// "Semua" atau data muat dalam satu halaman -> tidak perlu navigasi
+			if (perPage <= 0 || totalItems <= perPage || totalPages <= 1) {
+				return;
+			}
+
+			const buatTombol = function (label, page, opts) {
+				opts = opts || {};
+				const btn = document.createElement('button');
+				btn.type = 'button';
+				btn.textContent = label;
+				btn.className = 'page-btn' + (opts.active ? ' active' : '');
+				if (opts.disabled) {
+					btn.disabled = true;
+				} else {
+					btn.addEventListener('click', function () {
+						galleryCurrentPage = page;
+						applyFilters(false);
+					});
+				}
+				return btn;
+			};
+
+			galleryPagination.appendChild(buatTombol('<', galleryCurrentPage - 1, { disabled: galleryCurrentPage === 1 }));
+
+			for (let i = 1; i <= totalPages; i++) {
+				galleryPagination.appendChild(buatTombol(i, i, { active: i === galleryCurrentPage }));
+			}
+
+			galleryPagination.appendChild(buatTombol('>', galleryCurrentPage + 1, { disabled: galleryCurrentPage === totalPages }));
+		}
+
+		// Pencarian (kolom tabel & kolom navbar, keduanya otomatis)
+		if (galleryTableSearch) {
+			galleryTableSearch.addEventListener('input', function () { applyFilters(true); });
+		}
 		if (gallerySearch) {
-			gallerySearch.addEventListener('input', applyFilters);
+			gallerySearch.addEventListener('input', function () { applyFilters(true); });
+		}
+		if (galleryFilterKategori) {
+			galleryFilterKategori.addEventListener('change', function () { applyFilters(true); });
+		}
+		if (galleryFilterPerPage) {
+			galleryFilterPerPage.addEventListener('change', function () { applyFilters(true); });
 		}
 		const navSearchForm = document.querySelector('#content nav form');
 		if (navSearchForm) {
 			navSearchForm.addEventListener('submit', function (e) {
 				e.preventDefault();
-				applyFilters();
+				applyFilters(true);
 			});
 		}
 
@@ -892,16 +1143,20 @@
 		const photoCategory = document.getElementById('photoCategory');
 		const photoInput    = document.getElementById('photoInput');
 		const previewImg    = document.getElementById('previewImg');
+		const previewWrap   = document.getElementById('previewWrap');
 		const uploadLabel   = document.getElementById('uploadLabel');
+		const hapusGambarInput  = document.getElementById('hapusGambarInput');
+		const btnRemovePreview  = document.getElementById('btnRemovePreview');
 
 		const STORE_URL = "{{ route('admin.kelola-galeri.store') }}";
 
 		function openModal(mode, data = null) {
 			galleryForm.reset();
-			previewImg.classList.remove('show');
+			previewWrap.classList.remove('show');
 			previewImg.src = '';
 			uploadLabel.textContent = 'Klik atau seret foto ke sini';
 			photoInput.required = true;
+			hapusGambarInput.value = '0';
 
 			if (mode === 'edit' && data) {
 				modalTitle.textContent = 'Edit Foto Galeri';
@@ -912,7 +1167,7 @@
 				photoTitle.value = data.judul;
 				photoCategory.value = data.kategori;
 				previewImg.src = data.foto;
-				previewImg.classList.add('show');
+				previewWrap.classList.add('show');
 			} else {
 				modalTitle.textContent = 'Tambah Foto Galeri';
 				galleryForm.action = STORE_URL;
@@ -949,10 +1204,21 @@
 			const reader = new FileReader();
 			reader.onload = function (e) {
 				previewImg.src = e.target.result;
-				previewImg.classList.add('show');
+				previewWrap.classList.add('show');
 				uploadLabel.textContent = file.name;
+				hapusGambarInput.value = '0';
 			};
 			reader.readAsDataURL(file);
+		});
+
+		// Tombol silang di pojok kanan atas foto -> batalkan foto yang dipilih/ditampilkan
+		btnRemovePreview.addEventListener('click', function () {
+			photoInput.value = '';
+			previewImg.src = '';
+			previewWrap.classList.remove('show');
+			uploadLabel.textContent = 'Klik atau seret foto ke sini';
+			// Menandai foto lama (saat edit) untuk dihapus jika form disimpan tanpa foto baru
+			hapusGambarInput.value = '1';
 		});
 
 		/* ---------- ZOOM MODE FOTO ---------- */
@@ -992,7 +1258,7 @@
 		});
 
 		// Inisialisasi awal
-		applyFilters();
+		applyFilters(true);
 
 		// Fungsi buka/tutup menu generik
 		function toggleMenu(menuId) {

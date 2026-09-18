@@ -95,6 +95,54 @@
 			cursor: pointer;
 		}
 
+		/* TOOLBAR PENCARIAN & FILTER */
+		#content main .table-data .head .table-toolbar {
+			display: flex;
+			align-items: center;
+			grid-gap: 10px;
+			flex-wrap: wrap;
+		}
+		#content main .table-data .head .search-box {
+			display: flex;
+			align-items: center;
+			grid-gap: 8px;
+			background: var(--grey);
+			border-radius: 36px;
+			padding: 0 16px;
+			height: 38px;
+		}
+		#content main .table-data .head .search-box .bx {
+			font-size: 16px;
+			color: var(--dark-grey);
+			cursor: default;
+		}
+		#content main .table-data .head .search-box input {
+			border: none;
+			background: transparent;
+			outline: none;
+			font-family: var(--poppins);
+			font-size: 13px;
+			color: var(--dark);
+			width: 200px;
+		}
+		#content main .table-data .head select.filter-select {
+			height: 38px;
+			padding: 0 14px;
+			border-radius: 36px;
+			border: none;
+			background: var(--grey);
+			color: var(--dark);
+			font-family: var(--poppins);
+			font-size: 13px;
+			outline: none;
+			cursor: pointer;
+		}
+		#content main .table-data .order table .no-result-row td {
+			text-align: center;
+			padding: 32px 0;
+			color: var(--dark-grey);
+		}
+
 		#content main .table-data .order {
 			width: 100%;
 			flex-grow: 1;
@@ -190,6 +238,55 @@
 			color: var(--red);
 		}
 
+		/* PAGINASI HALAMAN */
+		.pagination-wrapper {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 20px;
+			flex-wrap: wrap;
+			grid-gap: 12px;
+		}
+		.pagination-info {
+			font-size: 13px;
+			color: var(--dark-grey);
+		}
+		.pagination-controls {
+			display: flex;
+			align-items: center;
+			grid-gap: 6px;
+			flex-wrap: wrap;
+		}
+		.pagination-btn {
+			min-width: 34px;
+			height: 34px;
+			padding: 0 10px;
+			border-radius: 8px;
+			border: 1px solid var(--grey);
+			background: var(--light);
+			color: var(--dark);
+			font-size: 13px;
+			font-weight: 500;
+			cursor: pointer;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			transition: all .2s ease;
+			font-family: var(--poppins);
+		}
+		.pagination-btn:hover:not(:disabled) {
+			background: var(--grey);
+		}
+		.pagination-btn.active {
+			background: var(--blue);
+			color: var(--light);
+			border-color: var(--blue);
+		}
+		.pagination-btn:disabled {
+			opacity: .4;
+			cursor: not-allowed;
+		}
+
 		/* MODAL FORM LAYANAN */
 		.modal-overlay {
 			display: none;
@@ -269,8 +366,8 @@
 			font-family: var(--poppins);
 		}
 		.modal-box .btn-cancel {
-			background: var(--grey);
-			color: var(--dark);
+			background: var(--red);
+			color: var(--light);
 		}
 		.modal-box .btn-save {
 			background: var(--blue);
@@ -428,7 +525,14 @@
 		.image-zoom-overlay.show {
 			display: flex;
 		}
+		.image-zoom-overlay .image-zoom-inner {
+			position: relative;
+			display: inline-flex;
+			max-width: 100%;
+			max-height: 85vh;
+		}
 		.image-zoom-overlay img {
+			display: block;
 			max-width: 100%;
 			max-height: 85vh;
 			border-radius: 8px;
@@ -436,12 +540,12 @@
 		}
 		.image-zoom-overlay .image-zoom-close {
 			position: absolute;
-			top: 20px;
-			right: 28px;
+			top: -16px;
+			right: -16px;
 			width: 40px;
 			height: 40px;
 			border-radius: 50%;
-			background: rgba(255,255,255,.15);
+			background: var(--red);
 			color: #fff;
 			font-size: 26px;
 			line-height: 1;
@@ -452,39 +556,7 @@
 			border: none;
 		}
 		.image-zoom-overlay .image-zoom-close:hover {
-			background: rgba(255,255,255,.3);
-		}
-
-		#content main .menu, #content nav .menu {
-			display: none;
-			list-style-type: none;
-			padding-left: 20px;
-			margin-top: 5px;
-			position: absolute;
-			background-color: #f9f9f9;
-			border: 1px solid #ddd;
-			border-radius: 5px;
-			width: 200px;
-		}
-		#content main .menu a , #content nav .menu a {
-			color: white;
-			text-decoration: none;
-			display: block;
-			padding: 8px 16px;
-		}
-		#content main .menu a:hover , #content nav .menu a:hover {
-			background-color: #444;
-		}
-		#content main .menu-link , #content nav .menu-link {
-			margin: 5px;
-			padding: 10px 20px;
-			font-size: 16px;
-			cursor: pointer;
-			text-decoration: none;
-			color: #007bff;
-		}
-		#content main .menu-link:hover, #content nav .menu-link:hover {
-			text-decoration: underline;
+			background: #c0392b;
 		}
 
 		/* Media Query for Smaller Screens */
@@ -580,38 +652,29 @@
 				</button>
 			</div>
 
-			<ul class="box-info">
-				<li>
-					<i class='bx bxs-shopping-bag-alt' ></i>
-					<span class="text">
-						<h3>18</h3>
-						<p>Total Layanan</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bxs-check-circle' ></i>
-					<span class="text">
-						<h3>14</h3>
-						<p>Layanan Aktif</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bxs-x-circle' ></i>
-					<span class="text">
-						<h3>4</h3>
-						<p>Layanan Nonaktif</p>
-					</span>
-				</li>
-			</ul>
-
 			<div class="table-data">
 				<div class="order">
 					<div class="head">
 						<h3>Daftar Layanan</h3>
-						<i class='bx bx-search' ></i>
-						<i class='bx bx-filter' ></i>
+						<div class="table-toolbar">
+							<div class="search-box">
+								<i class='bx bx-search'></i>
+								<input type="text" id="layananSearch" placeholder="Cari layanan...">
+							</div>
+							<select id="layananFilterGambar" class="filter-select">
+								<option value="">Semua Layanan</option>
+								<option value="ada">Ada Gambar</option>
+								<option value="tanpa">Tanpa Gambar</option>
+							</select>
+							<select id="layananLimit" class="filter-select">
+								<option value="semua">Semua Baris</option>
+								<option value="5">5 Baris</option>
+								<option value="10">10 Baris</option>
+								<option value="20">20 Baris</option>
+							</select>
+						</div>
 					</div>
-					<table>
+					<table id="layananTable">
 						<thead>
 							<tr>
 								<th style="width:48px; text-align:center;">No</th>
@@ -622,7 +685,7 @@
 						</thead>
 						<tbody id="layananTableBody">
 							@foreach($services as $service)
-							<tr>
+							<tr class="layanan-row" data-title="{{ strtolower($service->title) }}" data-desc="{{ strtolower($service->description) }}" data-gambar="{{ $service->image ? 'ada' : 'tanpa' }}" data-status="{{ $service->status ?? 'aktif' }}">
 								<td style="text-align:center;">{{ $loop->iteration }}</td>
 								<td class="col-layanan">
 									@if($service->image)
@@ -649,8 +712,21 @@
 								</td>
 							</tr>
 							@endforeach
+							<tr class="no-result-row" id="layananNoResult" style="display:none;">
+								<td colspan="4">Data tidak ditemukan.</td>
+							</tr>
 						</tbody>
 					</table>
+
+					<!-- KONTROL PAGINASI HALAMAN (1, 2, dst.) -->
+					<div class="pagination-wrapper" id="layananPagination">
+						<div class="pagination-info" id="paginationInfo">
+							Menampilkan 0 data
+						</div>
+						<div class="pagination-controls" id="paginationControls">
+							<!-- Navigasi 1, 2, dst. di-generate secara dinamis oleh JS -->
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -714,8 +790,10 @@
 
 		<!-- LIGHTBOX ZOOM GAMBAR -->
 		<div class="image-zoom-overlay" id="imageZoomOverlay" onclick="closeImageZoomBackdrop(event)">
-			<button type="button" class="image-zoom-close" onclick="closeImageZoom()">&times;</button>
-			<img id="imageZoomImg" src="" alt="Preview diperbesar">
+			<div class="image-zoom-inner">
+				<img id="imageZoomImg" src="" alt="Preview diperbesar">
+				<button type="button" class="image-zoom-close" onclick="closeImageZoom()">&times;</button>
+			</div>
 		</div>
 
 		<!-- Modal Konfirmasi Hapus -->
@@ -746,6 +824,150 @@
 
 @push('scripts')
 <script>
+		// ===== Menghitung Statistik Dinamis =====
+		function updateLayananStats() {
+			const rows = document.querySelectorAll('#layananTableBody .layanan-row');
+			let total = rows.length;
+			let aktif = 0;
+			let nonaktif = 0;
+
+			rows.forEach(row => {
+				const status = row.dataset.status ? row.dataset.status.toLowerCase() : 'aktif';
+				if (status === 'nonaktif' || status === '0' || status === 'inactive') {
+					nonaktif++;
+				} else {
+					aktif++;
+				}
+			});
+
+			document.getElementById('statTotalLayanan').textContent = total;
+			document.getElementById('statLayananAktif').textContent = aktif;
+			document.getElementById('statLayananNonaktif').textContent = nonaktif;
+		}
+
+		// Jalankan saat halaman dimuat
+		document.addEventListener('DOMContentLoaded', function() {
+			updateLayananStats();
+			applyLayananFilters();
+		});
+
+		// ===== Pencarian, Filter & Paginasi Dinamis =====
+		const layananSearchInput = document.getElementById('layananSearch');
+		const layananFilterGambar = document.getElementById('layananFilterGambar');
+		const layananLimit = document.getElementById('layananLimit');
+		const layananNoResult = document.getElementById('layananNoResult');
+
+		let currentPage = 1;
+
+		function applyLayananFilters() {
+			const keyword = layananSearchInput ? layananSearchInput.value.trim().toLowerCase() : '';
+			const gambar = layananFilterGambar ? layananFilterGambar.value : '';
+			const limitVal = layananLimit ? layananLimit.value : 'semua';
+			
+			const rows = Array.from(document.querySelectorAll('#layananTableBody .layanan-row'));
+			
+			// 1. Filter baris data
+			const filteredRows = rows.filter(function (row) {
+				const cocokKeyword = row.dataset.title.includes(keyword) || row.dataset.desc.includes(keyword);
+				const cocokGambar = gambar === '' || row.dataset.gambar === gambar;
+				return cocokKeyword && cocokGambar;
+			});
+
+			// Sembunyikan semua baris
+			rows.forEach(row => row.style.display = 'none');
+
+			const totalFiltered = filteredRows.length;
+
+			if (totalFiltered === 0) {
+				if (layananNoResult) layananNoResult.style.display = '';
+				renderPagination(0, limitVal, 1, 1, 0, 0);
+				return;
+			} else {
+				if (layananNoResult) layananNoResult.style.display = 'none';
+			}
+
+			// 2. Hitung jumlah halaman
+			const isSemua = (limitVal === 'semua');
+			const limit = isSemua ? totalFiltered : parseInt(limitVal);
+			const totalPages = isSemua ? 1 : Math.ceil(totalFiltered / limit);
+
+			// Validasi halaman aktif
+			if (currentPage > totalPages) currentPage = totalPages;
+			if (currentPage < 1) currentPage = 1;
+
+			const startIndex = (currentPage - 1) * limit;
+			const endIndex = Math.min(startIndex + limit, totalFiltered);
+
+			// 3. Tampilkan data halaman aktif
+			for (let i = startIndex; i < endIndex; i++) {
+				if (filteredRows[i]) {
+					filteredRows[i].style.display = '';
+				}
+			}
+
+			// 4. Render tombol paginasi
+			renderPagination(totalFiltered, limitVal, currentPage, totalPages, startIndex + 1, endIndex);
+		}
+
+		function renderPagination(totalFiltered, limitVal, page, totalPages, start, end) {
+			const paginationInfo = document.getElementById('paginationInfo');
+			const paginationControls = document.getElementById('paginationControls');
+
+			if (!paginationInfo || !paginationControls) return;
+
+			if (totalFiltered === 0) {
+				paginationInfo.textContent = 'Menampilkan 0 data';
+				paginationControls.innerHTML = '';
+				return;
+			}
+
+			paginationInfo.textContent = `Menampilkan ${start} - ${end} dari ${totalFiltered} data`;
+
+			if (limitVal === 'semua' || totalPages <= 1) {
+				paginationControls.innerHTML = '';
+				return;
+			}
+
+			let html = '';
+
+			// Tombol Sebelumnya (<)
+			html += `<button type="button" class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="changePage(${page - 1})"><i class='bx bx-chevron-left'></i></button>`;
+
+			// Tombol Angka Halaman (1, 2, dst.)
+			for (let i = 1; i <= totalPages; i++) {
+				html += `<button type="button" class="pagination-btn ${i === page ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+			}
+
+			// Tombol Selanjutnya (>)
+			html += `<button type="button" class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="changePage(${page + 1})"><i class='bx bx-chevron-right'></i></button>`;
+
+			paginationControls.innerHTML = html;
+		}
+
+		function changePage(page) {
+			currentPage = page;
+			applyLayananFilters();
+		}
+
+		if (layananSearchInput) {
+			layananSearchInput.addEventListener('input', function() {
+				currentPage = 1;
+				applyLayananFilters();
+			});
+		}
+		if (layananFilterGambar) {
+			layananFilterGambar.addEventListener('change', function() {
+				currentPage = 1;
+				applyLayananFilters();
+			});
+		}
+		if (layananLimit) {
+			layananLimit.addEventListener('change', function() {
+				currentPage = 1;
+				applyLayananFilters();
+			});
+		}
+
 		const modalLayanan = document.getElementById('modalLayanan');
 		const formLayanan  = document.getElementById('formLayanan');
 		const modalLayananTitle = document.getElementById('modalLayananTitle');
@@ -844,7 +1066,7 @@
 			modalLayanan.classList.add('show');
 		}
 
-		// Buka modal edit — menerima data dari atribut tombol
+		// Buka modal edit
 		function openEditModal(id, title, description, image) {
 			modalLayananTitle.innerText = 'Edit Layanan';
 			formLayanan.action = '/admin/kelola-layanan/' + id;
@@ -853,7 +1075,6 @@
 			document.getElementById('description').value = description;
 			hapusGambarFlag.value = '0';
 
-			// Tampilkan gambar yang sudah pernah diupload (kalau ada)
 			if (image) {
 				setImagePreviewUrl(image);
 			} else {
@@ -863,12 +1084,11 @@
 			modalLayanan.classList.add('show');
 		}
 
-		// Tutup modal
 		function closeModalLayanan() {
 			modalLayanan.classList.remove('show');
 		}
 
-		// Zoom gambar dari tabel Daftar Layanan
+		// Zoom gambar dari tabel
 		function openTableImageZoom(el) {
 			imageZoomImg.src = el.src;
 			imageZoomOverlay.classList.add('show');
@@ -879,7 +1099,6 @@
 			imageZoomImg.src = '';
 		}
 
-		// Tutup lightbox kalau klik area gelap di luar gambar/tombol close
 		function closeImageZoomBackdrop(e) {
 			if (e.target === imageZoomOverlay) closeImageZoom();
 		}
@@ -914,7 +1133,7 @@
 			}
 		});
 
-		// ===== Modal Notifikasi Sukses (tambah / update / hapus) =====
+		// ===== Modal Notifikasi Sukses =====
 		const successModal    = document.getElementById('successModal');
 		const successMessage  = document.getElementById('successMessage');
 		const btnCloseSuccess = document.getElementById('btnCloseSuccess');

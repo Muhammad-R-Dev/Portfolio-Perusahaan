@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\GalleryController;
@@ -51,8 +52,29 @@ Route::middleware('auth')->group(function () {
 
         // 2. Dashboard Admin
         Route::get('/dashboard', function () {
-            return view('admin.pages.dashboard');
+            // NOTE: sesuaikan nama Model di bawah ini (App\Models\...) jika nama
+            // model Blog/Service/Gallery/Team di project kamu berbeda.
+            $totalBlog    = \App\Models\Blog::count();
+            $totalLayanan = \App\Models\Service::count();
+            $totalGaleri  = \App\Models\Gallery::count();
+            $totalTim     = \App\Models\Team::count();
+            $totalDivisi  = \App\Models\Team::whereNotNull('divisi')->distinct('divisi')->count('divisi');
+
+            $recentBlogs   = \App\Models\Blog::latest()->take(3)->get();
+            $recentGaleri  = \App\Models\Gallery::latest()->take(4)->get();
+            $recentLayanan = \App\Models\Service::latest()->take(4)->get();
+            $recentTeam    = \App\Models\Team::latest()->take(4)->get();
+
+            return view('admin.pages.dashboard', compact(
+                'totalBlog', 'totalLayanan', 'totalGaleri', 'totalTim', 'totalDivisi',
+                'recentBlogs', 'recentGaleri', 'recentLayanan', 'recentTeam'
+            ));
         })->name('dashboard');
+
+        // 2.1 Kelola Proyek (Client & Project)
+        Route::get('/kelola-proyek', function () {
+            return view('admin.pages.kelola-proyek');
+        })->name('kelola-proyek');
 
         // 3. Kelola Layanan
         Route::resource('kelola-layanan', \App\Http\Controllers\AdminServiceController::class)->names([
@@ -92,5 +114,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/setting/username', [SettingController::class, 'updateUsername'])->name('setting.username.update');
         Route::post('/setting/password', [SettingController::class, 'updatePassword'])->name('setting.password.update');
 
+
+        Route::resource('clients', ClientController::class)->except(['create', 'edit', 'show']);
     });
 });

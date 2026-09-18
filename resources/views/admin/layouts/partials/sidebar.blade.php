@@ -14,6 +14,12 @@
 				<span class="text">Dashboard</span>
 			</a>
 		</li>
+		<li class="{{ request()->routeIs('admin.kelola-proyek') ? 'active' : '' }}">
+			<a href="{{ route('admin.kelola-proyek') }}">
+				<i class='bx bxs-folder-open bx-sm' ></i>
+				<span class="text">Kelola Proyek</span>
+			</a>
+		</li>
 		<li class="{{ request()->routeIs('admin.kelola-layanan.*') ? 'active' : '' }}">
 			<a href="{{ route('admin.kelola-layanan.index') }}">
 				<i class='bx bxs-briefcase-alt-2 bx-sm' ></i>

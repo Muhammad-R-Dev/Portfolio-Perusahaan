@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Inverted Product Card with Social Media</title>
+  <style>
+    body {
+      background-color: #dfdfdf;
+      font-family: poppins, sans-serif;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    
+    .container {
+      padding: 0.5rem;
+      background-color: #f5f5f3;
+      width: fit-content;
+      border-radius: 35px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 8px rgb(0 0 0 / 0.2);
+    }
+    
+    a {
+      color: inherit;
+      text-underline-offset: 3px;
+    }
+    
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Mengubah .price menjadi .social-icons dan mengatur ke kanan bawah */
+    .social-icons {
+      position: absolute;
+      bottom: -4%;
+      right: 9%;
+      display: flex;
+      gap: 12px;
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+    
+    .social-icons a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, color 0.2s ease;
+      color: #333;
+    }
+
+    .social-icons a:hover {
+      transform: translateY(-3px) scale(1.1);
+      color: #bdcca5; /* Warna hijau yang sama dengan background card image */
+    }
+
+    .social-icons svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .inverted {
+      clip-path: url("#clip");
+      max-width: 290px;
+      max-height: 320px;
+      background-color: #bdcca5;
+      aspect-ratio: 29 / 32;
+    }
+    
+    img {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="inverted">
+      <img src="https://images.unsplash.com/photo-1701541622919-a18d34c3d52d?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NTQ2NjUyNjh8&ixlib=rb-4.1.0&q=85" alt="Ice Matcha" />
+    </div>
+    
+    <!-- Logo Media Sosial Melayang di Kanan Bawah -->
+    <div class="social-icons">
+      <!-- Facebook -->
+      <a href="#" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+      </a>
+      <!-- X / Twitter -->
+      <a href="#" aria-label="X (Twitter)">
+        <svg viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+      </a>
+      <!-- Instagram -->
+      <a href="#" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+    </div>
+
+    <p class="title">Ice Matcha
+      <a href="https://corner-inverter.douiri.org/?w=290&h=320&b=0&r=32,32,32,32&ic=20x30x10:0,57x28x14:1,30x20x10:0,20x20x10:0&bc=FF2056&bg=bdcca5&utm_source=copy&utm_medium=share&utm_campaign=code_export" target="_blank">Try shape</a>
+    </p>
+  </div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: block;position: absolute" width="0" height="0">
+    <defs>
+      <clipPath id="clip" clipPathUnits="objectBoundingBox">
+        <path d="M0.1103,0H0.7552A0.0483,0.0437,0,0,1,0.8034,0.0437L0.8034,0.0437A0.0483,0.0437,0,0,0,0.8517,0.0875L0.9517,0.0875A0.0483,0.0437,0,0,1,1,0.1313V0.9A0.1103,0.1,0,0,1,0.8897,1H0.1103A0.1103,0.1,0,0,1,0,0.9V0.1A0.1103,0.1,0,0,1,0.1103,0Z" />
+      </clipPath>
+    </defs>
+  </svg>
+    
+</body>
+</html>

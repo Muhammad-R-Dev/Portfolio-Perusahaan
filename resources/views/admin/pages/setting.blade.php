@@ -400,7 +400,7 @@
 				<div class="settings-card" style="flex-basis: 100%;">
 					<div class="head">
 						<i class='bx bxs-user-detail'></i>
-						<h3>Pengaturan Akun</h3>
+						<h3>Edit Akun</h3>
 						<p>Perbarui username dan/atau kata sandi yang digunakan untuk masuk ke portal.</p>
 					</div>
 

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hero Section Only</title>
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+    
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap");
+      :root {
+        --color-white: #ffffff;
+        --color-blue-300: hsl(217, 80%, 55%);
+        --shadow-medium: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
+           rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        list-style: none;
+        list-style-type: none;
+        text-decoration: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      html {
+        font-size: 100%;
+        box-sizing: inherit;
+        scroll-behavior: smooth;
+        height: -webkit-fill-available;
+      }
+
+      body {
+        font-family: "Roboto", ui-sans-serif, sans-serif;
+        font-size: clamp(1rem, 2vw, 1.125rem);
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--color-white);
+        /* Warna background disesuaikan dengan biru teal pada logo */
+        background-color: #0d4358; 
+      }
+
+      main,
+      section {
+        overflow: hidden;
+      }
+
+      a,
+      button {
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        border: none;
+        outline: none;
+        color: inherit;
+        background: unset;
+      }
+
+      h1, h2, h3, h4, h5 {
+        font-family: inherit;
+        line-height: 1.25;
+        text-wrap: balance;
+        word-wrap: break-word;
+      }
+
+      p, li {
+        font-family: inherit;
+        line-height: 1.5;
+        text-wrap: pretty;
+        word-wrap: break-word;
+      }
+
+      img, svg, picture {
+        max-width: 100%;
+        height: auto;
+        vertical-align: middle;
+        object-fit: cover;
+        background-size: cover;
+        background-repeat: no-repeat;
+        image-rendering: crisp-edges;
+      }
+
+      .section {
+        padding-block: 6rem 3rem;
+      }
+
+      .container {
+        max-width: 75rem;
+        height: auto;
+        margin-inline: auto;
+        padding-inline: 1.5rem;
+      }
+
+      .title-large {
+        font-family: inherit;
+        font-size: clamp(2.65rem, 6vw, 4rem);
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .text-base {
+        font-family: inherit;
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+
+      .font-normal {
+        font-weight: 400;
+      }
+
+      .btn {
+        display: inline-flex;
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 1.5;
+        align-items: center;
+        white-space: nowrap;
+        text-align: center;
+        justify-content: center;
+        vertical-align: middle;
+        column-gap: 0.35rem;
+        padding-block: 0.5rem;
+        padding-inline: 1.25rem;
+        border-radius: 3rem;
+        transition: all 0.25s ease;
+      }
+      
+      .btn-primary {
+        color: var(--color-white);
+        background-color: var(--color-blue-300);
+        box-shadow: var(--shadow-medium);
+      }
+
+      .banner-column {
+        position: relative;
+        display: grid;
+        align-items: center;
+        row-gap: 3rem;
+        column-gap: 2rem;
+      }
+      
+      @media screen and (min-width: 48rem) {
+        .banner-column {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          justify-content: center;
+          margin-top: 4rem;
+        }
+      }
+      
+      @media screen and (min-width: 64rem) {
+        .banner-column {
+          grid-template-columns: 1fr max-content;
+          column-gap: 4rem;
+        }
+      }
+      
+      .banner-image {
+        display: block;
+        max-width: 16rem;
+        height: auto;
+        object-fit: cover;
+        justify-self: center;
+      }
+      
+      @media screen and (min-width: 48rem) {
+        .banner-image {
+          max-width: 20rem;
+          order: 1;
+        }
+      }
+      
+      @media screen and (min-width: 64rem) {
+        .banner-image {
+          max-width: 24rem;
+          margin-right: 5rem;
+        }
+      }
+      
+      .banner-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: baseline;
+        row-gap: 1.5rem;
+      }
+      
+      .banner-link {
+        position: absolute;
+        display: grid;
+        top: 30%;
+        right: 1.5rem;
+        justify-items: center;
+        row-gap: 0.5rem;
+        visibility: hidden;
+      }
+      
+      @media screen and (min-width: 64rem) {
+        .banner-link {
+          visibility: visible;
+        }
+      }
+      
+      .banner-link > * {
+        font-size: 1.25rem;
+        line-height: inherit;
+        color: var(--color-white);
+      }
+      
+      .banner-link::before, .banner-link::after {
+        content: "";
+        position: absolute;
+        width: 4rem;
+        height: 1.5px;
+        transform: rotate(90deg);
+        background: var(--color-white);
+      }
+      
+      .banner-link::before {
+        top: -3rem;
+      }
+      
+      .banner-link::after {
+        bottom: -3rem;
+      }
+    </style>
+  </head>
+    
+  <body>
+    <!-- Main section -->
+    <main class="main">
+       <section class="section banner-section">
+          <div class="container banner-column">
+             <!-- URL gambar telah diganti dengan hasil pencarian produk yang cocok -->
+             <img src="https://png.pngtree.com/png-vector/20251121/ourlarge/pngtree-black-wireless-headphones-product-shot-png-image_18018008.webp" class="banner-image" width="480" height="360" fetchpriority="high" alt="Headphone Banner Image">
+             <div class="banner-inner">
+                <h1 class="title-large">Experience Media Like Never Before</h1>
+                <p class="text-base font-normal">
+                   Enjoy award-winning stereo beats with wireless listening freedom and sleek,
+                   streamlined with premium padded and delivering first-rate playback.
+                </p>
+                <button type="button" class="btn btn-primary">
+                   Discover Now <i class="bx bx-chevron-right"></i>
+                </button>
+             </div>
+             <div class="banner-link">
+                <a href="#" title=""><i class="bx bxl-facebook"></i></a>
+                <a href="#" title=""><i class="bx bxl-instagram"></i></a>
+                <a href="#" title=""><i class="bx bxl-twitter"></i></a>
+                <a href="#" title=""><i class="bx bxl-youtube"></i></a>
+             </div>
+          </div>
+       </section>
+    </main>
+  </body>
+</html>

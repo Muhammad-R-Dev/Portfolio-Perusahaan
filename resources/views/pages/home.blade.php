@@ -46,13 +46,14 @@
 html {
   background-color: var(--ivory);
   scroll-behavior: smooth;
-}
 body {
-  font-family: var(--font-body);
+  font-family: 'Plus Jakarta Sans', sans-serif; /* Font utama yang bersih & modern */
   color: var(--text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.01em;
+}
+
+/* Pastikan semua heading atau teks di bawah ikut menggunakan font yang sama atau senada */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sora', sans-serif; /* Font heading yang tegas & modern */
 }
 
 
