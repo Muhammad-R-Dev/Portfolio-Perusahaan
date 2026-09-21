@@ -16,17 +16,15 @@
                 <div class="about-text">
                     <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi untuk mentransformasi ide menjadi solusi digital tingkat tinggi. Kami percaya bahwa setiap masalah bisnis memiliki jawaban teknologi yang tepat. Dengan perpaduan keahlian rekayasa perangkat lunak dan desain UI/UX yang modern, kami hadir sebagai mitra strategis untuk akselerasi digital Anda.</p>
                     <p>Filosofi "Astabrata" yang melambangkan 8 sifat alam semesta menjadi pedoman kami dalam berkarya: adaptif seperti air, kokoh seperti bumi, dan menerangi seperti matahari. Kami berkomitmen memberikan layanan terbaik dengan standar profesionalisme tertinggi.</p>
-                </div>
-                <div class="about-image">
-                    <img src="{{ asset('image/kantor.jpeg') }}" alt="Tentang Astabrata">
-                </div>
 
-                <div class="about-social">
-                    <a href="#" title="Facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="bx bxl-facebook"></i></a>
-                    <a href="#" title="Instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="bx bxl-instagram"></i></a>
-                    <a href="#" title="Twitter" aria-label="Twitter" target="_blank" rel="noopener"><i class="bx bxl-twitter"></i></a>
-                    <a href="#" title="YouTube" aria-label="YouTube" target="_blank" rel="noopener"><i class="bx bxl-youtube"></i></a>
+                    <div class="about-social">
+                        <a href="#" title="Facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="bx bxl-facebook"></i></a>
+                        <a href="#" title="Instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="bx bxl-instagram"></i></a>
+                        <a href="#" title="Twitter" aria-label="Twitter" target="_blank" rel="noopener"><i class="bx bxl-twitter"></i></a>
+                        <a href="#" title="YouTube" aria-label="YouTube" target="_blank" rel="noopener"><i class="bx bxl-youtube"></i></a>
+                    </div>
                 </div>
+                <div class="about-image" role="img" aria-label="Tentang Astabrata" style="background-image: url('{{ asset('image/kantor.jpeg') }}');"></div>
             </div>
         </div>
     </section>
@@ -85,6 +83,7 @@
     @endphp
 
     <section class="gallery-section reveal">
+        <div class="gallery-particles" id="galleryParticles" aria-hidden="true"></div>
         <div class="gallery-inner">
             <div class="section-heading text-center">
                 <h2>Galeri Kegiatan</h2>
@@ -306,6 +305,7 @@
         margin-right: -5vw;
         padding: 6rem 5vw 5rem;
         box-sizing: border-box;
+        overflow: hidden; /* foto yang dipojokkan & animasi scale tidak menyembul keluar band */
         background-color: var(--about-bg);
         color: var(--about-white);
         font-family: var(--about-font);
@@ -317,7 +317,7 @@
     .about-container {
         position: relative;
         display: grid;
-        align-items: center;
+        align-items: stretch;
         row-gap: 3rem;
         column-gap: 2rem;
         max-width: 75rem;
@@ -391,40 +391,41 @@
         transform: translateY(-2px);
     }
 
+    /* MOBILE & TABLET (default, di bawah 64rem): layout bertumpuk.
+       Rasio dikunci sama dengan foto asli (kantor.jpeg 1152x921) supaya
+       seluruh foto tampil pas, tidak terpotong. Tanpa blur dan tanpa fade. */
     .about-image {
         position: relative;
         z-index: 5;
         width: 100%;
-        max-width: 28rem;
+        max-width: 40rem;
+        aspect-ratio: 1152 / 921;
         justify-self: center;
+        border-radius: 0.6rem;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
-    .about-image img {
-        display: block;
-        width: 100%;
-        height: auto;
-        aspect-ratio: 4 / 3;
-        object-fit: cover;
-        border-radius: 1rem;
-        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+    .about-image::before {
+        content: none;
     }
 
-    /* Tablet: 2 kolom */
-    @media screen and (min-width: 48rem) {
-        .about-container {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            justify-content: center;
-        }
-        .about-image {
-            max-width: 100%;
-        }
+    /* Hanya tint gelap tipis di bagian bawah foto */
+    .about-image::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%);
     }
 
     /* ===== Ikon sosial media =====
-       Mobile & tablet : baris horizontal di bawah gambar, diapit 2 garis (kiri & kanan)
-       Desktop (>=64rem): kolom vertikal di sisi kanan, diapit 2 garis (atas & bawah) */
+       Sekarang menyatu di bawah paragraf deskripsi (.about-text), horizontal
+       di semua ukuran layar, diapit garis kiri & kanan. */
     .about-social {
-        grid-column: 1 / -1;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -455,45 +456,74 @@
         background: var(--about-white);
     }
 
-    /* Desktop */
+    /* DESKTOP (>= 64rem): 2 kolom, foto dipojokkan ke kanan.
+       Foto dikeluarkan dari alur grid (absolute terhadap .about-content yang
+       selebar layar) dan menempel di tepi kanan, atas, dan bawah band.
+       Lebar foto = kolom kanan + jarak container ke tepi layar
+       (max(5vw, (lebar band - 75rem) / 2)), jadi tetap mentok kanan di
+       layar selebar apa pun. Kolom kanan ikut mengecil di laptop kecil
+       (44vw) supaya kotak foto tidak jadi terlalu sempit/tinggi. */
     @media screen and (min-width: 64rem) {
         .about-container {
-            grid-template-columns: 1fr minmax(0, 30rem);
+            --about-img-col: min(38rem, 44vw);
+            position: static; /* supaya foto mengacu ke .about-content */
+            grid-template-columns: minmax(0, 1fr) var(--about-img-col);
             column-gap: 4rem;
-            padding-right: 4rem; /* ruang untuk ikon sosial media */
         }
 
-        .about-social {
-            grid-column: auto;
+        .about-image {
             position: absolute;
-            display: grid;
-            top: 30%;
-            right: 0.5rem;
-            width: auto;
-            justify-items: center;
-            column-gap: 0;
-            row-gap: 0.5rem;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: calc(var(--about-img-col) + max(5vw, (100% - 75rem) / 2));
+            max-width: none;
+            aspect-ratio: auto;
+            justify-self: auto;
+            border-radius: 0;
+            /* Sisi kiri foto tertutup fade, jadi fokus ke papan nama + fasad:
+               sedikit ke kanan, dan agak ke atas supaya papan tidak terpotong. */
+            background-position: 60% 20%;
+            /* Sisi kiri foto larut jadi transparan sehingga warna band
+               (#0d4358) di belakangnya langsung tampil: foto, blur, dan
+               background menyatu, tanpa garis/seam putih di tepi kiri.
+               (Tepi kiri sengaja 100% transparan, jadi tidak ada piksel
+               foto yang bisa "bocor" akibat pembulatan sub-piksel.) */
+            -webkit-mask-image: linear-gradient(90deg,
+                transparent 0%,
+                transparent 2%,
+                rgba(0, 0, 0, 0.15) 12%,
+                rgba(0, 0, 0, 0.5) 20%,
+                rgba(0, 0, 0, 0.85) 30%,
+                #000 42%);
+            mask-image: linear-gradient(90deg,
+                transparent 0%,
+                transparent 2%,
+                rgba(0, 0, 0, 0.15) 12%,
+                rgba(0, 0, 0, 0.5) 20%,
+                rgba(0, 0, 0, 0.85) 30%,
+                #000 42%);
         }
 
-        .about-social > a {
-            font-size: 1.25rem;
-            line-height: inherit;
-        }
-
-        .about-social > a:hover {
-            transform: translateX(-2px);
-        }
-
-        .about-social::before,
-        .about-social::after {
+        /* Blur hanya di sisi kiri (sempit), memudar ke kanan lewat mask */
+        .about-image::before {
+            content: '';
             position: absolute;
-            flex: none;
-            width: 4rem;
-            transform: rotate(90deg);
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 6%, transparent 26%);
+            mask-image: linear-gradient(90deg, #000 0%, #000 6%, transparent 26%);
         }
 
-        .about-social::before { top: -3rem; }
-        .about-social::after { bottom: -3rem; }
+        /* Fade ke warna section kini ditangani mask di .about-image, jadi
+           overlay teal horizontal tidak diperlukan lagi (itulah yang dulu
+           menimbulkan garis putih tipis di tepi kiri). Sisakan tint bawah. */
+        .about-image::after {
+            background: linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%);
+        }
     }
 
     #tim-kami { scroll-margin-top: 90px; }
@@ -528,7 +558,7 @@
         margin-left: -5vw;
         margin-right: -5vw;
         background: transparent;
-        padding: 56px 20px 50px;
+        padding: 56px 20px 20px;
         overflow: hidden;
         box-sizing: border-box;
     }
@@ -562,7 +592,7 @@
         top: 50%;
         left: 50%;
         width: var(--th-card-width);
-        background: #ffffff;
+        background: transparent;
         overflow: hidden;
         transform-style: preserve-3d;
         cursor: pointer;
@@ -581,7 +611,7 @@
         min-height: 0;
         overflow: hidden;
         background: #eef3f3;
-        border-radius: 6px 6px 0 0;
+        border-radius: 6px;
     }
 
     .th-card-photo img {
@@ -594,44 +624,56 @@
         z-index: 1;
     }
 
+    /* Nama + jabatan menumpuk di atas foto (tanpa kotak putih terpisah),
+       memakai gradien gelap di bawah supaya teks tetap terbaca. */
     .th-card-name {
-        position: relative;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 4;
-        flex: 0 0 auto;
-        padding: 14px 12px 16px;
-        text-align: center;
-        background-image:
-            linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)),
-            url('{{ asset('image/bg-batik.png') }}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-top: 1px solid rgba(9, 67, 86, 0.06);
-        border-radius: 0 0 6px 6px;
+        padding: 44px 14px 22px;
+        text-align: left;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.55) 55%, transparent 100%);
+        pointer-events: none;
     }
 
     .th-card-name h3 {
         margin: 0;
-        color: #094356;
+        color: #ffffff;
         font-family: 'Sora', sans-serif;
-        font-size: clamp(13px, 2vw, 16px);
-        line-height: 1.25;
+        font-size: clamp(14px, 2vw, 19px);
+        line-height: 1.2;
         font-weight: 800;
         word-break: break-word;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
         position: relative;
         z-index: 1;
     }
 
     .th-card-name p {
         margin: 4px 0 0;
-        color: #668087;
+        color: #f0f0f0;
         font-family: 'Poppins', sans-serif;
         font-size: clamp(10px, 1.5vw, 12.5px);
         line-height: 1.3;
         font-weight: 500;
         word-break: break-word;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
         position: relative;
         z-index: 1;
+    }
+
+    /* Saat kartu diperbesar, info sudah ditampilkan oleh .th-expand-info,
+       jadi overlay kecil ini disembunyikan agar tidak dobel. */
+    .th-card.clone .th-card-name {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .th-card-name { padding: 28px 8px 16px; }
+        .th-card-name h3 { font-size: clamp(11px, 3vw, 14px); }
+        .th-card-name p { font-size: clamp(9px, 2.4vw, 11px); }
     }
 
     .th-card::before,
@@ -642,14 +684,14 @@
     .th-card-photo .th-hover-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(0, 0, 0, 0.22);
         display: flex;
         align-items: center;
         justify-content: center;
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: 2;
-        border-radius: 6px 6px 0 0;
+        border-radius: 6px;
     }
 
     .th-card:hover .th-card-photo .th-hover-overlay {
@@ -657,6 +699,7 @@
     }
 
     .th-card .th-hover-overlay span {
+        display: none; /* jabatan sudah tampil di bagian bawah foto */
         color: white;
         font-family: 'Poppins', sans-serif;
         font-size: clamp(11px, 2.5vw, 15px);
@@ -757,21 +800,62 @@
         width: calc(100% + 10vw);
         max-width: none;
         margin: 0 -5vw;
-        padding: 70px 5vw 80px;
+        padding: 40px 5vw 80px;
         box-sizing: border-box;
-        /* Atur kepekatan lapisan putih di atas gambar: 0 = gambar penuh, 1 = putih polos */
-        --gallery-overlay: 0.78;
-        background-color: #ffffff; /* cadangan bila gambar gagal dimuat */
-        background-image:
-            linear-gradient(rgba(255, 255, 255, var(--gallery-overlay)), rgba(255, 255, 255, var(--gallery-overlay))),
-            url('{{ asset('image/bg 1.jpg') }}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        /* Latar putih polos; animasi partikel digambar oleh lapisan .gallery-particles di bawah. */
+        background: #ffffff;
+        isolation: isolate; /* lapisan partikel tidak "bocor" ke bagian lain halaman */
+    }
+    .gallery-section .section-heading p {
+        color: #3f5359;
     }
     .gallery-inner {
+        position: relative;
+        z-index: 1; /* selalu di atas lapisan partikel */
         max-width: 1200px;
         margin: 0 auto;
+    }
+
+    /* ===== Partikel cincin (CSS Houdini PaintWorklet, dari bg.html) =====
+       Hanya aktif di browser yang mendukung paint() (Chrome/Edge/Brave/Opera).
+       Di browser lain (Firefox/Safari) latar tetap putih polos, tanpa error. */
+    .gallery-particles {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    @supports (background: paint(something)) {
+        @property --animation-tick { syntax: '<number>'; inherits: false; initial-value: 0; }
+        @property --ring-radius { syntax: '<number> | auto'; inherits: false; initial-value: auto; }
+        @property --ring-x { syntax: '<number>'; inherits: false; initial-value: 50; }
+        @property --ring-y { syntax: '<number>'; inherits: false; initial-value: 50; }
+
+        @keyframes galleryRipple { 0% { --animation-tick: 0; } 100% { --animation-tick: 1; } }
+        @keyframes galleryRing { 0% { --ring-radius: 150; } 100% { --ring-radius: 250; } }
+
+        .gallery-particles {
+            /* Posisi cincin dikunci di tengah galeri (50% / 50%), tidak mengikuti mouse atau scroll. */
+            --ring-x: 50;
+            --ring-y: 50;
+            --ring-radius: 100;
+            --ring-thickness: 600;
+            --particle-count: 80;
+            --particle-rows: 25;
+            --particle-size: 2;
+            --particle-color: navy;
+            --particle-min-alpha: 0.1;
+            --particle-max-alpha: 1.0;
+            --seed: 200;
+
+            background-image: paint(ring-particles);
+            animation: galleryRipple 6s linear infinite, galleryRing 6s ease-in-out infinite alternate;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gallery-particles { animation: none; }
+        }
     }
     /* ===== Galeri: filter + masonry ===== */
     .gallery-section .section-heading { margin-bottom: 28px; }
@@ -1053,9 +1137,15 @@
             max-width: none;
             margin-left: -5vw;
             margin-right: -5vw;
-            padding: 30px 15px 40px;
+            padding: 30px 15px 12px;
             border-radius: 0;
         }
+        .th-card-wrapper .section-heading { margin-bottom: 18px; }
+
+        /* Galeri lebih naik mendekati bagian tim */
+        .gallery-section { padding: 28px 5vw 56px; }
+        .gallery-section .section-heading { margin-bottom: 20px; }
+        .gallery-filter { margin-bottom: 24px; }
     }
 
     /* ===== LIGHTBOX MODAL CSS ===== */
@@ -1231,26 +1321,139 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
-    /* ===== Reveal on scroll ===== */
+    /* ===== Animasi Scroll (GSAP + ScrollTrigger) ===== */
     document.addEventListener('DOMContentLoaded', function() {
-        const revealEls = document.querySelectorAll('.reveal');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = 'translateY(0)';
-                    observer.unobserve(entry.target);
+        if (typeof gsap === 'undefined') return;
+        gsap.registerPlugin(typeof ScrollTrigger !== 'undefined' ? ScrollTrigger : {});
+
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const hasST = typeof ScrollTrigger !== 'undefined';
+
+        // Jika user minta motion minim, cukup pastikan semua elemen 'reveal' terlihat normal.
+        if (prefersReduced || !hasST) {
+            document.querySelectorAll('.reveal, .about-header .eyebrow, .about-header h1, .subtitle, .about-text p, .about-image, .about-social a, .section-heading h2, .section-heading p, .gallery-filter-btn, .gallery-card').forEach(el => {
+                el.style.opacity = 1;
+                el.style.transform = 'none';
+            });
+            return;
+        }
+
+        /* --- Helper: pecah judul jadi per-kata untuk efek reveal bertingkat --- */
+        function splitWords(el) {
+            if (!el || el.dataset.split === '1') return [];
+            const text = el.textContent.trim();
+            el.textContent = '';
+            el.dataset.split = '1';
+            const words = text.split(/\s+/).filter(Boolean);
+            return words.map((word, i) => {
+                const outer = document.createElement('span');
+                outer.style.cssText = 'display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:0.18em;margin-bottom:-0.18em;';
+                const inner = document.createElement('span');
+                inner.style.display = 'inline-block';
+                inner.textContent = word + (i < words.length - 1 ? '\u00A0' : '');
+                outer.appendChild(inner);
+                el.appendChild(outer);
+                return inner;
+            });
+        }
+
+        // toggleActions: [onEnter] [onLeave] [onEnterBack] [onLeaveBack]
+        // "restart reverse restart reverse" = tiap kali elemen masuk viewport (dari
+        // scroll ke bawah ATAU ke atas), animasi diputar ulang dari awal; tiap kali
+        // keluar viewport, animasi dibalik (fade/keluar lagi). Jadi animasi tidak
+        // hanya jalan sekali di awal, tapi berulang terus mengikuti arah scroll.
+        const TOGGLE = 'restart reverse restart reverse';
+
+        /* ===== 1. HERO (ikut terpicu ulang saat scroll naik-turun) ===== */
+        const heroEyebrow = document.querySelector('.about-header .eyebrow');
+        const heroTitle = document.querySelector('.about-header h1');
+        const heroSubtitle = document.querySelector('.about-header .subtitle');
+
+        if (heroTitle) {
+            const words = splitWords(heroTitle);
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.about-header',
+                    start: 'top 85%',
+                    end: 'bottom 15%',
+                    toggleActions: TOGGLE
+                }
+            })
+                .fromTo(heroEyebrow, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out' })
+                .fromTo(words, { yPercent: 130, rotate: 7, transformOrigin: '0% 100%' }, { yPercent: 0, rotate: 0, duration: 1, ease: 'power4.out', stagger: 0.09 }, '-=0.3')
+                .fromTo(heroSubtitle, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.55');
+        }
+
+        /* ===== 2. ABOUT SECTION (teks, gambar, sosial media) ===== */
+        const aboutSection = document.querySelector('.about-section');
+        if (aboutSection) {
+            const paras = aboutSection.querySelectorAll('.about-text p');
+            const aboutImg = aboutSection.querySelector('.about-image');
+            const socialLinks = aboutSection.querySelectorAll('.about-social a');
+
+            const aboutTl = gsap.timeline({
+                defaults: { ease: 'power3.out' },
+                scrollTrigger: {
+                    trigger: aboutSection,
+                    start: 'top 78%',
+                    end: 'bottom 20%',
+                    toggleActions: TOGGLE
                 }
             });
-        }, { threshold: 0.1 });
+            aboutTl.fromTo(paras, { autoAlpha: 0, y: 45 }, { autoAlpha: 1, y: 0, duration: 0.75, stagger: 0.18 });
+            if (aboutImg) aboutTl.fromTo(aboutImg, { autoAlpha: 0, scale: 1.18, clipPath: 'inset(8%)' }, { autoAlpha: 1, scale: 1, clipPath: 'inset(0%)', duration: 1.1, ease: 'power4.out' }, '-=0.5');
+            aboutTl.fromTo(socialLinks, { autoAlpha: 0, y: 18, scale: 0.5 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'back.out(2.2)' }, '-=0.4');
+        }
 
-        revealEls.forEach(el => {
-            el.style.opacity = 0;
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease-out';
-            observer.observe(el);
-        });
+        /* ===== 3. TIM KAMI (heading + kartu tim) ===== */
+        const teamSection = document.querySelector('.team-section');
+        if (teamSection) {
+            const teamHeading = teamSection.querySelectorAll('.section-heading h2, .section-heading p');
+            const teamSlider = teamSection.querySelector('.th-slider-container');
+
+            // PENTING: jangan menganimasikan .th-card satu per satu di sini.
+            // Posisi/rotasi 3D tiap kartu sudah diatur penuh oleh slider (TeamHtmlSlider);
+            // kalau ScrollTrigger ikut menggeser y/scale/opacity kartu yang sama, keduanya
+            // saling menimpa dan kartu bisa "turun sendiri" / nyangkut di posisi salah.
+            // Jadi cukup animasikan pembungkus slider-nya saja.
+            gsap.timeline({
+                defaults: { ease: 'power3.out' },
+                scrollTrigger: { trigger: teamSection, start: 'top 80%', end: 'bottom 20%', toggleActions: TOGGLE }
+            })
+                .fromTo(teamHeading, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.12 })
+                .fromTo(teamSlider, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8 }, '-=0.35');
+        }
+
+        /* ===== 4. GALERI KEGIATAN (heading, filter, kartu galeri) ===== */
+        const gallerySection = document.querySelector('.gallery-section');
+        if (gallerySection) {
+            const galHeading = gallerySection.querySelectorAll('.section-heading h2, .section-heading p');
+            const filterBtns = gallerySection.querySelectorAll('.gallery-filter-btn');
+            const galCards = gallerySection.querySelectorAll('.gallery-card');
+
+            gsap.timeline({
+                defaults: { ease: 'power3.out' },
+                scrollTrigger: { trigger: gallerySection, start: 'top 82%', end: 'bottom 20%', toggleActions: TOGGLE }
+            })
+                .fromTo(galHeading, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.12 })
+                .fromTo(filterBtns, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.05 }, '-=0.35');
+
+            gsap.set(galCards, { autoAlpha: 0, y: 42, scale: 0.92 });
+            ScrollTrigger.batch(galCards, {
+                start: 'top 92%',
+                end: 'bottom 8%',
+                onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'power3.out', overwrite: true }),
+                onEnterBack: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'power3.out', overwrite: true }),
+                onLeave: (batch) => gsap.to(batch, { autoAlpha: 0, y: -35, scale: 0.94, duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true }),
+                onLeaveBack: (batch) => gsap.to(batch, { autoAlpha: 0, y: 35, scale: 0.94, duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
+            });
+        }
+
+        // Refresh setelah semua gambar termuat agar posisi trigger akurat
+        window.addEventListener('load', () => ScrollTrigger.refresh());
+        setTimeout(() => ScrollTrigger.refresh(), 800);
     });
 
     /* ===== Particle Technology Background ===== */
@@ -1377,9 +1580,36 @@
             }
 
             applyResponsiveSizing() {
+                const perspective = Math.max(600, BASE_PERSPECTIVE * this.scale);
                 document.documentElement.style.setProperty('--th-card-width', `${BASE_CARD_WIDTH * this.scale}px`);
-                this.container.style.perspective = `${Math.max(600, BASE_PERSPECTIVE * this.scale)}px`;
-                this.track.style.height = `${MAX_BASE_HEIGHT * this.scale}px`;
+                this.container.style.perspective = `${perspective}px`;
+                this.track.style.height = `${this.computeTrackHeight(perspective)}px`;
+            }
+
+            // Desktop: tinggi penuh (tidak berubah).
+            // Mobile: layar sempit hanya menampilkan ~3-5 kartu tengah, sedangkan kartu
+            // terjangkung (620px x skala) ada di luar layar. Tinggi track dipangkas sesuai
+            // kartu yang benar-benar terlihat supaya tidak ada ruang kosong di bawah tim,
+            // sehingga bagian galeri naik mendekat.
+            computeTrackHeight(perspective) {
+                const full = MAX_BASE_HEIGHT * this.scale;
+                if (window.innerWidth > 768) return full;
+
+                const halfView = (this.container.clientWidth || window.innerWidth) / 2;
+                const cardHalf = (BASE_CARD_WIDTH * this.scale) / 2;
+                const usedSlots = new Set(this.cards.map((_, i) => this.computeSlot(i, 0)));
+
+                let tallest = 0;
+                usedSlots.forEach((slot) => {
+                    const p = this.positions[slot];
+                    if (Math.abs(p.x) - cardHalf >= halfView) return; // di luar layar
+                    const depthScale = perspective / Math.max(1, perspective - p.z); // kartu yang maju tampak lebih besar
+                    tallest = Math.max(tallest, p.height * depthScale);
+                });
+
+                if (!tallest) return full;
+                const breathing = 44; // ruang untuk bayangan kartu (container overflow: hidden)
+                return Math.min(full, Math.ceil(tallest + breathing));
             }
 
             applyPositions(animate = false) {
@@ -1422,6 +1652,12 @@
                 if (overlay) overlay.remove();
 
                 clone.style.position = 'absolute';
+                // Clone menyalin inline transform kartu asli (translate -50%, translateX, rotateY, dst).
+                // Karena posisinya sudah dihitung lewat left/top, transform itu harus dibuang;
+                // kalau tidak, clone muncul melenceng dulu lalu "melompat" ke tengah.
+                clone.style.transform = 'none';
+                clone.style.opacity = '1';
+                clone.style.visibility = 'visible';
                 clone.style.left = (rect.left - sectionRect.left) + 'px';
                 clone.style.top = (rect.top - sectionRect.top) + 'px';
                 clone.style.width = rect.width + 'px';
@@ -1464,7 +1700,6 @@
                     left: centerX - finalWidth / 2,
                     top: centerY - finalHeight / 2,
                     clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-                    transform: 'translateZ(0) rotateY(0deg)',
                     duration: 0.8,
                     ease: 'power2.out',
                     onComplete: () => {
@@ -1621,14 +1856,37 @@
                 if (this.expandedCard) return;
                 this.isDragging = true;
                 this.container.classList.add('dragging');
-                this.startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                const isMouse = e.type.includes('mouse');
+                this.startX = isMouse ? e.clientX : e.touches[0].clientX;
+                this.startY = isMouse ? e.clientY : e.touches[0].clientY;
+                this.gesture = isMouse ? 'h' : null; // arah geser: 'h' (slider) / 'v' (scroll halaman)
                 this.dragDistance = 0;
             }
 
             handleDragMove(e) {
                 if (!this.isDragging) return;
+
+                const isMouse = e.type.includes('mouse');
+                const currentX = isMouse ? e.clientX : e.touches[0].clientX;
+
+                // Layar sentuh: kalau jari bergerak dominan ke atas/bawah, biarkan halaman scroll
+                // normal (dulu selalu di-preventDefault sehingga halaman "macet" saat jari di slider).
+                if (!isMouse) {
+                    if (this.gesture === null) {
+                        const dx = Math.abs(currentX - this.startX);
+                        const dy = Math.abs(e.touches[0].clientY - this.startY);
+                        if (dx < 8 && dy < 8) return; // belum jelas arahnya
+                        this.gesture = dx > dy ? 'h' : 'v';
+                    }
+                    if (this.gesture === 'v') {
+                        this.isDragging = false;
+                        this.container.classList.remove('dragging');
+                        this.trackXTo(0);
+                        return;
+                    }
+                }
+
                 e.preventDefault();
-                const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
                 this.dragDistance = currentX - this.startX;
 
                 const liveOffset = thClamp(this.dragDistance, -this.threshold, this.threshold) * 0.5;
@@ -1883,6 +2141,20 @@
             if (e.key === 'ArrowRight') showNext();
         });
     });
+</script>
+
+<script>
+    /* ===== Partikel cincin di latar galeri (CSS Houdini PaintWorklet, dari bg.html) =====
+       Posisi cincin dikunci di tengah lewat CSS (.gallery-particles), jadi di sini cukup
+       mendaftarkan worklet-nya. Browser tanpa dukungan paint() (mis. Firefox/Safari)
+       melewati blok ini; latar tetap putih polos. */
+    (function () {
+        if (!('paintWorklet' in CSS)) return;
+
+        CSS.paintWorklet
+            .addModule('https://unpkg.com/css-houdini-ringparticles/dist/ringparticles.js')
+            .catch(function () { /* worklet gagal dimuat: biarkan latar putih polos */ });
+    })();
 </script>
 @endpush
 @endsection

@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Kelola Galeri | AdminHub')
+@section('title', 'Kelola Galeri | Admin Astabrata Teknologi')
 @section('page-title', 'Kelola Galeri')
 @section('search-id', 'gallerySearch')
 @section('search-placeholder', 'Cari galeri...')

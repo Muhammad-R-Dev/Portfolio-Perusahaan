@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Kelola Tim | AdminHub')
+@section('title', 'Kelola Tim | Admin Astabrata Teknologi')
 @section('page-title', 'Kelola Tim')
 
 @push('styles')

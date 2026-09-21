@@ -51,29 +51,45 @@
             margin-bottom: 22px;
         }
 
-        .back-button {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: #FFFFFF;
-            color: var(--primary);
+        /* Header hijau: full lebar dari pojok kiri ke pojok kanan, tombol kembali di dalamnya */
+        .top-header {
+            width: 100%;
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5%;
+            height: 60px;
             display: flex;
             align-items: center;
-            justify-content: center;
+        }
+
+        /* Tombol kembali simpel dengan ikon < (di atas latar hijau) */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px 8px 8px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #FFFFFF;
+            font-family: var(--font-body);
+            font-size: 0.92rem;
+            font-weight: 500;
             cursor: pointer;
             flex-shrink: 0;
-            box-shadow: var(--shadow-soft);
-            transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+            transition: background 0.2s ease;
         }
         .back-button:hover {
-            background: var(--primary);
-            color: #FFFFFF;
-            box-shadow: var(--shadow-lift);
-            transform: translateX(-2px);
+            background: rgba(255, 255, 255, 0.16);
         }
-        .back-button:active { transform: scale(0.92); }
-        .back-button svg { width: 17px; height: 17px; }
+        .back-button:active { transform: scale(0.97); }
+        .back-button svg { width: 20px; height: 20px; }
 
         .detail-layout {
             display: grid;
@@ -228,7 +244,7 @@
         /* ===== Kolom kanan: sidebar ===== */
         .detail-sidebar {
             position: sticky;
-            top: 24px;
+            top: 84px;
             display: flex;
             flex-direction: column;
             gap: 36px;
@@ -332,18 +348,20 @@
     </style>
 </head>
 <body>
+    {{-- Header hijau (kiri ke kanan) berisi tombol kembali --}}
+    <header class="top-header">
+        <div class="top-header-inner">
+            <button type="button" class="back-button" id="backButton" aria-label="Kembali">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Kembali
+            </button>
+        </div>
+    </header>
+
     <div class="detail-wrapper">
         <div class="detail-shell">
-
-            {{-- Tombol Back --}}
-            <div class="detail-topbar">
-                <button type="button" class="back-button" id="backButton" aria-label="Kembali">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 12H5"></path>
-                        <path d="M12 19l-7-7 7-7"></path>
-                    </svg>
-                </button>
-            </div>
 
             @php
                 // Pisahkan artikel lainnya menjadi: kategori sama (Rekomendasi)

@@ -3,7 +3,7 @@
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Sora:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,
 *::before,
@@ -38,22 +38,36 @@
   --radius-lg: 28px;
   --radius-md: 18px;
   --radius-sm: 12px;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-heading: 'Sora', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
+  /* Satu keluarga font untuk seluruh halaman: simple & modern */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --font-heading: var(--font-sans);
+  --font-body: var(--font-sans);
 }
 
 html {
   background-color: var(--ivory);
   scroll-behavior: smooth;
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif; /* Font utama yang bersih & modern */
-  color: var(--text);
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Pastikan semua heading atau teks di bawah ikut menggunakan font yang sama atau senada */
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Heading memakai font yang sama dengan body, dibedakan lewat ukuran & ketebalan */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Sora', sans-serif; /* Font heading yang tegas & modern */
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+/* Tombol & form tidak otomatis mewarisi font, jadi dipaksa ikut */
+button, input, textarea, select {
+  font-family: var(--font-sans);
 }
 
 
@@ -110,7 +124,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.05rem;
 }
 .brand-badge__text {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 700;
   font-size: 0.92rem;
   line-height: 1.25;
@@ -170,7 +184,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 12px 12px 0 0 #FFFFFF;
 }
 .trust-badge h4 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -234,8 +248,8 @@ main {
   color: #FEFEFE;
   pointer-events: auto;
 }
-.text h2 { font-weight: 100; font-size: 6.5rem; line-height: 0.88; }
-.text h1 { font-weight: 800; font-size: 8rem; line-height: 0.88; }
+.text h2 { font-weight: 300; font-size: 6.5rem; line-height: 0.88; letter-spacing: 0.02em; }
+.text h1 { font-weight: 800; font-size: 8rem; line-height: 0.88; letter-spacing: -0.01em; }
 
 .mountain-6 { z-index: 10; position: absolute; width: 26.68%; top: calc(50% + 10.68%); left: calc(50% + 40.97%); }
 .fog-4 { z-index: 11; position: absolute; width: 37.71%; top: calc(50% + 29.88%); left: calc(50% - 4.44%); }
@@ -274,7 +288,7 @@ main {
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(6px);
   color: #FEFEFE;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   letter-spacing: 0.03em;
   cursor: pointer;
@@ -342,7 +356,7 @@ main {
   .info-image img { min-height: 260px; }
 }
 .info h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-size: 2.2rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -351,7 +365,7 @@ main {
 }
 .info .eyebrow {
   display: block;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -388,7 +402,7 @@ main {
 }
 .info .step b {
   display: block;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   color: #094356;
   font-weight: 600;
   margin-bottom: 0.2rem;
@@ -415,7 +429,7 @@ main {
 }
 .layanan h3,
 .project h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-size: 2.2rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -454,7 +468,7 @@ main {
   display: inline-block;
 }
 .layanan-card h4 {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -477,17 +491,25 @@ main {
   padding: 5rem 1.5rem 6.5rem;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
-/* ===== FAQ (Pertanyaan Umum): layout teks kiri + accordion kanan ===== */
+/* ===== FAQ (Pertanyaan Umum): teks + CTA di kiri, accordion di kanan =====
+   Desktop : [teks]  [accordion]
+             [CTA ]  [accordion]
+   Mobile  : teks -> accordion -> CTA ("Masih punya pertanyaan?" di bawah daftar pertanyaan) */
 .faq-layout {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 620px);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "text list"
+    "cta  list";
   justify-content: space-between;
-  gap: 3.5rem;
+  align-items: start;
+  column-gap: 3.5rem;
+  row-gap: 2.25rem;
 }
 .faq-text {
-  flex: 0 0 auto;
-  width: 100%;
-  max-width: 360px;
+  grid-area: text;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -496,7 +518,7 @@ main {
   align-items: center;
   gap: 0.5rem;
   width: fit-content;
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -509,16 +531,17 @@ main {
   margin-bottom: 1rem;
 }
 .faq-text h3 { margin-bottom: 1rem; color: #111111; }
-.faq-desc { margin-bottom: 2.25rem; color: rgba(17, 17, 17, 0.62); }
+.faq-desc { margin-bottom: 0; color: rgba(17, 17, 17, 0.62); }
 
 .faq-cta {
+  grid-area: cta;
   background: #FAFAFA;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 18px;
   padding: 1.75rem 1.75rem 2rem;
 }
 .faq-cta h4 {
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   font-weight: 700;
   color: #111111;
@@ -538,7 +561,7 @@ main {
   gap: 0.5rem;
   background: #084b5f;
   color: #FFFFFF;
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -553,9 +576,8 @@ main {
 }
 
 .faq-list {
-  flex: 1 1 auto;
-  width: 100%;
-  max-width: 620px;
+  grid-area: list;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -564,7 +586,8 @@ main {
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 0;
-  overflow: hidden;
+  /* overflow: hidden dihapus: ikon yang membesar (scale 1.1) saat aktif jadi terpotong di sisi kanan.
+     Animasi buka-tutup jawaban sudah ditangani oleh .faq-answer-inner { overflow: hidden } */
   transition: border-color 0.25s ease;
 }
 .faq-item:first-child {
@@ -587,8 +610,9 @@ main {
   border: none;
   cursor: pointer;
   text-align: left;
-  padding: 1.35rem 0;
-  font-family: 'Outfit', 'Inter', sans-serif;
+  /* ruang kecil di kanan supaya ikon yang membesar tidak keluar dari garis pemisah */
+  padding: 1.35rem 3px 1.35rem 0;
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 500;
   color: #111111;
@@ -599,6 +623,7 @@ main {
 }
 
 /* Modifikasi Ikon FAQ menjadi Ikon SVG Pesawat Kertas */
+.faq-icon svg { display: block; overflow: visible; }
 .faq-icon {
   flex-shrink: 0;
   width: 28px;
@@ -643,9 +668,16 @@ main {
 }
 
 @media (max-width: 900px) {
-  .faq-layout { flex-direction: column; align-items: stretch; gap: 2rem; }
-  .faq-text { max-width: 100%; }
-  .faq-list { max-width: 100%; }
+  .faq-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+      "text"
+      "list"
+      "cta";
+    justify-content: stretch;
+    row-gap: 2rem;
+  }
 }
 
 @media (min-width: 901px) {
@@ -653,7 +685,7 @@ main {
 }
 
 @media (max-width: 500px) {
-  .faq-question { padding: 1.1rem 0; font-size: 0.92rem; }
+  .faq-question { padding: 1.1rem 3px 1.1rem 0; font-size: 0.92rem; }
   .faq-answer p { padding: 0 0 1.35rem; }
   .faq-cta { padding: 1.5rem 1.4rem 1.75rem; }
 }
@@ -736,13 +768,13 @@ main {
    jadi header global (#navHeader) disembunyikan dulu supaya tidak dobel.
    Header ini baru muncul lagi setelah discroll (class .scrolled ditambahkan
    otomatis oleh script navbar.blade.php saat scrollY > 50). */
-#navHeader {
+html #navHeader {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.4s ease, visibility 0.4s ease;
 }
-#navHeader.scrolled {
+html #navHeader.scrolled {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -789,7 +821,7 @@ main {
   flex-shrink: 0;
 }
 .brand-badge-home .brand-text {
-  font-family: 'Sora', 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 700;
   font-size: 1rem;
   line-height: 1.2;
@@ -816,7 +848,7 @@ main {
   border: none;
   cursor: pointer;
   padding: 8px 12px;
-  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  font-family: var(--font-sans);
 }
 .menu-btn-home .mbh-text {
   font-size: 0.95rem;
@@ -1476,7 +1508,7 @@ if ('paintWorklet' in CSS) {
         margin-bottom: 50px;
     }
     .layanan-header .eyebrow {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: var(--font-sans);
         color: #094356;
         font-weight: 600;
         letter-spacing: 0.1em;
@@ -1486,7 +1518,7 @@ if ('paintWorklet' in CSS) {
         margin-bottom: 10px;
     }
     .layanan-header h3 {
-        font-family: 'Outfit', sans-serif;
+        font-family: var(--font-sans);
         font-size: 2.8rem;
         color: #094356;
         margin-bottom: 20px;
@@ -1685,8 +1717,8 @@ if ('paintWorklet' in CSS) {
     .swiper-slide__block .main__title {
         color: #f2f3f3;
         text-transform: uppercase;
-        font-family: Montserrat, sans-serif;
-        font-weight: 900;
+        font-family: var(--font-sans);
+        font-weight: 800;
         font-size: 2.6em;
         letter-spacing: 1px;
         margin: 0;
@@ -1706,12 +1738,12 @@ if ('paintWorklet' in CSS) {
     .swiper-slide__block .main__subtitle {
         margin: 2px 0;
         font-weight: 700;
-        font-family: Montserrat, sans-serif;
+        font-family: var(--font-sans);
         font-size: 0.9em;
         color: #f2f3f3;
     }
     .swiper-slide__block .main__subtitle span {
-        font-family: "Patua One", cursive;
+        font-family: var(--font-sans);
         font-style: normal;
         color: #00a8af;
         letter-spacing: 1px;
@@ -1740,9 +1772,9 @@ if ('paintWorklet' in CSS) {
         }
     }
     .swiper-slide__block .number {
-        font-family: Montserrat, sans-serif;
+        font-family: var(--font-sans);
         font-size: 12em;
-        font-weight: 900;
+        font-weight: 800;
         width: 100%;
         display: block;
         color: rgba(16, 47, 65, 0.04);
@@ -1761,7 +1793,7 @@ if ('paintWorklet' in CSS) {
         width: auto;
         position: relative;
         text-decoration: none;
-        font-family: Montserrat, sans-serif;
+        font-family: var(--font-sans);
         font-size: 0.7em;
         font-weight: 400;
         letter-spacing: 1px;
@@ -1974,12 +2006,6 @@ if ('paintWorklet' in CSS) {
         <p class="section-subtitle reveal faq-desc">
           Beberapa hal yang paling sering ditanyakan calon klien sebelum memulai proyek bersama kami.
         </p>
-
-        <div class="faq-cta reveal">
-          <h4>Masih punya pertanyaan?</h4>
-          <p>Tidak menemukan jawaban yang Anda cari? Hubungi kami dan tim kami akan membalas secepat mungkin.</p>
-          <a href="{{ url('/contact') }}" class="faq-cta-btn">Hubungi</a>
-        </div>
       </div>
 
       <div class="faq-list reveal">
@@ -2068,6 +2094,12 @@ if ('paintWorklet' in CSS) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="faq-cta reveal">
+        <h4>Masih punya pertanyaan?</h4>
+        <p>Tidak menemukan jawaban yang Anda cari? Hubungi kami dan tim kami akan membalas secepat mungkin.</p>
+        <a href="{{ url('/contact') }}" class="faq-cta-btn">Hubungi</a>
       </div>
     </div>
   </div>

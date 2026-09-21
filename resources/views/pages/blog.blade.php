@@ -24,8 +24,12 @@
 
                     <div class="category-filter" id="categoryFilter">
                         <button type="button" class="header-search-btn" id="filterToggleBtn" aria-label="Filter kategori" aria-haspopup="listbox" aria-expanded="false">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M4 5H20L14 12.2V19L10 17V12.2L4 5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                            </svg>
+                            <span class="filter-label" id="categoryFilterLabel">Semua Kategori</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="chevron" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
                         <ul class="category-filter-dropdown" id="categoryFilterDropdown" role="listbox">
@@ -39,7 +43,7 @@
 
                 <div class="count-filter" id="countFilter">
                     <button type="button" class="count-filter-btn" id="countFilterBtn" aria-haspopup="listbox" aria-expanded="false">
-                        <span id="countFilterLabel">Semua</span>
+                        <span id="countFilterLabel">Semua Baris</span>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" class="chevron" xmlns="http://www.w3.org/2000/svg">
                             <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -179,7 +183,24 @@
         background-image: 
             radial-gradient(circle at 15% 0%, rgba(13, 89, 120, 0.35), transparent 45%),
             radial-gradient(circle at 85% 100%, rgba(9, 67, 86, 0.4), transparent 50%),
-            url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E"),
+            /* Foto tema web/mobile development (layer paling bawah).
+               Sumber: Jakub Żerdzicki / Unsplash (Unsplash License, bebas dipakai komersial tanpa atribusi).
+               Disarankan diunduh lalu di-host sendiri di public/images/blog-hero.jpg (pakai asset('images/blog-hero.jpg')) */
+            url("https://images.unsplash.com/photo-1754548930550-be9fa88874f4?auto=format&fit=crop&w=1920&q=70");
+        background-size: auto, auto, auto, cover;
+        background-position: 0 0, 0 0, 0 0, center;
+        background-repeat: repeat, repeat, repeat, no-repeat;
+    }
+    /* Overlay gelap + tint teal supaya teks putih selalu terbaca di atas foto (desktop: gelap di sisi kiri tempat teks) */
+    .page-header-media::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(3, 21, 28, 0.92) 0%, rgba(3, 21, 28, 0.72) 45%, rgba(3, 21, 28, 0.5) 100%),
+            linear-gradient(rgba(9, 67, 86, 0.3), rgba(9, 67, 86, 0.3));
+        pointer-events: none;
     }
 
     .page-header::after {
@@ -351,6 +372,11 @@
     .category-filter.has-selection .header-search-btn {
         box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
     }
+    /* Mobile: tombol kategori hanya ikon bulat, label & chevron hanya tampil di desktop */
+    .header-search-btn .filter-label,
+    .header-search-btn .chevron {
+        display: none;
+    }
 
     /* ===== Count filter — its own separate card beside the search bar ===== */
     .count-filter {
@@ -445,17 +471,133 @@
         color: #FFFFFF;
     }
 
-    @media (max-width: 640px) {
-        .page-header { min-height: 480px; align-items: flex-start; padding-top: 56px; }
-        .page-header-text { padding: 0 6%; max-width: none; }
-        .page-header-text .subtitle { max-width: none; }
+    /* ===== DESKTOP (>= 641px): search bar dipanjangkan + filter kategori berbentuk pill seperti filter baris ===== */
+    @media (min-width: 641px) {
         .page-header-inner {
+            width: 90%;
+            max-width: 960px;
+            min-width: 0;
+        }
+        .header-search-row {
+            max-width: none;
+            gap: 12px;
+        }
+
+        /* Wrapper tidak lagi berbentuk satu pill; input & filter kategori berdiri sendiri */
+        .header-search-bar {
+            height: auto;
+            padding: 0;
+            gap: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        .header-search-bar:focus-within {
+            background: transparent;
+            box-shadow: none;
+        }
+        .header-search-input {
+            height: 48px;
+            padding: 0 22px;
+            background: var(--cream);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 999px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        }
+        .header-search-input:focus {
+            border-color: var(--primary);
+            background: var(--ivory);
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
+        }
+        .search-bar-divider {
+            display: none;
+        }
+
+        /* Tombol kategori: gaya sama dengan .count-filter-btn (filter baris) */
+        .header-search-btn {
+            width: auto;
+            height: 48px;
+            padding: 0 18px;
+            gap: 8px;
+            background: #FFFFFF;
+            color: var(--text);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 999px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: var(--shadow-soft);
+            box-sizing: border-box;
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+        .header-search-btn:hover {
+            background: #FFFFFF;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+        .header-search-btn.active,
+        .category-filter.open .header-search-btn {
+            background: var(--cream);
+            border-color: var(--primary);
+        }
+        .category-filter.has-selection .header-search-btn {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-soft);
+        }
+        .header-search-btn .filter-label {
+            display: inline-block;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .header-search-btn .chevron {
+            display: block;
+            transition: transform 0.2s ease;
+        }
+        .category-filter.open .header-search-btn .chevron {
+            transform: rotate(180deg);
+        }
+        .category-filter-dropdown {
+            right: auto;
+            left: 0;
+            min-width: 200px;
+        }
+    }
+
+    @media (max-width: 640px) {
+        /* Teks judul + subjudul berada di bagian bawah gambar tapi agak naik ke tengah (jarak 64px di atas kotak pencarian) */
+        .page-header {
+            min-height: 500px;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: stretch;
+            padding-top: 56px;
+        }
+        .page-header-text {
+            padding: 0 6%;
+            max-width: none;
+            margin-bottom: 64px;
+        }
+        .page-header-text .subtitle { max-width: none; }
+        /* Kotak pencarian ikut mengalir di bawah teks (tidak lagi absolute) agar jaraknya selalu konsisten */
+        .page-header-inner {
+            position: relative;
+            left: auto;
+            bottom: auto;
+            transform: none;
             width: 100%;
             max-width: none;
             min-width: 0;
             padding: 20px 6% 24px;
             border-top-left-radius: 0;
             border-top-right-radius: 0;
+        }
+        /* Mobile: gelapkan dari atas ke bawah, karena teks berada di bagian bawah gambar */
+        .page-header-media::before {
+            background:
+                linear-gradient(180deg, rgba(3, 21, 28, 0.5) 0%, rgba(3, 21, 28, 0.72) 55%, rgba(3, 21, 28, 0.92) 100%),
+                linear-gradient(rgba(9, 67, 86, 0.3), rgba(9, 67, 86, 0.3));
         }
         .page-header-inner::before,
         .page-header-inner::after {
@@ -477,15 +619,26 @@
             width: 100%;
             justify-content: center;
         }
-        .count-filter-dropdown,
-        .category-filter-dropdown {
+        /* Dropdown jumlah baris: tombolnya selebar row, jadi tetap di tengah */
+        .count-filter-dropdown {
             right: auto;
             left: 50%;
             transform: translateX(-50%) translateY(-8px);
         }
-        .count-filter.open .count-filter-dropdown,
-        .category-filter.open .category-filter-dropdown {
+        .count-filter.open .count-filter-dropdown {
             transform: translateX(-50%) translateY(0);
+        }
+        /* Dropdown kategori: rata kanan dengan tombol filter (bukan di-center di tombol),
+           sehingga bergeser ke kiri, tidak terpotong, dan masih ada jarak dari tepi layar */
+        .category-filter-dropdown {
+            right: 0;
+            left: auto;
+            min-width: 170px;
+            max-width: calc(100vw - 64px);
+            transform: translateY(-8px);
+        }
+        .category-filter.open .category-filter-dropdown {
+            transform: translateY(0);
         }
     }
 
@@ -502,29 +655,11 @@
         display: block;
     }
 
-    @media (max-width: 720px) {
-        .page-wrapper {
-            padding-top: 80px;
-            padding-left: 14px;
-            padding-right: 14px;
-            padding-bottom: 70px;
-        }
-        .projects-container {
-            grid-template-columns: minmax(0, 420px);
-            justify-content: center;
-            padding: 0;
-            max-width: none;
-        }
-        .project-card {
-            width: 100%;
-        }
-    }
-
+    /* ===== GRID CARD: Desktop 4 kolom, Tablet 3 kolom, Mobile 2 kolom ===== */
     .projects-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 340px));
-        justify-content: center;
-        gap: 36px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 28px;
         max-width: 1200px;
         margin: 56px auto 0;
     }
@@ -532,9 +667,9 @@
     .project-card {
         --card-border-radius: 20px;
         position: relative;
-        display: block;
+        display: flex;
+        flex-direction: column;
         width: 100%;
-        aspect-ratio: 3 / 4;
         background-color: #FFFFFF;
         background-image: var(--bgImage);
         background-repeat: no-repeat;
@@ -552,11 +687,10 @@
     }
 
     .project-card .card-photo {
-        position: absolute;
-        top: 0;
-        left: 0;
+        position: relative;
+        flex-shrink: 0;
         width: 100%;
-        height: 58%;
+        aspect-ratio: 16 / 10;
         border-radius: 0 0 0 var(--card-border-radius);
         overflow: hidden;
         z-index: 2;
@@ -579,11 +713,10 @@
     }
 
     .project-card .card-content {
-        position: absolute;
-        bottom: 0;
-        left: 0;
+        position: relative;
+        box-sizing: border-box;
+        flex: 1 1 auto;
         width: 100%;
-        height: 42%;
         background: #FFFFFF;
         border-radius: 0 var(--card-border-radius) 0 0;
         border-top: 1px solid rgba(11, 20, 18, 0.06);
@@ -601,21 +734,19 @@
     }
 
     .project-card .card-text-content {
-        position: absolute;
+        position: relative;
+        box-sizing: border-box;
         width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        gap: 6px;
-        padding: 1.05rem 1.35rem 1.1rem;
+        gap: 4px;
+        padding: 0.9rem 1rem 1rem;
     }
 
     .project-card .project-date {
         font-family: var(--font-heading);
-        font-size: 0.76rem;
+        font-size: 0.72rem;
         font-weight: 500;
         color: var(--muted);
         letter-spacing: 0.01em;
@@ -631,13 +762,13 @@
         background: var(--primary);
         color: var(--ivory);
         font-family: var(--font-heading);
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         font-weight: 600;
         letter-spacing: 0.02em;
         border-radius: 999px;
         text-decoration: none;
-        padding: 9px 22px;
-        margin-top: 10px;
+        padding: 7px 18px;
+        margin-top: 3px;
         opacity: 1;
         transform: none;
         transition: none;
@@ -676,17 +807,21 @@
     }
     .project-card .card-text-content h3 {
         font-family: var(--font-heading);
-        font-size: 1.02rem;
+        font-size: 0.95rem;
         color: #000000;
         margin-bottom: 0;
         line-height: 1.3;
         font-weight: 600;
         letter-spacing: -0.01em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
     .project-card .card-text-content p {
         color: var(--text-soft);
-        line-height: 1.5;
-        font-size: 0.86rem;
+        line-height: 1.45;
+        font-size: 0.8rem;
         margin: 2px 0 0;
         font-weight: 400;
         display: -webkit-box;
@@ -695,10 +830,68 @@
         overflow: hidden;
     }
 
+    /* Tablet: 3 kolom supaya card tidak terlalu sempit */
+    @media (max-width: 1024px) {
+        .projects-container {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+        }
+    }
+
     @media (max-width: 768px) {
         .page-header-text h1 { font-size: 1.7rem; }
-        .projects-container { gap: 28px; }
-        .project-card { aspect-ratio: 3 / 4; }
+    }
+
+    /* Mobile: 2 kolom */
+    @media (max-width: 720px) {
+        .page-wrapper {
+            padding-top: 80px;
+            padding-left: 14px;
+            padding-right: 14px;
+            padding-bottom: 70px;
+        }
+        .projects-container {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            padding: 0;
+            max-width: none;
+            margin-top: 36px;
+        }
+        .project-card {
+            --card-border-radius: 14px;
+        }
+        .project-card .card-photo { aspect-ratio: 4 / 3; }
+        .project-card .card-text-content {
+            gap: 3px;
+            padding: 0.6rem 0.7rem 0.75rem;
+        }
+        .project-card .card-text-content h3 {
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+        /* Deskripsi disembunyikan di mobile supaya card 2 kolom tetap rapi */
+        .project-card .card-text-content p { display: none; }
+        .project-card .project-date {
+            font-size: 0.66rem;
+            margin-top: 0;
+        }
+        .project-card .btn-detail {
+            font-size: 0.7rem;
+            padding: 6px 14px;
+            margin-top: 2px;
+        }
+        .project-card .badge {
+            top: 12px;
+            min-height: 24px;
+            padding: 0 16px 0 10px;
+            font-size: 0.55rem;
+            letter-spacing: 0.06em;
+            clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%);
+        }
+        .project-card .badge::after {
+            border-width: 5px 5px 0 0;
+        }
+        .project-card:hover { transform: none; }
     }
 </style>
 @endpush
@@ -740,6 +933,7 @@
 
         const categoryFilter = document.getElementById('categoryFilter');
         const filterToggleBtn = document.getElementById('filterToggleBtn');
+        const categoryFilterLabel = document.getElementById('categoryFilterLabel');
         const categoryFilterDropdown = document.getElementById('categoryFilterDropdown');
         const categoryItems = categoryFilterDropdown ? categoryFilterDropdown.querySelectorAll('li') : [];
 
@@ -820,6 +1014,9 @@
                 categoryItems.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
                 activeCategory = item.dataset.category;
+                if (categoryFilterLabel) {
+                    categoryFilterLabel.textContent = activeCategory === 'all' ? 'Semua Kategori' : item.textContent.trim();
+                }
                 categoryFilter.classList.toggle('has-selection', activeCategory !== 'all');
                 categoryFilter.classList.remove('open');
                 filterToggleBtn.classList.remove('active');

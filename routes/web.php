@@ -89,6 +89,10 @@ Route::middleware('auth')->group(function () {
 
         // 4. Kelola Blog (parameter binding by "id" seperti yang kamu jelaskan di komentar)
         Route::get('/kelola-blog', [AdminBlogController::class, 'index'])->name('kelola-blog.index');
+        
+        // ---> RUTE EXPORT CSV DITAMBAHKAN DI SINI <---
+        Route::get('/kelola-blog/export', [AdminBlogController::class, 'export'])->name('kelola-blog.export');
+        
         Route::post('/kelola-blog', [AdminBlogController::class, 'store'])->name('kelola-blog.store');
         Route::put('/kelola-blog/{blog:id}', [AdminBlogController::class, 'update'])->name('kelola-blog.update');
         Route::delete('/kelola-blog/{blog:id}', [AdminBlogController::class, 'destroy'])->name('kelola-blog.destroy');

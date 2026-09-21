@@ -115,4 +115,49 @@ class BlogController extends Controller
             ->route('admin.kelola-blog.index')
             ->with('success', 'Blog berhasil dihapus.');
     }
+
+    /**
+     * Export data blog ke file CSV (Bisa dibuka di Excel)
+     */
+    public function export()
+    {
+        $fileName = 'data-blog-astabrata.csv';
+        $blogs = Blog::latest()->get(); // Ambil semua data blog urut terbaru
+
+        // Pengaturan Header biar browser mengenali ini sebagai file download CSV
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        // Judul kolom paling atas
+        $columns = ['ID', 'Judul Blog', 'Kategori', 'Status', 'Tanggal Dibuat'];
+
+        // Proses tulis data ke memori
+        $callback = function() use($blogs, $columns) {
+            $file = fopen('php://output', 'w');
+            
+            // Tulis baris judul (header)
+            fputcsv($file, $columns);
+
+            // Looping dan tulis data tiap baris
+            foreach ($blogs as $blog) {
+                fputcsv($file, [
+                    $blog->id,
+                    $blog->judul,
+                    $blog->kategori,
+                    $blog->status ?? 'Publish',
+                    $blog->created_at ? $blog->created_at->format('d-m-Y H:i:s') : '-'
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        // Lempar file ke browser
+        return response()->stream($callback, 200, $headers);
+    }
 }

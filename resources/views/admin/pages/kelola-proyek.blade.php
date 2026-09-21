@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Kelola Proyek - AdminHub Admin')
+@section('title', 'Kelola Proyek - Admin Astabrata Teknologi')
 @section('page-title', 'Kelola Proyek')
 
 @push('styles')
@@ -28,6 +28,19 @@
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
     #content main .head-title .btn-download:hover { background: #2563eb; transform: translateY(-2px); }
+
+    /* Tombol Import & Export Custom */
+    .btn-export {
+        background: #10B981 !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    }
+    .btn-export:hover { background: #059669 !important; }
+    
+    .btn-import {
+        background: #F59E0B !important;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2) !important;
+    }
+    .btn-import:hover { background: #D97706 !important; }
 
     #content main .box-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-gap: 24px; margin-top: 36px; }
     #content main .box-info li { padding: 24px; background: #fff; border-radius: 20px; display: flex; align-items: center; grid-gap: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
@@ -273,9 +286,36 @@
                 <li><a class="active" href="#">Kelola Proyek</a></li>
             </ul>
         </div>
-        <button type="button" class="btn-download" onclick="chbOpenAddModal()">
-            <i class='bx bx-plus'></i> Tambah Client
-        </button>
+        
+        <!-- BUNGKUS TOMBOL EXPORT, IMPORT, & TAMBAH CLIENT -->
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            
+            <!-- Tombol Export Excel -->
+            <a href="{{ route('admin.kelola-proyek.export') }}" class="btn-download btn-export">
+                <i class='bx bxs-file-export'></i>
+                <span class="text">Export CSV</span>
+            </a>
+
+            <!-- Form & Tombol Import Excel -->
+            <form action="{{ route('admin.kelola-proyek.import') }}" method="POST" enctype="multipart/form-data" id="importForm" style="display: flex; gap: 8px; align-items: center; margin: 0;">
+                @csrf
+                <input type="file" name="file" accept=".csv" required style="display: none;" id="importFile" onchange="document.getElementById('importSubmitBtn').click()">
+                
+                <button type="button" class="btn-download btn-import" onclick="document.getElementById('importFile').click()">
+                    <i class='bx bxs-file-import'></i>
+                    <span class="text">Import CSV</span>
+                </button>
+                
+                <!-- Tombol submit tersembunyi, akan diklik otomatis oleh onchange input file -->
+                <button type="submit" id="importSubmitBtn" style="display: none;"></button>
+            </form>
+
+            <!-- Tombol Tambah Client (Bawaan lu) -->
+            <button type="button" class="btn-download" onclick="chbOpenAddModal()">
+                <i class='bx bx-plus'></i> 
+                <span class="text">Tambah Client</span>
+            </button>
+        </div>
     </div>
 
     <ul class="box-info">
@@ -506,7 +546,7 @@
         </div>
     </div>
 
-    {{-- ===================== MODAL: NOTIFIKASI SUKSES (TAMBAH / EDIT / HAPUS) ===================== --}}
+    {{-- ===================== MODAL: NOTIFIKASI SUKSES (TAMBAH / EDIT / HAPUS / IMPORT) ===================== --}}
     <div class="modal-overlay" id="successModal">
         <div class="modal-box modal-confirm">
             <div class="confirm-icon success"><i class='bx bx-check-circle'></i></div>
@@ -517,6 +557,16 @@
             </div>
         </div>
     </div>
+
+    {{-- Script untuk memunculkan modal success jika ada session 'success' dari controller (misal saat Import) --}}
+    @if(session('success'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('successModalText').textContent = "{{ session('success') }}";
+                document.getElementById('successModal').classList.add('show');
+            });
+        </script>
+    @endif
 
     {{-- ===================== GLOBAL LIGHTBOX ZOOM ===================== --}}
     <div id="dbLightbox" class="db-lightbox">

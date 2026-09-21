@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Settings | AdminHub')
+@section('title', 'Settings | Admin Astabrata Teknologi')
 @section('page-title', 'Settings')
 
 @push('styles')
