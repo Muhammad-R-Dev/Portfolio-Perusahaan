@@ -76,6 +76,10 @@ Route::middleware('auth')->group(function () {
             return view('admin.pages.kelola-proyek');
         })->name('kelola-proyek');
 
+        // ---> RUTE EXPORT & IMPORT PROYEK DITAMBAHKAN DI SINI <---
+        Route::get('/kelola-proyek/export', [ClientController::class, 'export'])->name('kelola-proyek.export');
+        Route::post('/kelola-proyek/import', [ClientController::class, 'import'])->name('kelola-proyek.import');
+
         // 3. Kelola Layanan
         Route::resource('kelola-layanan', \App\Http\Controllers\AdminServiceController::class)->names([
             'index'   => 'kelola-layanan.index',
@@ -120,5 +124,6 @@ Route::middleware('auth')->group(function () {
 
 
         Route::resource('clients', ClientController::class)->except(['create', 'edit', 'show']);
+        Route::get('kelola-proyek/template', [ClientExcelController::class, 'template'])->name('kelola-proyek.template');
     });
 });

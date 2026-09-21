@@ -247,6 +247,41 @@
     .modal-box.modal-confirm p { color: var(--dark-grey); font-size: 14px; margin: 0; }
     .modal-box.modal-confirm .modal-actions { justify-content: center; margin-top: 24px; }
 
+    /* ========== IMPORT EXCEL: MODAL UNGGAH & MODAL HASIL ========== */
+    .modal-box.modal-import { max-width: 520px; padding: 32px 32px 28px; }
+    .modal-import .import-head { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .modal-import .import-icon { width: 52px; height: 52px; flex: 0 0 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; background: #fef3c7; color: #d97706; }
+    .modal-import h2 { font-size: 20px; margin: 0 0 2px; color: var(--dark); }
+    .modal-import .import-sub { margin: 0; font-size: 13px; color: var(--dark-grey); }
+    .modal-import .import-steps { margin: 0 0 18px; padding-left: 20px; font-size: 13.5px; line-height: 1.7; color: #334155; }
+    .modal-import .import-link { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; color: #2563eb; font-weight: 600; text-decoration: none; }
+    .modal-import .import-link:hover { text-decoration: underline; }
+    .import-drop { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 22px 16px; border: 2px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; color: #475569; cursor: pointer; transition: border-color .2s, background .2s; }
+    .import-drop:hover, .import-drop.is-over { border-color: #3b82f6; background: #eff6ff; }
+    .import-drop.has-file { border-style: solid; border-color: #22c55e; background: #f0fdf4; }
+    .import-drop .bx { font-size: 30px; color: #64748b; }
+    .import-drop.has-file .bx { color: #16a34a; }
+    .import-drop strong { font-size: 14px; font-weight: 600; color: #1e293b; word-break: break-all; }
+    .import-drop small { font-size: 12px; color: #64748b; }
+    .import-msg { min-height: 18px; margin: 10px 2px 0; font-size: 12.5px; color: #dc2626; }
+    .modal-import .import-note { margin: 4px 2px 0; font-size: 12px; line-height: 1.5; color: var(--dark-grey); }
+    .modal-import .modal-actions { margin-top: 20px; }
+
+    .modal-box.modal-result { max-width: 520px; }
+    .modal-result .confirm-icon.warn { background: #fef3c7; color: #d97706; }
+    .result-stats { display: flex; gap: 10px; margin: 20px 0 0; }
+    .result-stats .stat { flex: 1; padding: 12px 6px; border-radius: 12px; background: #f1f5f9; }
+    .result-stats .stat b { display: block; font-size: 22px; font-weight: 600; color: #0f172a; }
+    .result-stats .stat span { font-size: 12px; color: #64748b; }
+    .result-stats .stat.ok b { color: #16a34a; }
+    .result-stats .stat.skip b { color: #d97706; }
+    .result-stats .stat.bad b { color: #dc2626; }
+    .result-errors { list-style: none; margin: 14px 0 0; padding: 0; max-height: 220px; overflow-y: auto; text-align: left; border: 1px solid #e2e8f0; border-radius: 12px; }
+    .result-errors li { display: flex; gap: 12px; padding: 9px 14px; font-size: 13px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+    .result-errors li:last-child { border-bottom: 0; }
+    .result-errors li b { flex: 0 0 64px; color: #0f172a; }
+    .result-hint { margin: 12px 2px 0 !important; font-size: 12.5px !important; text-align: left; }
+
     /* ========== LIGHTBOX ZOOM (GLOBAL) ========== */
     .db-lightbox { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
     .db-lightbox.show { display: flex; opacity: 1; }
@@ -287,28 +322,20 @@
             </ul>
         </div>
         
-        <!-- BUNGKUS TOMBOL EXPORT, IMPORT, & TAMBAH CLIENT -->
+        <!-- TOMBOL EXPORT, IMPORT, & TAMBAH CLIENT -->
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            
-            <!-- Tombol Export Excel -->
+
+            <!-- Export: unduh semua data client sebagai file Excel (.xlsx) -->
             <a href="{{ route('admin.kelola-proyek.export') }}" class="btn-download btn-export">
                 <i class='bx bxs-file-export'></i>
-                <span class="text">Export CSV</span>
+                <span class="text">Export Excel</span>
             </a>
 
-            <!-- Form & Tombol Import Excel -->
-            <form action="{{ route('admin.kelola-proyek.import') }}" method="POST" enctype="multipart/form-data" id="importForm" style="display: flex; gap: 8px; align-items: center; margin: 0;">
-                @csrf
-                <input type="file" name="file" accept=".csv" required style="display: none;" id="importFile" onchange="document.getElementById('importSubmitBtn').click()">
-                
-                <button type="button" class="btn-download btn-import" onclick="document.getElementById('importFile').click()">
-                    <i class='bx bxs-file-import'></i>
-                    <span class="text">Import CSV</span>
-                </button>
-                
-                <!-- Tombol submit tersembunyi, akan diklik otomatis oleh onchange input file -->
-                <button type="submit" id="importSubmitBtn" style="display: none;"></button>
-            </form>
+            <!-- Import: membuka popup berisi petunjuk, template, dan pilihan file -->
+            <button type="button" class="btn-download btn-import" onclick="openImportModal()">
+                <i class='bx bxs-file-import'></i>
+                <span class="text">Import Excel</span>
+            </button>
 
             <!-- Tombol Tambah Client (Bawaan lu) -->
             <button type="button" class="btn-download" onclick="chbOpenAddModal()">
@@ -558,11 +585,105 @@
         </div>
     </div>
 
-    {{-- Script untuk memunculkan modal success jika ada session 'success' dari controller (misal saat Import) --}}
+    {{-- ===================== MODAL: IMPORT EXCEL ===================== --}}
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-box modal-import">
+            <form action="{{ route('admin.kelola-proyek.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+                @csrf
+                <div class="import-head">
+                    <div class="import-icon"><i class='bx bxs-file-import'></i></div>
+                    <div>
+                        <h2>Import data client</h2>
+                        <p class="import-sub">Tambahkan banyak client dan project sekaligus dari file Excel.</p>
+                    </div>
+                </div>
+
+                <ol class="import-steps">
+                    <li>Unduh template lalu isi datanya.
+                        <a class="import-link" href="{{ route('admin.kelola-proyek.template') }}"><i class='bx bx-download'></i>Unduh template</a>
+                    </li>
+                    <li>Nama Client, Nama Project, Tanggal Mulai, dan Deadline wajib diisi.</li>
+                    <li>Pilih file yang sudah diisi di bawah ini.</li>
+                </ol>
+
+                <label class="import-drop" id="importDrop" for="importFile">
+                    <i class='bx bx-cloud-upload'></i>
+                    <strong id="importFileName">Klik untuk memilih file, atau seret ke sini</strong>
+                    <small id="importFileHint">.xlsx, .xls, atau .csv, maksimal 5 MB</small>
+                </label>
+                <input type="file" name="file" id="importFile" accept=".xlsx,.xls,.csv" hidden>
+                <p class="import-msg" id="importMsg" role="alert"></p>
+                <p class="import-note">Data yang sama dengan yang sudah ada (Nama Client, Nama Project, dan Tanggal Mulai sama) akan dilewati, jadi file boleh diunggah ulang dengan aman.</p>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeImportModal()">Batal</button>
+                    <button type="submit" class="btn-save" id="importSubmitBtn" disabled>Import data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ===================== MODAL: HASIL IMPORT (file bermasalah, atau ada baris dilewati / gagal) ===================== --}}
+    @if(session('import_report'))
+        @php
+            $importReport     = session('import_report');
+            $importFatal      = $importReport['fatal'] ?? null;
+            $importErrors     = $importReport['errors'] ?? [];
+            $importErrorTotal = $importReport['error_total'] ?? count($importErrors);
+            $importInserted   = $importReport['inserted'] ?? 0;
+            $importSkipped    = $importReport['skipped'] ?? 0;
+        @endphp
+        <div class="modal-overlay show" id="importResultModal">
+            <div class="modal-box modal-confirm modal-result">
+                <div class="confirm-icon {{ $importFatal ? '' : 'warn' }}">
+                    <i class='bx {{ $importFatal ? 'bx-error-circle' : 'bx-info-circle' }}'></i>
+                </div>
+
+                @if($importFatal)
+                    <h2>Import gagal</h2>
+                    <p>{{ $importFatal }}</p>
+                @else
+                    <h2>{{ $importInserted > 0 ? 'Import selesai' : 'Tidak ada data baru yang ditambahkan' }}</h2>
+
+                    <div class="result-stats">
+                        <div class="stat ok"><b>{{ $importInserted }}</b><span>Ditambahkan</span></div>
+                        <div class="stat skip"><b>{{ $importSkipped }}</b><span>Dilewati (sudah ada)</span></div>
+                        <div class="stat bad"><b>{{ $importErrorTotal }}</b><span>Perlu diperbaiki</span></div>
+                    </div>
+
+                    @if(count($importErrors))
+                        <ul class="result-errors">
+                            @foreach($importErrors as $err)
+                                <li><b>Baris {{ $err['row'] }}</b><span>{{ $err['message'] }}</span></li>
+                            @endforeach
+                        </ul>
+                        @if($importErrorTotal > count($importErrors))
+                            <p class="result-hint">Menampilkan {{ count($importErrors) }} dari {{ $importErrorTotal }} baris bermasalah.</p>
+                        @endif
+                        <p class="result-hint">Perbaiki baris di atas lalu unggah file yang sama lagi. Data yang sudah masuk tidak akan terduplikasi.</p>
+                    @endif
+                @endif
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-save" onclick="closeImportResultModal()">OK</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            function closeImportResultModal() {
+                document.getElementById('importResultModal').classList.remove('show');
+            }
+            document.getElementById('importResultModal').addEventListener('click', function (e) {
+                if (e.target === this) closeImportResultModal();
+            });
+        </script>
+    @endif
+
+    {{-- Memunculkan modal success jika ada session 'success' dari controller (misal setelah Import berhasil penuh) --}}
     @if(session('success'))
         <script>
             document.addEventListener("DOMContentLoaded", function() {
-                document.getElementById('successModalText').textContent = "{{ session('success') }}";
+                document.getElementById('successModalText').textContent = @json(session('success'));
                 document.getElementById('successModal').classList.add('show');
             });
         </script>
@@ -609,6 +730,7 @@
         initEditorImageEvents();
         initSidebarOffset();
         initTableFilters();
+        initImportModal();
     });
 
     /* ============================================================
@@ -1163,6 +1285,82 @@
     chbSuccessModal.addEventListener('click', function (e) {
         if (e.target === chbSuccessModal) closeSuccessModal();
     });
+
+    /* ============================================================
+       IMPORT EXCEL (popup unggah file)
+       ============================================================ */
+    const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
+    const IMPORT_EXT = ['xlsx', 'xls', 'csv'];
+    const IMPORT_DEFAULT_LABEL = 'Klik untuk memilih file, atau seret ke sini';
+
+    function openImportModal() {
+        resetImportModal();
+        document.getElementById('importModal').classList.add('show');
+    }
+
+    function closeImportModal() {
+        if (document.getElementById('importSubmitBtn').dataset.busy === '1') return;
+        document.getElementById('importModal').classList.remove('show');
+    }
+
+    function resetImportModal() {
+        document.getElementById('importFile').value = '';
+        document.getElementById('importDrop').classList.remove('has-file', 'is-over');
+        document.getElementById('importFileName').textContent = IMPORT_DEFAULT_LABEL;
+        document.getElementById('importFileHint').style.display = '';
+        document.getElementById('importMsg').textContent = '';
+        document.getElementById('importSubmitBtn').disabled = true;
+    }
+
+    function initImportModal() {
+        const modal = document.getElementById('importModal');
+        const form  = document.getElementById('importForm');
+        const input = document.getElementById('importFile');
+        const drop  = document.getElementById('importDrop');
+        const name  = document.getElementById('importFileName');
+        const hint  = document.getElementById('importFileHint');
+        const msg   = document.getElementById('importMsg');
+        const btn   = document.getElementById('importSubmitBtn');
+
+        function checkFile() {
+            const file = input.files[0];
+            drop.classList.remove('has-file');
+            msg.textContent = '';
+            btn.disabled = true;
+
+            if (!file) { name.textContent = IMPORT_DEFAULT_LABEL; hint.style.display = ''; return; }
+
+            name.textContent = file.name;
+            hint.style.display = 'none';
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!IMPORT_EXT.includes(ext)) { msg.textContent = 'Format file tidak didukung. Pilih file .xlsx, .xls, atau .csv.'; return; }
+            if (file.size > IMPORT_MAX_BYTES) { msg.textContent = 'Ukuran file lebih dari 5 MB. Kecilkan atau pecah file-nya.'; return; }
+
+            drop.classList.add('has-file');
+            btn.disabled = false;
+        }
+
+        input.addEventListener('change', checkFile);
+
+        ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
+        ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('is-over'); }));
+        drop.addEventListener('drop', e => {
+            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+            const dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            input.files = dt.files;
+            checkFile();
+        });
+
+        form.addEventListener('submit', () => {
+            btn.dataset.busy = '1';
+            btn.disabled = true;
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Mengimpor...";
+        });
+
+        modal.addEventListener('click', e => { if (e.target === modal) closeImportModal(); });
+    }
 
     /* ============================================================
        DETAIL

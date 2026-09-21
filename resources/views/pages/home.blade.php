@@ -885,30 +885,20 @@ html #navHeader.scrolled {
 
 <main>
   <div class="vignette"></div>
-  <img src="img/bg.png" loading="eager" data-speedx="0.3" data-distance="-200" data-rotation="0" data-speedy="0.38" data-speedz="0" alt="" class="parallax bg-img">
-  <img src="img/fog_7.png" loading="lazy" data-speedx="0.27" data-distance="850" data-rotation="0" data-speedz="0" data-speedy="0.32" alt="" class="parallax fog-7">
-  <img src="img/g10v2.png" data-speedx="0.195" data-distance="1100" data-rotation="0" data-speedz="0" data-speedy="0.305" alt="" class="parallax mountain-10">
+  <img src="img/bg.webp" loading="eager" data-speedx="0.3" data-distance="-200" data-rotation="0" data-speedy="0.38" data-speedz="0" alt="" class="parallax bg-img">
+  <img src="img/fo_7.png" loading="lazy" data-speedx="0.27" data-distance="850" data-rotation="0" data-speedz="0" data-speedy="0.32" alt="" class="parallax fog-7">
+  <img src="img/g10v2.webp" data-speedx="0.195" data-distance="1100" data-rotation="0" data-speedz="0" data-speedy="0.305" alt="" class="parallax mountain-10">
   <img src="img/fo_6.png" data-speedx="0.25" data-distance="1400" data-rotation="0" data-speedz="0" data-speedy="0.28" alt="" class="parallax fog-6">
-  <img src="img/g9v2.png" data-speedx="0.125" data-distance="1700" data-rotation="0.02" data-speedz="0.15" data-speedy="0.155" alt="" class="parallax mountain-9">
-  <img src="img/g8v3.png" data-speedx="0.1" data-distance="1800" data-rotation="0.02" data-speedz="0" data-speedy="0.11" alt="" class="parallax mountain-8">
+  <img src="img/g9v2.webp" data-speedx="0.125" data-distance="1700" data-rotation="0.02" data-speedz="0.15" data-speedy="0.155" alt="" class="parallax mountain-9">
+  <img src="img/g8v3.webp" data-speedx="0.1" data-distance="1800" data-rotation="0.02" data-speedz="0" data-speedy="0.11" alt="" class="parallax mountain-8">
   <img src="img/fo_5.png" data-speedx="0.16" data-distance="1900" data-rotation="0" data-speedz="0" data-speedy="0.105" alt="" class="parallax fog-5">
-  <img src="img/mountain.jpeg" data-speedx="0.1" data-distance="2000" data-rotation="0.09" data-speedz="0" data-speedy="0.1" alt="" class="parallax mountain-7">
   <div class="text parallax" data-speedx="0.07" data-rotation="0.11" data-speedz="0" data-speedy="0.07">
     <h1>Astabrata </h1>
     <h2>Teknologi</h2>
   </div>
-  <img src="img/mountai_6.png" data-speedx="0.065" data-distance="2300" data-rotation="0.12" data-speedz="0.05" data-speedy="0.05" alt="" class="parallax mountain-6">
-  <img src="img/fo_4.png" data-speedx="0.135" data-distance="2400" data-rotation="0" data-speedz="0" data-speedy="0.04" alt="" class="parallax fog-4">
-  <img src="img/mountai_5.png" data-speedx="0.08" data-distance="2550" data-rotation="0.1" data-speedz="0.13" data-speedy="0.03" alt="" class="parallax mountain-5">
-  <img src="img/fo_3.png" data-speedx="0.11" data-distance="2800" data-rotation="0" data-speedz="0" data-speedy="0.018" alt="" class="parallax fog-3">
-  <img src="img/mountai_4.png" data-speedx="0.059" data-distance="3200" data-rotation="0.14" data-speedz="0" data-speedy="0.024" alt="" class="parallax mountain-4">
-  <img src="img/mountai_3.png" data-speedx="0.04" data-distance="3400" data-rotation="0.05" data-speedz="0.32" data-speedy="0.018" alt="" class="parallax mountain-3">
-  <img src="img/fog_2.png" data-speedx="0.15" data-distance="3600" data-rotation="0" data-speedz="0" data-speedy="0.0115" alt="" class="parallax fog-2">
-  <img src="img/mountai_2.png" data-speedx="0.0235" data-distance="3800" data-rotation="0.15" data-speedz="0" data-speedy="0.013" alt="" class="parallax mountain-2">
-  <img src="img/.png" data-speedx="0.027" data-distance="4000" data-rotation="0.2" data-speedz="0.53" data-speedy="0.018" alt="" class="parallax mountain-1">
-  <img src="img/sun_rays.png" alt="" class="sun-rays">
+  <img src="img/sun_rays.webp" alt="" class="sun-rays">
   <img src="img/black_shadow.png" alt="" class="black-shadow">
-  <img src="img/fog_1.png" data-speedx="0.12" data-distance="4200" data-rotation="0" data-speedz="0" data-speedy="0.01" alt="" class="parallax fog-1">
+  <img src="img/fo_1.png" data-speedx="0.12" data-distance="4200" data-rotation="0" data-speedz="0" data-speedy="0.01" alt="" class="parallax fog-1">
 
   <a href="{{ url('/') }}" class="brand-badge-home">
     <img src="img/logo asta.png" alt="Logo Astabrata">
