@@ -121,6 +121,34 @@ class ClientController extends Controller
     }
 
     /**
+     * Download Template CSV Kosong untuk Import
+     */
+    public function template()
+    {
+        $fileName = 'Template-Import-Proyek.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['Nama Client', 'Nama Project', 'Deskripsi', 'Tanggal Mulai', 'Deadline'];
+
+        $callback = function() use($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            // Isi baris dummy sebagai panduan admin
+            fputcsv($file, ['PT Contoh Sukses', 'Pembuatan Aplikasi Kasir', 'Dibuat dengan Laravel', '2026-10-01', '2026-12-31']);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
      * Import data Client dari Frontend (Menerima Data Mentah dari SheetJS)
      */
     public function import(Request $request)
