@@ -218,20 +218,75 @@
 		#content main .table-data .order table td.col-aksi {
 			white-space: nowrap;
 		}
-		#content main .table-data .order table td.col-aksi .bx {
+		#content main .table-data .order table td.col-aksi .btn-edit {
+			border: none;
 			cursor: pointer;
-			font-size: 18px;
-			padding: 6px;
-			border-radius: 8px;
-			margin-right: 4px;
+			font-family: var(--poppins);
+			padding: 6px 14px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: 500;
+			background: var(--blue);
+			color: var(--light);
 		}
-		#content main .table-data .order table td.col-aksi .bx-edit {
-			color: var(--blue);
-			background: var(--light-blue);
+
+		/* TOMBOL MODE PILIH (HAPUS) & HAPUS TERPILIH */
+		#content main .table-data .head .btn-select-mode,
+		#content main .table-data .head .btn-bulk-delete {
+			height: 38px;
+			padding: 0 16px;
+			border-radius: 36px;
+			border: none;
+			cursor: pointer;
+			font-family: var(--poppins);
+			font-size: 13px;
+			font-weight: 500;
+			display: flex;
+			align-items: center;
+			grid-gap: 6px;
+			transition: all .2s ease;
+			white-space: nowrap;
 		}
-		#content main .table-data .order table td.col-aksi .bx-trash {
-			color: var(--red);
+		#content main .table-data .head .btn-select-mode {
+			background: var(--red);
+			color: var(--light);
+		}
+		#content main .table-data .head .btn-select-mode:hover {
+			opacity: .9;
+		}
+		#content main .table-data .head .btn-select-mode.active {
+			background: var(--dark);
+			color: var(--light);
+		}
+		#content main .table-data .head .bulk-actions-group {
+			display: none;
+			align-items: center;
+			grid-gap: 10px;
+		}
+		#content main .table-data .head .bulk-actions-group.show {
+			display: flex;
+		}
+		#content main .table-data .head .btn-bulk-delete {
 			background: var(--light-orange);
+			color: var(--red);
+		}
+		#content main .table-data .head .btn-bulk-delete:hover:not(:disabled) {
+			background: var(--red);
+			color: var(--light);
+		}
+		#content main .table-data .head .btn-bulk-delete:disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+		#content main .table-data .order table th input[type="checkbox"],
+		#content main .table-data .order table td.col-aksi input[type="checkbox"] {
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+			accent-color: var(--blue);
+		}
+		#content main .table-data .order table tbody tr.row-selected {
+			background: var(--light-blue);
 		}
 		#content main .table-data .order table .empty-row td {
 			text-align: center;
@@ -768,6 +823,14 @@
 								<option value="10">10 per Hal</option>
 								<option value="20">20 per Hal</option>
 							</select>
+							<button type="button" class="btn-select-mode" id="btnToggleBlogSelectMode" onclick="toggleBlogSelectMode()">
+								<i class='bx bx-list-check'></i> <span id="btnToggleBlogSelectModeText">Hapus</span>
+							</button>
+							<div class="bulk-actions-group" id="blogBulkActionsGroup">
+								<button type="button" class="btn-bulk-delete" id="btnBlogBulkDelete" disabled onclick="confirmBulkDeleteBlog()">
+									<i class='bx bx-trash'></i> Hapus (<span id="blogBulkDeleteCount">0</span>)
+								</button>
+							</div>
 						</div>
 					</div>
 					<table id="blogTable">
@@ -778,12 +841,12 @@
 								<th>Judul</th>
 								<th>Kategori</th>
 								<th>Tanggal Dibuat</th>
-								<th>Aksi</th>
+								<th id="blogAksiHeader">Aksi</th>
 							</tr>
 						</thead>
 						<tbody id="blogTableBody">
 							@forelse($blogs as $blog)
-							<tr class="blog-row" data-judul="{{ strtolower($blog->judul) }}" data-kategori="{{ strtolower($blog->kategori) }}">
+							<tr class="blog-row" data-id="{{ $blog->id }}" data-judul="{{ strtolower($blog->judul) }}" data-kategori="{{ strtolower($blog->kategori) }}">
 								<td class="col-no">{{ $loop->iteration }}</td>
 								<td class="col-gambar">
 									<img src="{{ $blog->gambar ? asset('storage/'.$blog->gambar) : 'https://placehold.co/600x400/png' }}" alt="{{ $blog->judul }}" onclick="openListImageZoom(this.src)">
@@ -792,8 +855,7 @@
 								<td class="col-kategori"><span>{{ $blog->kategori }}</span></td>
 								<td>{{ $blog->created_at->format('d-m-Y') }}</td>
 								<td class="col-aksi">
-									<i
-										class='bx bx-edit'
+									<button type="button" class="btn-edit"
 										title="Edit"
 										data-id="{{ $blog->id }}"
 										data-judul="{{ $blog->judul }}"
@@ -801,12 +863,10 @@
 										data-konten="{{ $blog->konten }}"
 										data-gambar="{{ $blog->gambar ? asset('storage/'.$blog->gambar) : '' }}"
 										data-update-url="{{ route('admin.kelola-blog.update', $blog->id) }}"
-										onclick="openEditModal(this)"
-									></i>
-									<form action="{{ route('admin.kelola-blog.destroy', $blog->id) }}" method="POST" class="form-delete" style="display:inline;">
+										onclick="openEditModal(this)">Edit</button>
+									<form id="deleteFormBlog{{ $blog->id }}" action="{{ route('admin.kelola-blog.destroy', $blog->id) }}" method="POST" style="display:none;">
 										@csrf
 										@method('DELETE')
-										<i class='bx bx-trash' title="Hapus" onclick="confirmDelete(this)"></i>
 									</form>
 								</td>
 							</tr>
@@ -993,8 +1053,8 @@
 			<div class="modal-overlay" id="deleteConfirmModal">
 				<div class="modal-box modal-confirm">
 					<div class="confirm-icon"><i class='bx bx-trash'></i></div>
-					<h2>Hapus Blog Ini?</h2>
-					<p>Yakin ingin menghapus blog ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
+					<h2 id="deleteConfirmTitle">Hapus Blog Ini?</h2>
+					<p id="deleteConfirmText">Yakin ingin menghapus blog ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
 					<div class="modal-actions">
 						<button type="button" class="btn btn-cancel" id="btnCancelDelete">Batal</button>
 						<button type="button" class="btn btn-danger" id="btnConfirmDelete">Ya, Hapus</button>
@@ -1064,11 +1124,118 @@
 		const zoomedImage = document.getElementById('zoomedImage');
 		const btnCloseZoom = document.getElementById('btnCloseZoom');
 
+		/* ============================================================
+		   MODE PILIH: kolom "Aksi" berubah jadi kolom checkbox
+		   ============================================================ */
+		let blogSelectMode = false;
+		let blogSelectedIds = new Set();
+		const blogActionCellCache = new Map(); // id -> HTML tombol aksi asli (Edit)
+
+		function toggleBlogSelectMode() {
+			blogSelectMode = !blogSelectMode;
+			blogSelectedIds.clear();
+			renderBlogActionCells();
+			updateBlogAksiHeader();
+			updateBlogBulkToolbar();
+		}
+
+		function renderBlogActionCells() {
+			document.querySelectorAll('#blogTableBody tr.blog-row').forEach(function (tr) {
+				const id = tr.dataset.id;
+				const cell = tr.querySelector('td.col-aksi');
+				if (!id || !cell) return;
+
+				if (blogSelectMode) {
+					if (!blogActionCellCache.has(id)) {
+						blogActionCellCache.set(id, cell.innerHTML);
+					}
+					const checked = blogSelectedIds.has(id);
+					cell.innerHTML = '<input type="checkbox" class="blog-row-checkbox" value="' + id + '" ' + (checked ? 'checked' : '') + ' onchange="toggleBlogRowSelect(\'' + id + '\', this.checked)">';
+					tr.classList.toggle('row-selected', checked);
+				} else {
+					if (blogActionCellCache.has(id)) {
+						cell.innerHTML = blogActionCellCache.get(id);
+					}
+					tr.classList.remove('row-selected');
+				}
+			});
+		}
+
+		function updateBlogAksiHeader() {
+			const th = document.getElementById('blogAksiHeader');
+			const toggleBtn = document.getElementById('btnToggleBlogSelectMode');
+			const toggleBtnText = document.getElementById('btnToggleBlogSelectModeText');
+			const bulkGroup = document.getElementById('blogBulkActionsGroup');
+			if (!th) return;
+
+			if (blogSelectMode) {
+				th.innerHTML = '<input type="checkbox" id="blogSelectAll" title="Pilih semua di halaman ini" onclick="toggleBlogSelectAllOnPage(this.checked)">';
+				toggleBtn.classList.add('active');
+				toggleBtnText.textContent = 'Batal';
+				bulkGroup.classList.add('show');
+			} else {
+				th.textContent = 'Aksi';
+				toggleBtn.classList.remove('active');
+				toggleBtnText.textContent = 'Hapus';
+				bulkGroup.classList.remove('show');
+			}
+		}
+
+		function toggleBlogRowSelect(id, checked) {
+			if (checked) blogSelectedIds.add(id);
+			else blogSelectedIds.delete(id);
+
+			const cb = document.querySelector('.blog-row-checkbox[value="' + id + '"]');
+			const row = cb ? cb.closest('tr') : null;
+			if (row) row.classList.toggle('row-selected', checked);
+
+			syncBlogSelectAllCheckbox();
+			updateBlogBulkToolbar();
+		}
+
+		function getVisibleBlogCheckboxes() {
+			return Array.from(document.querySelectorAll('#blogTableBody .blog-row .blog-row-checkbox')).filter(function (cb) {
+				const tr = cb.closest('tr');
+				return tr && tr.style.display !== 'none';
+			});
+		}
+
+		function toggleBlogSelectAllOnPage(checked) {
+			getVisibleBlogCheckboxes().forEach(function (cb) {
+				cb.checked = checked;
+				const id = cb.value;
+				if (checked) blogSelectedIds.add(id);
+				else blogSelectedIds.delete(id);
+				const row = cb.closest('tr');
+				if (row) row.classList.toggle('row-selected', checked);
+			});
+			updateBlogBulkToolbar();
+		}
+
+		function syncBlogSelectAllCheckbox() {
+			const selectAll = document.getElementById('blogSelectAll');
+			if (!selectAll) return; // hanya ada saat mode pilih aktif
+			const boxes = getVisibleBlogCheckboxes();
+			if (!boxes.length) { selectAll.checked = false; selectAll.indeterminate = false; return; }
+			const checkedCount = boxes.filter(function (cb) { return cb.checked; }).length;
+			selectAll.checked = checkedCount === boxes.length;
+			selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+		}
+
+		function updateBlogBulkToolbar() {
+			const count = blogSelectedIds.size;
+			document.getElementById('blogBulkDeleteCount').textContent = count;
+			document.getElementById('btnBlogBulkDelete').disabled = count === 0;
+		}
+
 		// Modal konfirmasi hapus
 		const deleteConfirmModal = document.getElementById('deleteConfirmModal');
 		const btnCancelDelete = document.getElementById('btnCancelDelete');
 		const btnConfirmDelete = document.getElementById('btnConfirmDelete');
+		const deleteConfirmTitle = document.getElementById('deleteConfirmTitle');
+		const deleteConfirmText = document.getElementById('deleteConfirmText');
 		let formToDelete = null;
+		let blogDeleteMode = 'single'; // 'single' | 'bulk'
 
 		// Modal notifikasi sukses
 		const successModal = document.getElementById('successModal');
@@ -1110,6 +1277,7 @@
 				if (blogNoResult) blogNoResult.style.display = '';
 				if (paginationInfo) paginationInfo.textContent = '';
 				if (paginationButtons) paginationButtons.innerHTML = '';
+				syncBlogSelectAllCheckbox();
 				return;
 			} else {
 				if (blogNoResult) blogNoResult.style.display = 'none';
@@ -1149,6 +1317,7 @@
 
 			// 5. Render Tombol Paginasi (1, 2, 3...)
 			renderPaginationControls(totalPages, perPageVal);
+			syncBlogSelectAllCheckbox();
 		}
 
 		function renderPaginationControls(totalPages, perPageVal) {
@@ -1635,26 +1804,85 @@
 			blogModal.classList.remove('show');
 		}
 
-		function confirmDelete(icon) {
-			formToDelete = icon.closest('form');
+		function openBlogDeleteConfirm(title, text) {
+			deleteConfirmTitle.textContent = title;
+			deleteConfirmText.textContent = text;
 			deleteConfirmModal.classList.add('show');
+		}
+
+		// Hapus satu blog (dipanggil manual jika diperlukan)
+		function confirmDelete(icon) {
+			blogDeleteMode = 'single';
+			formToDelete = icon.closest('form');
+			openBlogDeleteConfirm('Hapus Blog Ini?', 'Yakin ingin menghapus blog ini? Data yang sudah dihapus tidak dapat dikembalikan.');
+		}
+
+		// Hapus semua blog yang dicentang (tombol "Hapus Terpilih")
+		function confirmBulkDeleteBlog() {
+			if (blogSelectedIds.size === 0) return;
+			blogDeleteMode = 'bulk';
+			openBlogDeleteConfirm(
+				'Hapus Blog Terpilih?',
+				'Yakin ingin menghapus ' + blogSelectedIds.size + ' blog yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan.'
+			);
 		}
 
 		btnCancelDelete.addEventListener('click', function () {
 			formToDelete = null;
+			blogDeleteMode = 'single';
 			deleteConfirmModal.classList.remove('show');
 		});
 
-		btnConfirmDelete.addEventListener('click', function () {
-			if (formToDelete) {
-				formToDelete.submit();
+		btnConfirmDelete.addEventListener('click', async function () {
+			if (blogDeleteMode === 'single') {
+				if (formToDelete) {
+					formToDelete.submit();
+				}
+				deleteConfirmModal.classList.remove('show');
+				return;
 			}
+
+			// Mode massal: kirim form hapus untuk tiap blog yang dicentang
+			const ids = Array.from(blogSelectedIds);
+			if (ids.length === 0) {
+				deleteConfirmModal.classList.remove('show');
+				return;
+			}
+
+			const originalText = btnConfirmDelete.innerHTML;
+			btnConfirmDelete.innerHTML = 'Menghapus...';
+			btnConfirmDelete.disabled = true;
+
+			let gagal = 0;
+			for (const id of ids) {
+				const form = document.getElementById('deleteFormBlog' + id);
+				if (!form) { gagal++; continue; }
+				try {
+					const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+					if (!res.ok) gagal++;
+				} catch (e) {
+					gagal++;
+				}
+			}
+
+			const berhasil = ids.length - gagal;
+			sessionStorage.setItem(
+				'blogBulkDeleteMessage',
+				gagal === 0
+					? berhasil + ' blog berhasil dihapus.'
+					: berhasil + ' dari ' + ids.length + ' blog berhasil dihapus.'
+			);
+
+			btnConfirmDelete.innerHTML = originalText;
+			btnConfirmDelete.disabled = false;
 			deleteConfirmModal.classList.remove('show');
+			window.location.reload();
 		});
 
 		deleteConfirmModal.addEventListener('click', function (e) {
-			if (e.target === deleteConfirmModal) {
+			if (e.target === deleteConfirmModal && !btnConfirmDelete.disabled) {
 				formToDelete = null;
+				blogDeleteMode = 'single';
 				deleteConfirmModal.classList.remove('show');
 			}
 		});
@@ -1673,8 +1901,15 @@
 			if (e.target === successModal) successModal.classList.remove('show');
 		});
 
+		const blogBulkDeleteMessage = sessionStorage.getItem('blogBulkDeleteMessage');
+		if (blogBulkDeleteMessage) {
+			sessionStorage.removeItem('blogBulkDeleteMessage');
+			showSuccessPopup(blogBulkDeleteMessage);
+		}
 		@if(session('success'))
-			showSuccessPopup(@json(session('success')));
+			else {
+				showSuccessPopup(@json(session('success')));
+			}
 		@endif
 
 		// ===== Validasi sebelum submit =====

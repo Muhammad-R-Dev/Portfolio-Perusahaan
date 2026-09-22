@@ -110,5 +110,7 @@ class ClientExcelController extends Controller
             'Content-Type'  => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'Cache-Control' => 'max-age=0, no-cache, must-revalidate',
         ]);
+
+        
     }
 }

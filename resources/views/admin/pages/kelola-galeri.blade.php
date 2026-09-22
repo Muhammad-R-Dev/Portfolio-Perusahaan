@@ -513,6 +513,73 @@
 			outline: none;
 			cursor: pointer;
 		}
+		/* TOMBOL MODE PILIH (HAPUS) & HAPUS TERPILIH */
+		#content main .table-section .btn-select-mode,
+		#content main .table-section .btn-bulk-delete {
+			height: 38px;
+			padding: 0 16px;
+			border-radius: 36px;
+			border: none;
+			cursor: pointer;
+			font-family: var(--poppins);
+			font-size: 13px;
+			font-weight: 500;
+			display: flex;
+			align-items: center;
+			grid-gap: 6px;
+			transition: all .2s ease;
+			white-space: nowrap;
+		}
+		#content main .table-section .btn-select-mode {
+			background: var(--red);
+			color: var(--light);
+		}
+		#content main .table-section .btn-select-mode:hover {
+			opacity: .9;
+		}
+		#content main .table-section .btn-select-mode.active {
+			background: var(--dark);
+			color: var(--light);
+		}
+		#content main .table-section .bulk-actions-group {
+			display: none;
+			align-items: center;
+			grid-gap: 10px;
+		}
+		#content main .table-section .bulk-actions-group.show {
+			display: flex;
+		}
+		#content main .table-section .btn-bulk-delete {
+			background: var(--light-orange);
+			color: var(--red);
+		}
+		#content main .table-section .btn-bulk-delete:hover:not(:disabled) {
+			background: var(--red);
+			color: var(--light);
+		}
+		#content main .table-section .btn-bulk-delete:disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+		#content main .gallery-table thead th#galleryAksiHeader.select-mode-header {
+			display: flex;
+			align-items: center;
+			grid-gap: 8px;
+		}
+		#content main .gallery-table td.select-cell {
+			text-align: left;
+		}
+		#content main .gallery-table th input[type="checkbox"],
+		#content main .gallery-table td.select-cell input[type="checkbox"] {
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+			accent-color: var(--blue);
+		}
+		#content main .gallery-table tbody tr.row-selected {
+			background: var(--light-blue);
+		}
+
 		#content main .table-responsive {
 			overflow-x: auto;
 		}
@@ -580,24 +647,16 @@
 			display: flex;
 			grid-gap: 8px;
 		}
-		#content main .gallery-table .table-actions button {
-			width: 32px;
-			height: 32px;
-			border-radius: 8px;
-			border: none;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			font-size: 15px;
-		}
 		#content main .gallery-table .table-actions .btn-edit {
-			background: var(--light-blue);
-			color: var(--blue);
-		}
-		#content main .gallery-table .table-actions .btn-delete {
-			background: var(--light-orange);
-			color: var(--red);
+			border: none;
+			cursor: pointer;
+			font-family: var(--poppins);
+			padding: 6px 14px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: 500;
+			background: var(--blue);
+			color: var(--light);
 		}
 		#content main .gallery-table .table-empty {
 			text-align: center;
@@ -826,6 +885,14 @@
 							<option value="10">10</option>
 							<option value="20">20</option>
 						</select>
+						<button type="button" class="btn-select-mode" id="btnToggleGallerySelectMode" onclick="toggleGallerySelectMode()">
+							<i class='bx bx-list-check'></i> <span id="btnToggleGallerySelectModeText">Hapus</span>
+						</button>
+						<div class="bulk-actions-group" id="galleryBulkActionsGroup">
+							<button type="button" class="btn-bulk-delete" id="btnGalleryBulkDelete" disabled onclick="confirmBulkDeleteGaleri()">
+								<i class='bx bx-trash'></i> Hapus (<span id="galleryBulkDeleteCount">0</span>)
+							</button>
+						</div>
 					</div>
 				</div>
 				<div class="table-responsive">
@@ -836,12 +903,12 @@
 								<th>Gambar</th>
 								<th>Judul</th>
 								<th>Kategori</th>
-								<th>Aksi</th>
+								<th id="galleryAksiHeader">Aksi</th>
 							</tr>
 						</thead>
 						<tbody>
 							@forelse($galleries as $index => $gallery)
-							<tr class="gallery-row" data-category="{{ $gallery->kategori }}" data-title="{{ $gallery->judul }}">
+							<tr class="gallery-row" data-id="{{ $gallery->id }}" data-category="{{ $gallery->kategori }}" data-title="{{ $gallery->judul }}">
 								<td>{{ $index + 1 }}</td>
 								<td>
 									<img src="{{ $gallery->foto_url }}" alt="{{ $gallery->judul }}" class="table-thumb"
@@ -851,7 +918,7 @@
 								</td>
 								<td>{{ $gallery->judul }}</td>
 								<td><span class="table-category-tag">{{ $gallery->kategori_label }}</span></td>
-								<td>
+								<td class="action-cell">
 									<div class="table-actions">
 										<button type="button" class="btn-edit" title="Edit"
 											data-id="{{ $gallery->id }}"
@@ -859,10 +926,7 @@
 											data-kategori="{{ $gallery->kategori }}"
 											data-foto="{{ $gallery->foto_url }}"
 											data-url="{{ route('admin.kelola-galeri.update', $gallery->id) }}">
-											<i class='bx bx-edit'></i>
-										</button>
-										<button type="button" class="btn-delete" title="Hapus" onclick="confirmDeleteGaleri('{{ $gallery->id }}')">
-											<i class='bx bx-trash'></i>
+											Edit
 										</button>
 									</div>
 								</td>
@@ -941,8 +1005,8 @@
 			<div class="modal-overlay" id="deleteConfirmModal">
 				<div class="modal-box modal-confirm">
 					<div class="confirm-icon"><i class='bx bx-trash'></i></div>
-					<h2>Hapus Foto?</h2>
-					<p>Yakin ingin menghapus foto ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
+					<h2 id="deleteConfirmTitle">Hapus Foto?</h2>
+					<p id="deleteConfirmText">Yakin ingin menghapus foto ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
 					<div class="modal-actions">
 						<button type="button" class="btn-cancel" id="btnCancelDelete">Batal</button>
 						<button type="button" class="btn-danger" id="btnConfirmDelete">Ya, Hapus</button>
@@ -1020,6 +1084,7 @@
 			emptyState.classList.toggle('show', filteredRows.length === 0);
 
 			renderGalleryPagination(filteredRows.length, perPage, totalPages);
+			syncGallerySelectAllCheckbox();
 		}
 
 		function renderGalleryPagination(totalItems, perPage, totalPages) {
@@ -1078,32 +1143,195 @@
 			});
 		}
 
-		// Hapus foto — modal konfirmasi
+		/* ============================================================
+		   MODE PILIH: kolom "Aksi" berubah jadi kolom checkbox
+		   ============================================================ */
+		let gallerySelectMode = false;
+		let gallerySelectedIds = new Set();
+		const galleryActionCellCache = new Map(); // id -> HTML tombol aksi asli (edit/hapus)
+
+		function toggleGallerySelectMode() {
+			gallerySelectMode = !gallerySelectMode;
+			gallerySelectedIds.clear();
+			renderGalleryActionCells();
+			updateGalleryAksiHeader();
+			updateGalleryBulkToolbar();
+		}
+
+		function renderGalleryActionCells() {
+			document.querySelectorAll('#galleryTable tbody tr.gallery-row').forEach(function (tr) {
+				const id = tr.dataset.id;
+				const cell = tr.querySelector('td.action-cell');
+				if (!id || !cell) return;
+
+				if (gallerySelectMode) {
+					if (!galleryActionCellCache.has(id)) {
+						galleryActionCellCache.set(id, cell.innerHTML);
+					}
+					const checked = gallerySelectedIds.has(id);
+					cell.innerHTML = '<input type="checkbox" class="gallery-row-checkbox" value="' + id + '" ' + (checked ? 'checked' : '') + ' onchange="toggleGalleryRowSelect(\'' + id + '\', this.checked)">';
+					cell.classList.add('select-cell');
+					tr.classList.toggle('row-selected', checked);
+				} else {
+					if (galleryActionCellCache.has(id)) {
+						cell.innerHTML = galleryActionCellCache.get(id);
+					}
+					cell.classList.remove('select-cell');
+					tr.classList.remove('row-selected');
+				}
+			});
+		}
+
+		function updateGalleryAksiHeader() {
+			const th = document.getElementById('galleryAksiHeader');
+			const toggleBtn = document.getElementById('btnToggleGallerySelectMode');
+			const toggleBtnText = document.getElementById('btnToggleGallerySelectModeText');
+			const bulkGroup = document.getElementById('galleryBulkActionsGroup');
+			if (!th) return;
+
+			if (gallerySelectMode) {
+				th.innerHTML = '<input type="checkbox" id="gallerySelectAll" title="Pilih semua di halaman ini" onclick="toggleGallerySelectAllOnPage(this.checked)">';
+				toggleBtn.classList.add('active');
+				toggleBtnText.textContent = 'Batal';
+				bulkGroup.classList.add('show');
+			} else {
+				th.textContent = 'Aksi';
+				toggleBtn.classList.remove('active');
+				toggleBtnText.textContent = 'Hapus';
+				bulkGroup.classList.remove('show');
+			}
+		}
+
+		function toggleGalleryRowSelect(id, checked) {
+			if (checked) gallerySelectedIds.add(id);
+			else gallerySelectedIds.delete(id);
+
+			const cb = document.querySelector('.gallery-row-checkbox[value="' + id + '"]');
+			const row = cb ? cb.closest('tr') : null;
+			if (row) row.classList.toggle('row-selected', checked);
+
+			syncGallerySelectAllCheckbox();
+			updateGalleryBulkToolbar();
+		}
+
+		function toggleGallerySelectAllOnPage(checked) {
+			document.querySelectorAll('#galleryTable tbody tr.gallery-row:not(.row-hidden) .gallery-row-checkbox').forEach(function (cb) {
+				cb.checked = checked;
+				const id = cb.value;
+				if (checked) gallerySelectedIds.add(id);
+				else gallerySelectedIds.delete(id);
+				const row = cb.closest('tr');
+				if (row) row.classList.toggle('row-selected', checked);
+			});
+			updateGalleryBulkToolbar();
+		}
+
+		function syncGallerySelectAllCheckbox() {
+			const selectAll = document.getElementById('gallerySelectAll');
+			if (!selectAll) return; // hanya ada saat mode pilih aktif
+			const boxes = document.querySelectorAll('#galleryTable tbody tr.gallery-row:not(.row-hidden) .gallery-row-checkbox');
+			if (!boxes.length) { selectAll.checked = false; selectAll.indeterminate = false; return; }
+			const checkedCount = Array.from(boxes).filter(function (cb) { return cb.checked; }).length;
+			selectAll.checked = checkedCount === boxes.length;
+			selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+		}
+
+		function updateGalleryBulkToolbar() {
+			const count = gallerySelectedIds.size;
+			document.getElementById('galleryBulkDeleteCount').textContent = count;
+			document.getElementById('btnGalleryBulkDelete').disabled = count === 0;
+		}
+
+		/* ============================================================
+		   HAPUS FOTO — modal konfirmasi (satu data / data terpilih)
+		   ============================================================ */
 		const deleteConfirmModal = document.getElementById('deleteConfirmModal');
 		const btnCancelDelete    = document.getElementById('btnCancelDelete');
 		const btnConfirmDelete   = document.getElementById('btnConfirmDelete');
+		const deleteConfirmTitle = document.getElementById('deleteConfirmTitle');
+		const deleteConfirmText  = document.getElementById('deleteConfirmText');
 		let formToDelete = null;
+		let galleryDeleteMode = 'single'; // 'single' | 'bulk'
 
-		function confirmDeleteGaleri(id) {
-			formToDelete = document.getElementById('deleteFormGaleri' + id);
+		function openGalleryDeleteConfirm(title, text) {
+			deleteConfirmTitle.textContent = title;
+			deleteConfirmText.textContent = text;
 			deleteConfirmModal.classList.add('show');
+		}
+
+		// Hapus satu foto (tombol tong sampah per baris)
+		function confirmDeleteGaleri(id) {
+			galleryDeleteMode = 'single';
+			formToDelete = document.getElementById('deleteFormGaleri' + id);
+			openGalleryDeleteConfirm('Hapus Foto?', 'Yakin ingin menghapus foto ini? Data yang sudah dihapus tidak dapat dikembalikan.');
+		}
+
+		// Hapus semua foto yang dicentang (tombol "Hapus Terpilih")
+		function confirmBulkDeleteGaleri() {
+			if (gallerySelectedIds.size === 0) return;
+			galleryDeleteMode = 'bulk';
+			openGalleryDeleteConfirm(
+				'Hapus Foto Terpilih?',
+				'Yakin ingin menghapus ' + gallerySelectedIds.size + ' foto yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan.'
+			);
 		}
 
 		btnCancelDelete.addEventListener('click', function () {
 			formToDelete = null;
+			galleryDeleteMode = 'single';
 			deleteConfirmModal.classList.remove('show');
 		});
 
-		btnConfirmDelete.addEventListener('click', function () {
-			if (formToDelete) {
-				formToDelete.submit();
+		btnConfirmDelete.addEventListener('click', async function () {
+			if (galleryDeleteMode === 'single') {
+				if (formToDelete) {
+					formToDelete.submit();
+				}
+				deleteConfirmModal.classList.remove('show');
+				return;
 			}
+
+			// Mode massal: kirim form hapus untuk tiap foto yang dicentang
+			const ids = Array.from(gallerySelectedIds);
+			if (ids.length === 0) {
+				deleteConfirmModal.classList.remove('show');
+				return;
+			}
+
+			const originalText = btnConfirmDelete.innerHTML;
+			btnConfirmDelete.innerHTML = 'Menghapus...';
+			btnConfirmDelete.disabled = true;
+
+			let gagal = 0;
+			for (const id of ids) {
+				const form = document.getElementById('deleteFormGaleri' + id);
+				if (!form) { gagal++; continue; }
+				try {
+					const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+					if (!res.ok) gagal++;
+				} catch (e) {
+					gagal++;
+				}
+			}
+
+			const berhasil = ids.length - gagal;
+			sessionStorage.setItem(
+				'galleryBulkDeleteMessage',
+				gagal === 0
+					? berhasil + ' foto berhasil dihapus.'
+					: berhasil + ' dari ' + ids.length + ' foto berhasil dihapus.'
+			);
+
+			btnConfirmDelete.innerHTML = originalText;
+			btnConfirmDelete.disabled = false;
 			deleteConfirmModal.classList.remove('show');
+			window.location.reload();
 		});
 
 		deleteConfirmModal.addEventListener('click', function (e) {
-			if (e.target === deleteConfirmModal) {
+			if (e.target === deleteConfirmModal && !btnConfirmDelete.disabled) {
 				formToDelete = null;
+				galleryDeleteMode = 'single';
 				deleteConfirmModal.classList.remove('show');
 			}
 		});
@@ -1126,8 +1354,15 @@
 			if (e.target === successModal) successModal.classList.remove('show');
 		});
 
+		const galleryBulkDeleteMessage = sessionStorage.getItem('galleryBulkDeleteMessage');
+		if (galleryBulkDeleteMessage) {
+			sessionStorage.removeItem('galleryBulkDeleteMessage');
+			showSuccessPopup(galleryBulkDeleteMessage);
+		}
 		@if(session('success'))
-			showSuccessPopup(@json(session('success')));
+			else {
+				showSuccessPopup(@json(session('success')));
+			}
 		@endif
 
 		/* ---------- MODAL TAMBAH / EDIT FOTO ---------- */

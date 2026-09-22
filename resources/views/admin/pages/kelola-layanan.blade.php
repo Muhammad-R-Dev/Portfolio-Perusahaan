@@ -237,6 +237,84 @@
 			background: var(--light-orange);
 			color: var(--red);
 		}
+		#content main .table-data .aksi .btn-edit-text {
+			border: none;
+			cursor: pointer;
+			font-family: var(--poppins);
+			padding: 6px 14px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: 500;
+			background: var(--blue);
+			color: var(--light);
+		}
+
+		/* TOMBOL MODE PILIH (HAPUS) & HAPUS TERPILIH - sama seperti Kelola Galeri */
+		#content main .table-data .btn-select-mode,
+		#content main .table-data .btn-bulk-delete {
+			height: 38px;
+			padding: 0 16px;
+			border-radius: 36px;
+			border: none;
+			cursor: pointer;
+			font-family: var(--poppins);
+			font-size: 13px;
+			font-weight: 500;
+			display: flex;
+			align-items: center;
+			grid-gap: 6px;
+			transition: all .2s ease;
+			white-space: nowrap;
+		}
+		#content main .table-data .btn-select-mode {
+			background: var(--red);
+			color: var(--light);
+		}
+		#content main .table-data .btn-select-mode:hover {
+			opacity: .9;
+		}
+		#content main .table-data .btn-select-mode.active {
+			background: var(--dark);
+			color: var(--light);
+		}
+		#content main .table-data .bulk-actions-group {
+			display: none;
+			align-items: center;
+			grid-gap: 10px;
+		}
+		#content main .table-data .bulk-actions-group.show {
+			display: flex;
+		}
+		#content main .table-data .btn-bulk-delete {
+			background: var(--light-orange);
+			color: var(--red);
+		}
+		#content main .table-data .btn-bulk-delete:hover:not(:disabled) {
+			background: var(--red);
+			color: var(--light);
+		}
+		#content main .table-data .btn-bulk-delete:disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+		#content main .table-data th#layananAksiHeader.select-mode-header {
+			display: flex;
+			align-items: center;
+			grid-gap: 8px;
+		}
+		#content main .table-data td.select-cell {
+			text-align: left;
+		}
+		#content main .table-data th input[type="checkbox"],
+		#content main .table-data td.select-cell input[type="checkbox"] {
+			width: 16px;
+			height: 16px;
+			cursor: pointer;
+			accent-color: var(--blue);
+		}
+		#content main .table-data tbody tr.row-selected {
+			background: var(--light-blue);
+		}
 
 		/* PAGINASI HALAMAN */
 		.pagination-wrapper {
@@ -672,20 +750,39 @@
 								<option value="10">10 Baris</option>
 								<option value="20">20 Baris</option>
 							</select>
+							<button type="button" class="btn-select-mode" id="btnToggleLayananSelectMode" onclick="toggleLayananSelectMode()">
+								<i class='bx bx-list-check'></i> <span id="btnToggleLayananSelectModeText">Hapus</span>
+							</button>
+							<div class="bulk-actions-group" id="layananBulkActionsGroup">
+								<button type="button" class="btn-bulk-delete" id="btnLayananBulkDelete" disabled onclick="confirmBulkDeleteLayanan()">
+									<i class='bx bx-trash'></i> Hapus (<span id="layananBulkDeleteCount">0</span>)
+								</button>
+							</div>
 						</div>
 					</div>
+
+					<!-- Form hapus tersembunyi (dipakai tombol Hapus Terpilih) -->
+					<div style="display:none;">
+						@foreach($services as $service)
+						<form id="deleteFormLayanan{{ $service->id }}" action="{{ route('admin.kelola-layanan.destroy', $service->id) }}" method="POST">
+							@csrf
+							@method('DELETE')
+						</form>
+						@endforeach
+					</div>
+
 					<table id="layananTable">
 						<thead>
 							<tr>
 								<th style="width:48px; text-align:center;">No</th>
 								<th>Layanan</th>
 								<th>Deskripsi</th>
-								<th>Aksi</th>
+								<th id="layananAksiHeader">Aksi</th>
 							</tr>
 						</thead>
 						<tbody id="layananTableBody">
 							@foreach($services as $service)
-							<tr class="layanan-row" data-title="{{ strtolower($service->title) }}" data-desc="{{ strtolower($service->description) }}" data-gambar="{{ $service->image ? 'ada' : 'tanpa' }}" data-status="{{ $service->status ?? 'aktif' }}">
+							<tr class="layanan-row" data-id="{{ $service->id }}" data-title="{{ strtolower($service->title) }}" data-desc="{{ strtolower($service->description) }}" data-gambar="{{ $service->image ? 'ada' : 'tanpa' }}" data-status="{{ $service->status ?? 'aktif' }}">
 								<td style="text-align:center;">{{ $loop->iteration }}</td>
 								<td class="col-layanan">
 									@if($service->image)
@@ -698,17 +795,10 @@
 								<td>
 									<p class="desc-kategori">{{ Str::limit($service->description, 50) }}</p>
 								</td>
-								<td class="aksi">
-									<button type="button" class="btn-icon btn-edit" onclick="openEditModal({{ $service->id }}, '{{ addslashes($service->title) }}', '{{ addslashes($service->description) }}', '{{ $service->image ? asset('images/services/' . $service->image) : '' }}')">
-										<i class='bx bx-edit'></i>
+								<td class="aksi action-cell">
+									<button type="button" class="btn-edit-text" onclick="openEditModal({{ $service->id }}, '{{ addslashes($service->title) }}', '{{ addslashes($service->description) }}', '{{ $service->image ? asset('images/services/' . $service->image) : '' }}')">
+										Edit
 									</button>
-									<button type="button" class="btn-icon btn-delete" onclick="confirmDeleteLayanan({{ $service->id }})">
-										<i class='bx bx-trash'></i>
-									</button>
-									<form id="deleteFormLayanan{{ $service->id }}" action="{{ route('admin.kelola-layanan.destroy', $service->id) }}" method="POST" style="display:none;">
-										@csrf
-										@method('DELETE')
-									</form>
 								</td>
 							</tr>
 							@endforeach
@@ -800,8 +890,8 @@
 		<div class="modal-overlay" id="deleteConfirmModal">
 			<div class="modal-box modal-confirm">
 				<div class="confirm-icon"><i class='bx bx-trash'></i></div>
-				<h2>Hapus Layanan?</h2>
-				<p>Yakin ingin menghapus layanan ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
+				<h2 id="deleteConfirmTitle">Hapus Layanan?</h2>
+				<p id="deleteConfirmText">Yakin ingin menghapus layanan ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
 				<div class="modal-actions">
 					<button type="button" class="btn-cancel" id="btnCancelDelete">Batal</button>
 					<button type="button" class="btn-danger" id="btnConfirmDelete">Ya, Hapus</button>
@@ -1103,32 +1193,202 @@
 			if (e.target === imageZoomOverlay) closeImageZoom();
 		}
 
-		// ===== Modal Konfirmasi Hapus =====
+		/* ============================================================
+		   MODE PILIH: kolom "Aksi" berubah jadi kolom checkbox
+		   (sama persis polanya dengan Kelola Galeri)
+		   ============================================================ */
+		let layananSelectMode = false;
+		let layananSelectedIds = new Set();
+		const layananActionCellCache = new Map(); // id -> HTML tombol aksi asli (edit)
+
+		function toggleLayananSelectMode() {
+			layananSelectMode = !layananSelectMode;
+			layananSelectedIds.clear();
+			renderLayananActionCells();
+			updateLayananAksiHeader();
+			updateLayananBulkToolbar();
+		}
+
+		function renderLayananActionCells() {
+			document.querySelectorAll('#layananTable tbody tr.layanan-row').forEach(function (tr) {
+				const id = tr.dataset.id;
+				const cell = tr.querySelector('td.action-cell');
+				if (!id || !cell) return;
+
+				if (layananSelectMode) {
+					if (!layananActionCellCache.has(id)) {
+						layananActionCellCache.set(id, cell.innerHTML);
+					}
+					const checked = layananSelectedIds.has(id);
+					cell.innerHTML = '<input type="checkbox" class="layanan-row-checkbox" value="' + id + '" ' + (checked ? 'checked' : '') + ' onchange="toggleLayananRowSelect(\'' + id + '\', this.checked)">';
+					cell.classList.add('select-cell');
+					tr.classList.toggle('row-selected', checked);
+				} else {
+					if (layananActionCellCache.has(id)) {
+						cell.innerHTML = layananActionCellCache.get(id);
+					}
+					cell.classList.remove('select-cell');
+					tr.classList.remove('row-selected');
+				}
+			});
+		}
+
+		function updateLayananAksiHeader() {
+			const th = document.getElementById('layananAksiHeader');
+			const toggleBtn = document.getElementById('btnToggleLayananSelectMode');
+			const toggleBtnText = document.getElementById('btnToggleLayananSelectModeText');
+			const bulkGroup = document.getElementById('layananBulkActionsGroup');
+			if (!th) return;
+
+			if (layananSelectMode) {
+				th.innerHTML = '<input type="checkbox" id="layananSelectAll" title="Pilih semua di halaman ini" onclick="toggleLayananSelectAllOnPage(this.checked)">';
+				toggleBtn.classList.add('active');
+				toggleBtnText.textContent = 'Batal';
+				bulkGroup.classList.add('show');
+			} else {
+				th.textContent = 'Aksi';
+				toggleBtn.classList.remove('active');
+				toggleBtnText.textContent = 'Hapus';
+				bulkGroup.classList.remove('show');
+			}
+		}
+
+		function isLayananRowVisible(row) {
+			return row.style.display !== 'none';
+		}
+
+		function toggleLayananRowSelect(id, checked) {
+			if (checked) layananSelectedIds.add(id);
+			else layananSelectedIds.delete(id);
+
+			const cb = document.querySelector('.layanan-row-checkbox[value="' + id + '"]');
+			const row = cb ? cb.closest('tr') : null;
+			if (row) row.classList.toggle('row-selected', checked);
+
+			syncLayananSelectAllCheckbox();
+			updateLayananBulkToolbar();
+		}
+
+		function toggleLayananSelectAllOnPage(checked) {
+			document.querySelectorAll('#layananTable tbody tr.layanan-row').forEach(function (tr) {
+				if (!isLayananRowVisible(tr)) return;
+				const cb = tr.querySelector('.layanan-row-checkbox');
+				if (!cb) return;
+				cb.checked = checked;
+				const id = cb.value;
+				if (checked) layananSelectedIds.add(id);
+				else layananSelectedIds.delete(id);
+				tr.classList.toggle('row-selected', checked);
+			});
+			updateLayananBulkToolbar();
+		}
+
+		function syncLayananSelectAllCheckbox() {
+			const selectAll = document.getElementById('layananSelectAll');
+			if (!selectAll) return; // hanya ada saat mode pilih aktif
+			const boxes = Array.from(document.querySelectorAll('#layananTable tbody tr.layanan-row')).filter(isLayananRowVisible).map(function (tr) { return tr.querySelector('.layanan-row-checkbox'); }).filter(Boolean);
+			if (!boxes.length) { selectAll.checked = false; selectAll.indeterminate = false; return; }
+			const checkedCount = boxes.filter(function (cb) { return cb.checked; }).length;
+			selectAll.checked = checkedCount === boxes.length;
+			selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+		}
+
+		function updateLayananBulkToolbar() {
+			const count = layananSelectedIds.size;
+			document.getElementById('layananBulkDeleteCount').textContent = count;
+			document.getElementById('btnLayananBulkDelete').disabled = count === 0;
+		}
+
+		/* ============================================================
+		   HAPUS LAYANAN — modal konfirmasi (satu data / data terpilih)
+		   ============================================================ */
 		const deleteConfirmModal = document.getElementById('deleteConfirmModal');
 		const btnCancelDelete    = document.getElementById('btnCancelDelete');
 		const btnConfirmDelete   = document.getElementById('btnConfirmDelete');
+		const deleteConfirmTitle = document.getElementById('deleteConfirmTitle');
+		const deleteConfirmText  = document.getElementById('deleteConfirmText');
 		let formToDelete = null;
+		let layananDeleteMode = 'single'; // 'single' | 'bulk'
 
-		function confirmDeleteLayanan(id) {
-			formToDelete = document.getElementById('deleteFormLayanan' + id);
+		function openLayananDeleteConfirm(title, text) {
+			deleteConfirmTitle.textContent = title;
+			deleteConfirmText.textContent = text;
 			deleteConfirmModal.classList.add('show');
+		}
+
+		// Hapus satu layanan
+		function confirmDeleteLayanan(id) {
+			layananDeleteMode = 'single';
+			formToDelete = document.getElementById('deleteFormLayanan' + id);
+			openLayananDeleteConfirm('Hapus Layanan?', 'Yakin ingin menghapus layanan ini? Data yang sudah dihapus tidak dapat dikembalikan.');
+		}
+
+		// Hapus semua layanan yang dicentang (tombol "Hapus Terpilih")
+		function confirmBulkDeleteLayanan() {
+			if (layananSelectedIds.size === 0) return;
+			layananDeleteMode = 'bulk';
+			openLayananDeleteConfirm(
+				'Hapus Layanan Terpilih?',
+				'Yakin ingin menghapus ' + layananSelectedIds.size + ' layanan yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan.'
+			);
 		}
 
 		btnCancelDelete.addEventListener('click', function () {
 			formToDelete = null;
+			layananDeleteMode = 'single';
 			deleteConfirmModal.classList.remove('show');
 		});
 
-		btnConfirmDelete.addEventListener('click', function () {
-			if (formToDelete) {
-				formToDelete.submit();
+		btnConfirmDelete.addEventListener('click', async function () {
+			if (layananDeleteMode === 'single') {
+				if (formToDelete) {
+					formToDelete.submit();
+				}
+				deleteConfirmModal.classList.remove('show');
+				return;
 			}
+
+			// Mode massal: kirim form hapus untuk tiap layanan yang dicentang
+			const ids = Array.from(layananSelectedIds);
+			if (ids.length === 0) {
+				deleteConfirmModal.classList.remove('show');
+				return;
+			}
+
+			const originalText = btnConfirmDelete.innerHTML;
+			btnConfirmDelete.innerHTML = 'Menghapus...';
+			btnConfirmDelete.disabled = true;
+
+			let gagal = 0;
+			for (const id of ids) {
+				const form = document.getElementById('deleteFormLayanan' + id);
+				if (!form) { gagal++; continue; }
+				try {
+					const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+					if (!res.ok) gagal++;
+				} catch (e) {
+					gagal++;
+				}
+			}
+
+			const berhasil = ids.length - gagal;
+			sessionStorage.setItem(
+				'layananBulkDeleteMessage',
+				gagal === 0
+					? berhasil + ' layanan berhasil dihapus.'
+					: berhasil + ' dari ' + ids.length + ' layanan berhasil dihapus.'
+			);
+
+			btnConfirmDelete.innerHTML = originalText;
+			btnConfirmDelete.disabled = false;
 			deleteConfirmModal.classList.remove('show');
+			window.location.reload();
 		});
 
 		deleteConfirmModal.addEventListener('click', function (e) {
-			if (e.target === deleteConfirmModal) {
+			if (e.target === deleteConfirmModal && !btnConfirmDelete.disabled) {
 				formToDelete = null;
+				layananDeleteMode = 'single';
 				deleteConfirmModal.classList.remove('show');
 			}
 		});
@@ -1151,8 +1411,15 @@
 			if (e.target === successModal) successModal.classList.remove('show');
 		});
 
+		const layananBulkDeleteMessage = sessionStorage.getItem('layananBulkDeleteMessage');
+		if (layananBulkDeleteMessage) {
+			sessionStorage.removeItem('layananBulkDeleteMessage');
+			showSuccessPopup(layananBulkDeleteMessage);
+		}
 		@if(session('success'))
-			showSuccessPopup(@json(session('success')));
+			else {
+				showSuccessPopup(@json(session('success')));
+			}
 		@endif
 </script>
 @endpush

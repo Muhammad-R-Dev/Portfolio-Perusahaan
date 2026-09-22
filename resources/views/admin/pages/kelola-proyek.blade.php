@@ -66,6 +66,22 @@
     #content main .table-data .head .search-box input { border: none; background: transparent; outline: none; font-family: var(--poppins), sans-serif; font-size: 13px; color: #1e293b; width: 180px; }
     #content main .table-data .head select.filter-select { height: 38px; padding: 0 14px; border-radius: 36px; border: none; background: #f1f5f9; color: #1e293b; font-family: var(--poppins), sans-serif; font-size: 13px; outline: none; cursor: pointer; }
 
+    /* TOMBOL PILIH DATA (toggle mode) & HAPUS TERPILIH / HAPUS SEMUA */
+    #content main .table-data .head .btn-select-mode,
+    #content main .table-data .head .btn-bulk-delete {
+        height: 38px; padding: 0 16px; border-radius: 36px; border: none; cursor: pointer;
+        font-family: var(--poppins), sans-serif; font-size: 13px; font-weight: 500;
+        display: flex; align-items: center; grid-gap: 6px; transition: all 0.2s ease; white-space: nowrap;
+    }
+    #content main .table-data .head .btn-select-mode { background: #ef4444; color: #fff; }
+    #content main .table-data .head .btn-select-mode:hover { background: #dc2626; }
+    #content main .table-data .head .btn-select-mode.active { background: #1e293b; color: #fff; }
+    #content main .table-data .head .bulk-actions-group { display: none; align-items: center; grid-gap: 10px; }
+    #content main .table-data .head .bulk-actions-group.show { display: flex; }
+    #content main .table-data .head .btn-bulk-delete { background: #fee2e2; color: #ef4444; }
+    #content main .table-data .head .btn-bulk-delete:hover:not(:disabled) { background: #ef4444; color: #fff; }
+    #content main .table-data .head .btn-bulk-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+
     #content main .table-data .client table { width: 100%; min-width: 820px; border-collapse: collapse; table-layout: fixed; }
     #content main .table-data .client table th:nth-child(1) { width: 50px; }
     #content main .table-data .client table th:nth-child(2) { width: 17%; }
@@ -73,12 +89,33 @@
     #content main .table-data .client table th:nth-child(4) { width: 220px; }
     #content main .table-data .client table th:nth-child(5),
     #content main .table-data .client table th:nth-child(6) { width: 110px; }
-    #content main .table-data .client table th:nth-child(7) { width: 230px; }
+    #content main .table-data .client table th:nth-child(7) { width: 130px; }
+    #content main .table-data .client table th:nth-child(8) { width: 230px; }
+    #content main .table-data .client table th#chbAksiHeader { display: flex; align-items: center; justify-content: center; text-align: center; grid-gap: 8px; }
+    #content main .table-data .client table th#chbAksiHeader.select-mode-header {
+        display: grid;
+        grid-template-columns: 1fr 16px 1fr;
+        align-items: center;
+        text-align: left;
+    }
+    #content main .table-data .client table th#chbAksiHeader.select-mode-header #chbSelectAll {
+        grid-column: 2;
+        margin: 0;
+    }
+    #content main .table-data .client table th#chbAksiHeader.select-mode-header .chb-select-label {
+        grid-column: 3;
+        margin-left: 8px;
+        white-space: nowrap;
+    }
+    #content main .table-data .client table td.select-cell { text-align: center; }
+    #content main .table-data .client table th input[type="checkbox"],
+    #content main .table-data .client table td.select-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6; }
+    #content main .table-data .client table tr.row-selected { background: #eff6ff; }
     #content main .table-data .client table th { padding-bottom: 14px; font-size: 13px; text-align: left; border-bottom: 2px solid #f1f5f9; color: #64748b; white-space: nowrap; font-weight: 600; }
     #content main .table-data .client table td { padding: 16px 12px 16px 0; vertical-align: top; font-size: 14px; color: #334155; border-bottom: 1px solid #f8fafc; }
     #content main .table-data .client table td.desc-cell { max-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #64748b; }
 
-    #content main .table-data .client table td.action-cell { white-space: nowrap; }
+    #content main .table-data .client table td.action-cell { white-space: nowrap; text-align: center; }
     #content main .table-data .client table .btn-detail,
     #content main .table-data .client table .btn-edit,
     #content main .table-data .client table .btn-delete { border: none; cursor: pointer; font-family: var(--poppins), sans-serif; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; color: #fff; margin-right: 4px; transition: opacity 0.2s; display: inline-block; }
@@ -89,14 +126,19 @@
 
     /* ========== INDIKATOR DEADLINE ========== */
     .status-lewat { border-left: 4px solid #ef4444 !important; padding-left: 8px !important; }
+    .status-h1 { border-left: 4px solid #eab308 !important; padding-left: 8px !important; }
     .status-aktif { border-left: 4px solid #22c55e !important; padding-left: 8px !important; }
     
     .badge-lewat {
-        display: inline-block; margin-top: 4px; font-size: 11px;
+        display: inline-block; font-size: 11px;
         background: #fee2e2; color: #ef4444; padding: 2px 8px; border-radius: 12px; font-weight: 600;
     }
+    .badge-h1 {
+        display: inline-block; font-size: 11px;
+        background: #fef9c3; color: #ca8a04; padding: 2px 8px; border-radius: 12px; font-weight: 600;
+    }
     .badge-aktif {
-        display: inline-block; margin-top: 4px; font-size: 11px;
+        display: inline-block; font-size: 11px;
         background: #dcfce7; color: #22c55e; padding: 2px 8px; border-radius: 12px; font-weight: 600;
     }
 
@@ -215,8 +257,7 @@
     .detail-value { font-size: 14px; color: #0f172a; line-height: 1.6; }
     .detail-value img { max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in; }
 
-    /* ========== MODAL KONFIRMASI & NOTIFIKASI (HAPUS, SIMPAN/EDIT, BERHASIL) ==========
-       Tampilan disamakan dengan halaman Kelola Layanan */
+    /* ========== MODAL KONFIRMASI & NOTIFIKASI ========== */
     .modal-overlay {
         display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .5);
         z-index: 5000; justify-content: center; align-items: center; padding: 16px;
@@ -267,21 +308,6 @@
     .modal-import .import-note { margin: 4px 2px 0; font-size: 12px; line-height: 1.5; color: var(--dark-grey); }
     .modal-import .modal-actions { margin-top: 20px; }
 
-    .modal-box.modal-result { max-width: 520px; }
-    .modal-result .confirm-icon.warn { background: #fef3c7; color: #d97706; }
-    .result-stats { display: flex; gap: 10px; margin: 20px 0 0; }
-    .result-stats .stat { flex: 1; padding: 12px 6px; border-radius: 12px; background: #f1f5f9; }
-    .result-stats .stat b { display: block; font-size: 22px; font-weight: 600; color: #0f172a; }
-    .result-stats .stat span { font-size: 12px; color: #64748b; }
-    .result-stats .stat.ok b { color: #16a34a; }
-    .result-stats .stat.skip b { color: #d97706; }
-    .result-stats .stat.bad b { color: #dc2626; }
-    .result-errors { list-style: none; margin: 14px 0 0; padding: 0; max-height: 220px; overflow-y: auto; text-align: left; border: 1px solid #e2e8f0; border-radius: 12px; }
-    .result-errors li { display: flex; gap: 12px; padding: 9px 14px; font-size: 13px; color: #334155; border-bottom: 1px solid #f1f5f9; }
-    .result-errors li:last-child { border-bottom: 0; }
-    .result-errors li b { flex: 0 0 64px; color: #0f172a; }
-    .result-hint { margin: 12px 2px 0 !important; font-size: 12.5px !important; text-align: left; }
-
     /* ========== LIGHTBOX ZOOM (GLOBAL) ========== */
     .db-lightbox { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
     .db-lightbox.show { display: flex; opacity: 1; }
@@ -325,8 +351,8 @@
         <!-- TOMBOL EXPORT, IMPORT, & TAMBAH CLIENT -->
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
 
-            <!-- Export: unduh semua data client sebagai file Excel (.xlsx) -->
-            <a href="{{ route('admin.kelola-proyek.export') }}" class="btn-download btn-export">
+            <!-- Export: unduh semua data client sebagai file Excel (.csv) -->
+            <a href="{{ route('admin.kelola-proyek.export') }}" class="btn-download btn-export" id="btnExportExcel" onclick="return chbHandleExportClick(event, this.href)">
                 <i class='bx bxs-file-export'></i>
                 <span class="text">Export Excel</span>
             </a>
@@ -389,6 +415,14 @@
                         <option value="10">10 Baris</option>
                         <option value="20">20 Baris</option>
                     </select>
+                    <button type="button" class="btn-select-mode" id="btnToggleSelectMode" onclick="chbToggleSelectMode()">
+                        <i class='bx bx-list-check'></i> <span id="btnToggleSelectModeText">Hapus</span>
+                    </button>
+                    <div class="bulk-actions-group" id="bulkActionsGroup">
+                        <button type="button" class="btn-bulk-delete" id="btnBulkDelete" disabled onclick="chbBulkDeleteSelected()">
+                            <i class='bx bx-trash'></i> Hapus (<span id="bulkDeleteCount">0</span>)
+                        </button>
+                    </div>
                 </div>
             </div>
             <table>
@@ -400,7 +434,8 @@
                         <th>Deskripsi</th>
                         <th>Mulai</th>
                         <th>Deadline</th>
-                        <th>Aksi</th>
+                        <th>Status</th>
+                        <th id="chbAksiHeader">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="chbClientTableBody">
@@ -564,8 +599,8 @@
     <div class="modal-overlay" id="deleteConfirmModal">
         <div class="modal-box modal-confirm">
             <div class="confirm-icon"><i class='bx bx-trash'></i></div>
-            <h2>Hapus Client?</h2>
-            <p>Yakin ingin menghapus client ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
+            <h2 id="deleteConfirmTitle">Hapus Client?</h2>
+            <p id="deleteConfirmText">Yakin ingin menghapus client ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" id="btnCancelDelete">Batal</button>
                 <button type="button" class="btn-danger" id="btnConfirmDelete">Ya, Hapus</button>
@@ -573,7 +608,19 @@
         </div>
     </div>
 
-    {{-- ===================== MODAL: NOTIFIKASI SUKSES (TAMBAH / EDIT / HAPUS / IMPORT) ===================== --}}
+    {{-- ===================== MODAL: KONFIRMASI EXPORT SAAT DATA KOSONG ===================== --}}
+    <div class="modal-overlay" id="exportEmptyModal">
+        <div class="modal-box modal-confirm">
+            <div class="confirm-icon"><i class='bx bx-error'></i></div>
+            <h2>Data Masih Kosong</h2>
+            <p>Belum ada data client sama sekali, jadi belum ada yang bisa diexport.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="btnCancelExportEmpty">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===================== MODAL: NOTIFIKASI SUKSES (TAMBAH / EDIT / HAPUS) ===================== --}}
     <div class="modal-overlay" id="successModal">
         <div class="modal-box modal-confirm">
             <div class="confirm-icon success"><i class='bx bx-check-circle'></i></div>
@@ -585,11 +632,11 @@
         </div>
     </div>
 
-    {{-- ===================== MODAL: IMPORT EXCEL ===================== --}}
+    {{-- ===================== MODAL: IMPORT EXCEL (SheetJS) ===================== --}}
     <div class="modal-overlay" id="importModal">
         <div class="modal-box modal-import">
-            <form action="{{ route('admin.kelola-proyek.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
-                @csrf
+            <!-- Form dimatikan action-nya, kita handle pakai JS/Fetch -->
+            <form onsubmit="event.preventDefault(); document.getElementById('importFile').click();" id="importForm">
                 <div class="import-head">
                     <div class="import-icon"><i class='bx bxs-file-import'></i></div>
                     <div>
@@ -599,11 +646,9 @@
                 </div>
 
                 <ol class="import-steps">
-                    <li>Unduh template lalu isi datanya.
-                        <a class="import-link" href="{{ route('admin.kelola-proyek.template') }}"><i class='bx bx-download'></i>Unduh template</a>
-                    </li>
-                    <li>Nama Client, Nama Project, Tanggal Mulai, dan Deadline wajib diisi.</li>
-                    <li>Pilih file yang sudah diisi di bawah ini.</li>
+                    <li>Siapkan file Excel dengan kolom: <b>Nama Client, Nama Project, Deskripsi, Tanggal Mulai, Deadline</b>.</li>
+                    <li>Pastikan baris pertama adalah judul kolom.</li>
+                    <li>Pilih file .xlsx, .xls, atau .csv di bawah ini.</li>
                 </ol>
 
                 <label class="import-drop" id="importDrop" for="importFile">
@@ -611,83 +656,19 @@
                     <strong id="importFileName">Klik untuk memilih file, atau seret ke sini</strong>
                     <small id="importFileHint">.xlsx, .xls, atau .csv, maksimal 5 MB</small>
                 </label>
-                <input type="file" name="file" id="importFile" accept=".xlsx,.xls,.csv" hidden>
+                <!-- Input file untuk SheetJS -->
+                <input type="file" name="file" id="importFile" accept=".xlsx,.xls,.csv" hidden onchange="handleImportFile(event)">
                 <p class="import-msg" id="importMsg" role="alert"></p>
-                <p class="import-note">Data yang sama dengan yang sudah ada (Nama Client, Nama Project, dan Tanggal Mulai sama) akan dilewati, jadi file boleh diunggah ulang dengan aman.</p>
+                <p class="import-note">Data akan diproses dan langsung ditambahkan ke tabel tanpa memuat ulang halaman.</p>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeImportModal()">Batal</button>
-                    <button type="submit" class="btn-save" id="importSubmitBtn" disabled>Import data</button>
+                    <button type="button" class="btn-cancel" onclick="closeImportModal()">Tutup</button>
+                    <!-- Tombol ini cuma trigger click ke input file -->
+                    <button type="button" class="btn-save" id="importSubmitBtn" onclick="document.getElementById('importFile').click()">Pilih File Excel</button>
                 </div>
             </form>
         </div>
     </div>
-
-    {{-- ===================== MODAL: HASIL IMPORT (file bermasalah, atau ada baris dilewati / gagal) ===================== --}}
-    @if(session('import_report'))
-        @php
-            $importReport     = session('import_report');
-            $importFatal      = $importReport['fatal'] ?? null;
-            $importErrors     = $importReport['errors'] ?? [];
-            $importErrorTotal = $importReport['error_total'] ?? count($importErrors);
-            $importInserted   = $importReport['inserted'] ?? 0;
-            $importSkipped    = $importReport['skipped'] ?? 0;
-        @endphp
-        <div class="modal-overlay show" id="importResultModal">
-            <div class="modal-box modal-confirm modal-result">
-                <div class="confirm-icon {{ $importFatal ? '' : 'warn' }}">
-                    <i class='bx {{ $importFatal ? 'bx-error-circle' : 'bx-info-circle' }}'></i>
-                </div>
-
-                @if($importFatal)
-                    <h2>Import gagal</h2>
-                    <p>{{ $importFatal }}</p>
-                @else
-                    <h2>{{ $importInserted > 0 ? 'Import selesai' : 'Tidak ada data baru yang ditambahkan' }}</h2>
-
-                    <div class="result-stats">
-                        <div class="stat ok"><b>{{ $importInserted }}</b><span>Ditambahkan</span></div>
-                        <div class="stat skip"><b>{{ $importSkipped }}</b><span>Dilewati (sudah ada)</span></div>
-                        <div class="stat bad"><b>{{ $importErrorTotal }}</b><span>Perlu diperbaiki</span></div>
-                    </div>
-
-                    @if(count($importErrors))
-                        <ul class="result-errors">
-                            @foreach($importErrors as $err)
-                                <li><b>Baris {{ $err['row'] }}</b><span>{{ $err['message'] }}</span></li>
-                            @endforeach
-                        </ul>
-                        @if($importErrorTotal > count($importErrors))
-                            <p class="result-hint">Menampilkan {{ count($importErrors) }} dari {{ $importErrorTotal }} baris bermasalah.</p>
-                        @endif
-                        <p class="result-hint">Perbaiki baris di atas lalu unggah file yang sama lagi. Data yang sudah masuk tidak akan terduplikasi.</p>
-                    @endif
-                @endif
-
-                <div class="modal-actions">
-                    <button type="button" class="btn-save" onclick="closeImportResultModal()">OK</button>
-                </div>
-            </div>
-        </div>
-        <script>
-            function closeImportResultModal() {
-                document.getElementById('importResultModal').classList.remove('show');
-            }
-            document.getElementById('importResultModal').addEventListener('click', function (e) {
-                if (e.target === this) closeImportResultModal();
-            });
-        </script>
-    @endif
-
-    {{-- Memunculkan modal success jika ada session 'success' dari controller (misal setelah Import berhasil penuh) --}}
-    @if(session('success'))
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                document.getElementById('successModalText').textContent = @json(session('success'));
-                document.getElementById('successModal').classList.add('show');
-            });
-        </script>
-    @endif
 
     {{-- ===================== GLOBAL LIGHTBOX ZOOM ===================== --}}
     <div id="dbLightbox" class="db-lightbox">
@@ -701,6 +682,9 @@
 @endsection
 
 @push('scripts')
+<!-- Library SheetJS untuk baca Excel di Browser -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <script>
     const CHB_CSRF = document.querySelector('meta[name="csrf-token"]').content;
     let chbClients = [];
@@ -710,6 +694,10 @@
     let chbFilterStatus = '';
     let chbLimit = 'semua';
     let chbCurrentPage = 1;
+
+    // State pilihan checkbox untuk Hapus Terpilih / Hapus Semua
+    let chbSelectedIds = new Set();
+    let chbSelectMode = false; // true = kolom Aksi berubah jadi kolom checkbox
 
     let lbImagesArr = [];
     let lbCurrentIndex = 0;
@@ -730,11 +718,126 @@
         initEditorImageEvents();
         initSidebarOffset();
         initTableFilters();
-        initImportModal();
+        initImportModalDragDrop();
     });
 
     /* ============================================================
-       FUNGSI PENCARIAN & FILTER TABEL
+       FUNGSI IMPORT EXCEL (MEMAKAI SHEETJS)
+       ============================================================ */
+    async function handleImportFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validasi Ukuran (Max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            document.getElementById('importMsg').textContent = 'Ukuran file lebih dari 5 MB!';
+            document.getElementById('importFile').value = '';
+            return;
+        }
+
+        // Tampilan Visual saat Loading
+        const drop = document.getElementById('importDrop');
+        const name = document.getElementById('importFileName');
+        const hint = document.getElementById('importFileHint');
+        const btn  = document.getElementById('importSubmitBtn');
+        const originalBtnText = btn.innerHTML;
+
+        drop.classList.add('has-file');
+        name.textContent = file.name;
+        hint.style.display = 'none';
+        document.getElementById('importMsg').textContent = '';
+        
+        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Memproses...";
+        btn.disabled = true;
+
+        const reader = new FileReader();
+        reader.onload = async function(ev) {
+            try {
+                const data = new Uint8Array(ev.target.result);
+                // Baca file Excel
+                const workbook = XLSX.read(data, {type: 'array', cellDates: true});
+                const firstSheet = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheet];
+                
+                // Convert jadi array of array (seperti CSV mentah)
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                    header: 1, 
+                    raw: false, 
+                    dateNF: 'yyyy-mm-dd'
+                });
+                
+                // Kirim langsung ke Controller Laravel
+                const res = await fetch("{{ route('admin.kelola-proyek.import') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CHB_CSRF,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ data: jsonData })
+                });
+
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    closeImportModal();
+                    document.getElementById('successModalText').textContent = result.message;
+                    document.getElementById('successModal').classList.add('show');
+                    await chbFetchClients(); // Auto Refresh Data Tabel
+                } else {
+                    document.getElementById('importMsg').textContent = 'Gagal: ' + (result.message || 'Data tidak valid.');
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('importMsg').textContent = 'Format file rusak atau tidak bisa dibaca.';
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+                document.getElementById('importFile').value = ''; // Reset uploader
+                drop.classList.remove('has-file');
+                name.textContent = 'Klik untuk memilih file, atau seret ke sini';
+                hint.style.display = '';
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function openImportModal() {
+        document.getElementById('importFile').value = '';
+        document.getElementById('importDrop').classList.remove('has-file', 'is-over');
+        document.getElementById('importFileName').textContent = 'Klik untuk memilih file, atau seret ke sini';
+        document.getElementById('importFileHint').style.display = '';
+        document.getElementById('importMsg').textContent = '';
+        document.getElementById('importSubmitBtn').disabled = false;
+        document.getElementById('importModal').classList.add('show');
+    }
+
+    function closeImportModal() {
+        if (document.getElementById('importSubmitBtn').disabled) return; // cegah tutup saat loading
+        document.getElementById('importModal').classList.remove('show');
+    }
+
+    // Efek Drag and Drop Upload Box
+    function initImportModalDragDrop() {
+        const drop = document.getElementById('importDrop');
+        const input = document.getElementById('importFile');
+        ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
+        ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('is-over'); }));
+        drop.addEventListener('drop', e => {
+            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+            const dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            input.files = dt.files;
+            
+            // Trigger onChange
+            const event = new Event('change');
+            input.dispatchEvent(event);
+        });
+        document.getElementById('importModal').addEventListener('click', e => { if (e.target === document.getElementById('importModal')) closeImportModal(); });
+    }
+
+    /* ============================================================
+       FUNGSI BAWAAN LAMA (TIDAK DIUBAH)
        ============================================================ */
     function initTableFilters() {
         document.getElementById('clientSearch').addEventListener('input', function(e) {
@@ -756,9 +859,6 @@
         });
     }
 
-    /* ============================================================
-       PERBARUI DATA STATISTIK PADA KARTU (BOX INFO)
-       ============================================================ */
     function chbUpdateStats() {
         const totalClient = chbClients.length;
         let projectAktif = 0;
@@ -812,9 +912,6 @@
         setTimeout(chbSyncSidebarOffset, 400);
     }
 
-    /* ============================================================
-       EDITOR TEKS
-       ============================================================ */
     function formatDoc(cmd, value = null) {
         const editor = document.getElementById('chbDeskripsiEditor');
         editor.focus();
@@ -966,16 +1063,140 @@
     }
     function stopResize() { if (!chbResizeState) return; chbResizeState = null; document.body.style.userSelect = ''; setTimeout(() => document.getElementById('chbImgSizeBadge').classList.remove('active'), 600); positionImgUI(); }
 
-    /* ============================================================
-       CRUD CLIENT
-       ============================================================ */
+    function chbToggleSelectMode() {
+        chbSelectMode = !chbSelectMode;
+        chbSelectedIds.clear();
+        chbUpdateAksiHeader();
+        chbRenderTable();
+    }
+
+    function chbUpdateAksiHeader() {
+        const th = document.getElementById('chbAksiHeader');
+        const toggleBtn = document.getElementById('btnToggleSelectMode');
+        const toggleBtnText = document.getElementById('btnToggleSelectModeText');
+        const bulkGroup = document.getElementById('bulkActionsGroup');
+
+        if (chbSelectMode) {
+            th.innerHTML = `<input type="checkbox" id="chbSelectAll" title="Pilih semua di halaman ini" onclick="chbToggleSelectAllOnPage(this.checked)"><span class="chb-select-label">Pilih</span>`;
+            th.classList.add('select-mode-header');
+            toggleBtn.classList.add('active');
+            toggleBtnText.textContent = 'Batal';
+            bulkGroup.classList.add('show');
+        } else {
+            th.textContent = 'Aksi';
+            th.classList.remove('select-mode-header');
+            toggleBtn.classList.remove('active');
+            toggleBtnText.textContent = 'Hapus';
+            bulkGroup.classList.remove('show');
+        }
+    }
+
+    function chbToggleRowSelect(id, checked) {
+        if (checked) chbSelectedIds.add(id);
+        else chbSelectedIds.delete(id);
+
+        const row = document.querySelector(`.chb-row-checkbox[value="${id}"]`)?.closest('tr');
+        if (row) row.classList.toggle('row-selected', checked);
+
+        chbSyncSelectAllCheckbox();
+        chbUpdateBulkToolbar();
+    }
+
+    function chbToggleSelectAllOnPage(checked) {
+        document.querySelectorAll('.chb-row-checkbox').forEach(cb => {
+            const id = parseInt(cb.value, 10);
+            cb.checked = checked;
+            cb.closest('tr')?.classList.toggle('row-selected', checked);
+            if (checked) chbSelectedIds.add(id);
+            else chbSelectedIds.delete(id);
+        });
+        chbUpdateBulkToolbar();
+    }
+
+    function chbSyncSelectAllCheckbox() {
+        const selectAll = document.getElementById('chbSelectAll');
+        if (!selectAll) return; // hanya ada saat mode pilih aktif
+        const boxes = document.querySelectorAll('.chb-row-checkbox');
+        if (!boxes.length) { selectAll.checked = false; selectAll.indeterminate = false; return; }
+        const checkedCount = Array.from(boxes).filter(cb => cb.checked).length;
+        selectAll.checked = checkedCount === boxes.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+    }
+
+    function chbUpdateBulkToolbar() {
+        const count = chbSelectedIds.size;
+        document.getElementById('bulkDeleteCount').textContent = count;
+        document.getElementById('btnBulkDelete').disabled = count === 0;
+    }
+
     async function chbFetchClients() {
         try {
             const res = await fetch('/admin/clients');
             chbClients = await res.json();
             chbRenderTable();
             chbUpdateStats();
+            chbUpdateNotifications();
         } catch (err) { console.error(err); }
+    }
+
+    function chbUpdateNotifications() {
+        const listEl = document.getElementById('notificationList');
+        const countEl = document.getElementById('notificationCount');
+        if (!listEl || !countEl) return; 
+
+        const hariIni = new Date();
+        hariIni.setHours(0, 0, 0, 0);
+
+        const besok = new Date(hariIni);
+        besok.setDate(besok.getDate() + 1);
+
+        const notifBesok = [];  
+        const notifLewat = [];  
+
+        chbClients.forEach(client => {
+            if (!client.deadline) return;
+            const dDate = new Date(client.deadline + 'T00:00:00');
+            dDate.setHours(0, 0, 0, 0);
+
+            if (dDate.getTime() === besok.getTime()) {
+                notifBesok.push(client);
+            } else if (dDate.getTime() < hariIni.getTime()) {
+                notifLewat.push(client);
+            }
+        });
+
+        notifBesok.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+        notifLewat.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
+
+        let itemsHtml = '';
+
+        notifBesok.forEach(client => {
+            itemsHtml += `
+                <li class="notif-item notif-h1" onclick="chbNotifGoToDetail(${client.id})">
+                    <div class="notif-title"><i class='bx bxs-time-five'></i> H-1 Deadline: ${chbEscape(client.project)}</div>
+                    <div class="notif-sub">${chbEscape(client.nama)} &bull; jatuh tempo ${chbFormatDate(client.deadline)}</div>
+                </li>`;
+        });
+
+        notifLewat.forEach(client => {
+            itemsHtml += `
+                <li class="notif-item notif-lewat" onclick="chbNotifGoToDetail(${client.id})">
+                    <div class="notif-title"><i class='bx bxs-error-circle'></i> Deadline Lewat: ${chbEscape(client.project)}</div>
+                    <div class="notif-sub">${chbEscape(client.nama)} &bull; deadline ${chbFormatDate(client.deadline)}</div>
+                </li>`;
+        });
+
+        listEl.innerHTML = itemsHtml || '<li class="notif-empty">Tidak ada notifikasi</li>';
+
+        const totalNotif = notifBesok.length + notifLewat.length;
+        countEl.textContent = totalNotif;
+        countEl.style.display = totalNotif > 0 ? 'flex' : 'none';
+    }
+
+    function chbNotifGoToDetail(id) {
+        const menu = document.getElementById('notificationMenu');
+        if (menu) menu.classList.remove('show');
+        chbOpenDetailModal(id);
     }
     function chbFormatDate(dateStr) {
         if (!dateStr) return '-'; const d = new Date(dateStr + 'T00:00:00'); if (isNaN(d)) return dateStr;
@@ -1021,8 +1242,10 @@
         const paginatedData = filtered.slice(startIndex, endIndex);
 
         if (paginatedData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">Data tidak ditemukan.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:30px;">Data tidak ditemukan.</td></tr>';
             renderPagination(0, 1);
+            chbSyncSelectAllCheckbox();
+            chbUpdateBulkToolbar();
             return;
         }
 
@@ -1031,41 +1254,57 @@
             
             // CEK STATUS DEADLINE UNTUK INDIKATOR VISUAL
             let isLewat = false;
+            let isH1 = false;
             if (client.deadline) {
                 const dDate = new Date(client.deadline + 'T00:00:00');
                 dDate.setHours(0, 0, 0, 0);
-                if (dDate < hariIni) isLewat = true;
+                const diffHari = Math.round((dDate - hariIni) / 86400000);
+                if (diffHari < 0) isLewat = true;
+                else if (diffHari === 1) isH1 = true;
             }
 
-            // Tentukan Class Border Kiri dan Tampilan Teks Deadline
             let borderClass = 'status-aktif';
             let deadlineHtml = chbFormatDate(client.deadline);
-            let badgeHtml = `<br><span class="badge-aktif">Berjalan</span>`;
+            let badgeHtml = `<span class="badge-aktif">Berjalan</span>`;
 
             if (isLewat) {
                 borderClass = 'status-lewat';
                 deadlineHtml = `<span style="color: #ef4444; font-weight: 600;">${deadlineHtml}</span>`;
-                badgeHtml = `<br><span class="badge-lewat">Lewat Deadline</span>`;
+                badgeHtml = `<span class="badge-lewat">Lewat Deadline</span>`;
+            } else if (isH1) {
+                borderClass = 'status-h1';
+                deadlineHtml = `<span style="color: #ca8a04; font-weight: 600;">${deadlineHtml}</span>`;
+                badgeHtml = `<span class="badge-h1">H-1 Deadline</span>`;
             }
 
+            const isChecked = chbSelectedIds.has(client.id);
+
+            const aksiCellHtml = chbSelectMode
+                ? `<td class="action-cell select-cell"><input type="checkbox" class="chb-row-checkbox" value="${client.id}" ${isChecked ? 'checked' : ''} onchange="chbToggleRowSelect(${client.id}, this.checked)"></td>`
+                : `<td class="action-cell">
+                    <button class="btn-detail" onclick="chbOpenDetailModal(${client.id})">Detail</button>
+                    <button class="btn-edit" onclick="chbOpenEditModal(${client.id})">Edit</button>
+                    <button class="btn-delete" onclick="chbDeleteClient(${client.id})">Hapus</button>
+                   </td>`;
+
             const tr = document.createElement('tr');
+            if (chbSelectMode && isChecked) tr.classList.add('row-selected');
             tr.innerHTML = `
                 <td class="${borderClass}"><b>${actualIndex}</b></td>
                 <td><strong>${chbEscape(client.nama)}</strong></td>
                 <td>${chbEscape(client.project)}</td>
                 <td class="desc-cell">${chbEscape(chbTruncate(client.deskripsi, 32))}</td>
                 <td>${chbFormatDate(client.tanggal_awal)}</td>
-                <td>${deadlineHtml} ${badgeHtml}</td>
-                <td class="action-cell">
-                    <button class="btn-detail" onclick="chbOpenDetailModal(${client.id})">Detail</button>
-                    <button class="btn-edit" onclick="chbOpenEditModal(${client.id})">Edit</button>
-                    <button class="btn-delete" onclick="chbDeleteClient(${client.id})">Hapus</button>
-                </td>
+                <td>${deadlineHtml}</td>
+                <td>${badgeHtml}</td>
+                ${aksiCellHtml}
             `;
             tbody.appendChild(tr);
         });
 
         renderPagination(totalPages, chbCurrentPage);
+        chbSyncSelectAllCheckbox();
+        chbUpdateBulkToolbar();
     }
 
     function renderPagination(totalPages, currentPage) {
@@ -1143,9 +1382,6 @@
         document.getElementById('chbFormModalOverlay').classList.remove('show'); 
     }
 
-    /* ============================================================
-       MODAL KONFIRMASI SIMPAN / EDIT & SUCCESS
-       ============================================================ */
     function chbProcessFormSubmit(event) {
         event.preventDefault(); 
         deselectEditorImage();
@@ -1217,59 +1453,102 @@
         document.getElementById('successModal').classList.remove('show');
     }
 
-    /* ============================================================
-       MODAL KONFIRMASI HAPUS
-       ============================================================ */
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
     const btnCancelDelete = document.getElementById('btnCancelDelete');
     const btnConfirmDelete = document.getElementById('btnConfirmDelete');
     let chbIdToDelete = null;
+    let chbDeleteMode = 'single'; 
+
+    function chbOpenDeleteConfirm(title, text) {
+        document.getElementById('deleteConfirmTitle').textContent = title;
+        document.getElementById('deleteConfirmText').textContent = text;
+        deleteConfirmModal.classList.add('show');
+    }
 
     function chbDeleteClient(id) {
+        chbDeleteMode = 'single';
         chbIdToDelete = id;
-        deleteConfirmModal.classList.add('show');
+        chbOpenDeleteConfirm('Hapus Client?', 'Yakin ingin menghapus client ini? Data yang sudah dihapus tidak dapat dikembalikan.');
+    }
+
+    function chbBulkDeleteSelected() {
+        if (chbSelectedIds.size === 0) return;
+        chbDeleteMode = 'bulk';
+        chbOpenDeleteConfirm(
+            'Hapus Data Terpilih?',
+            `Yakin ingin menghapus ${chbSelectedIds.size} data client yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan.`
+        );
     }
 
     btnCancelDelete.addEventListener('click', function () {
         chbIdToDelete = null;
+        chbDeleteMode = 'single';
         deleteConfirmModal.classList.remove('show');
     });
 
     btnConfirmDelete.addEventListener('click', async function () {
-        if (!chbIdToDelete) return;
-        
+        if (chbDeleteMode === 'single' && !chbIdToDelete) return;
+        if (chbDeleteMode === 'bulk' && chbSelectedIds.size === 0) return;
+        if (chbDeleteMode === 'all' && chbClients.length === 0) return;
+
         const originalText = btnConfirmDelete.innerHTML;
         btnConfirmDelete.innerHTML = 'Menghapus...';
         btnConfirmDelete.disabled = true;
 
         try {
-            const res = await fetch(`/admin/clients/${chbIdToDelete}`, { 
-                method: 'DELETE', 
-                headers: { 'X-CSRF-TOKEN': CHB_CSRF } 
-            });
+            let res;
+
+            if (chbDeleteMode === 'single') {
+                res = await fetch(`/admin/clients/${chbIdToDelete}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': CHB_CSRF }
+                });
+            } else if (chbDeleteMode === 'bulk') {
+                res = await fetch(`/admin/clients/bulk-delete`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CHB_CSRF, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: Array.from(chbSelectedIds) })
+                });
+            } else if (chbDeleteMode === 'all') {
+                res = await fetch(`/admin/clients/delete-all`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': CHB_CSRF }
+                });
+            }
+
             if (res.ok) {
+                if (chbDeleteMode === 'bulk' || chbDeleteMode === 'all') {
+                    chbSelectedIds.clear();
+                    if (chbSelectMode) { chbSelectMode = false; chbUpdateAksiHeader(); }
+                }
+
                 await chbFetchClients();
                 deleteConfirmModal.classList.remove('show');
-                
-                document.getElementById('successModalText').textContent = 'Data client berhasil dihapus selamanya.';
+
+                let successText = 'Data client berhasil dihapus selamanya.';
+                if (chbDeleteMode === 'bulk') successText = 'Data client yang dipilih berhasil dihapus.';
+                if (chbDeleteMode === 'all') successText = 'Semua data client berhasil dihapus.';
+
+                document.getElementById('successModalText').textContent = successText;
                 document.getElementById('successModal').classList.add('show');
             } else {
                 alert('Gagal menghapus data.');
             }
-        } catch (err) { 
-            console.error(err); 
+        } catch (err) {
+            console.error(err);
             alert('Terjadi kesalahan saat menghapus data.');
         } finally {
             btnConfirmDelete.innerHTML = originalText;
             btnConfirmDelete.disabled = false;
             chbIdToDelete = null;
+            chbDeleteMode = 'single';
         }
     });
 
-    /* Klik area gelap di luar kotak = tutup popup (sama seperti Kelola Layanan) */
     deleteConfirmModal.addEventListener('click', function (e) {
         if (e.target === deleteConfirmModal && !btnConfirmDelete.disabled) {
             chbIdToDelete = null;
+            chbDeleteMode = 'single';
             deleteConfirmModal.classList.remove('show');
         }
     });
@@ -1286,85 +1565,28 @@
         if (e.target === chbSuccessModal) closeSuccessModal();
     });
 
-    /* ============================================================
-       IMPORT EXCEL (popup unggah file)
-       ============================================================ */
-    const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
-    const IMPORT_EXT = ['xlsx', 'xls', 'csv'];
-    const IMPORT_DEFAULT_LABEL = 'Klik untuk memilih file, atau seret ke sini';
+    const exportEmptyModal = document.getElementById('exportEmptyModal');
+    const btnCancelExportEmpty = document.getElementById('btnCancelExportEmpty');
 
-    function openImportModal() {
-        resetImportModal();
-        document.getElementById('importModal').classList.add('show');
-    }
-
-    function closeImportModal() {
-        if (document.getElementById('importSubmitBtn').dataset.busy === '1') return;
-        document.getElementById('importModal').classList.remove('show');
-    }
-
-    function resetImportModal() {
-        document.getElementById('importFile').value = '';
-        document.getElementById('importDrop').classList.remove('has-file', 'is-over');
-        document.getElementById('importFileName').textContent = IMPORT_DEFAULT_LABEL;
-        document.getElementById('importFileHint').style.display = '';
-        document.getElementById('importMsg').textContent = '';
-        document.getElementById('importSubmitBtn').disabled = true;
-    }
-
-    function initImportModal() {
-        const modal = document.getElementById('importModal');
-        const form  = document.getElementById('importForm');
-        const input = document.getElementById('importFile');
-        const drop  = document.getElementById('importDrop');
-        const name  = document.getElementById('importFileName');
-        const hint  = document.getElementById('importFileHint');
-        const msg   = document.getElementById('importMsg');
-        const btn   = document.getElementById('importSubmitBtn');
-
-        function checkFile() {
-            const file = input.files[0];
-            drop.classList.remove('has-file');
-            msg.textContent = '';
-            btn.disabled = true;
-
-            if (!file) { name.textContent = IMPORT_DEFAULT_LABEL; hint.style.display = ''; return; }
-
-            name.textContent = file.name;
-            hint.style.display = 'none';
-
-            const ext = file.name.split('.').pop().toLowerCase();
-            if (!IMPORT_EXT.includes(ext)) { msg.textContent = 'Format file tidak didukung. Pilih file .xlsx, .xls, atau .csv.'; return; }
-            if (file.size > IMPORT_MAX_BYTES) { msg.textContent = 'Ukuran file lebih dari 5 MB. Kecilkan atau pecah file-nya.'; return; }
-
-            drop.classList.add('has-file');
-            btn.disabled = false;
+    function chbHandleExportClick(e, url) {
+        if (chbClients.length === 0) {
+            e.preventDefault();
+            exportEmptyModal.classList.add('show');
+            return false;
         }
-
-        input.addEventListener('change', checkFile);
-
-        ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
-        ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('is-over'); }));
-        drop.addEventListener('drop', e => {
-            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
-            const dt = new DataTransfer();
-            dt.items.add(e.dataTransfer.files[0]);
-            input.files = dt.files;
-            checkFile();
-        });
-
-        form.addEventListener('submit', () => {
-            btn.dataset.busy = '1';
-            btn.disabled = true;
-            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Mengimpor...";
-        });
-
-        modal.addEventListener('click', e => { if (e.target === modal) closeImportModal(); });
+        return true; 
     }
 
-    /* ============================================================
-       DETAIL
-       ============================================================ */
+    btnCancelExportEmpty.addEventListener('click', function () {
+        exportEmptyModal.classList.remove('show');
+    });
+
+    exportEmptyModal.addEventListener('click', function (e) {
+        if (e.target === exportEmptyModal) {
+            exportEmptyModal.classList.remove('show');
+        }
+    });
+
     function chbOpenDetailModal(id) {
         const client = chbClients.find(c => c.id === id); if (!client) return;
         document.getElementById('chbDetailContent').innerHTML = `
@@ -1380,9 +1602,6 @@
     }
     function chbCloseDetailModal() { document.getElementById('chbDetailModalOverlay').classList.remove('show'); }
 
-    /* ============================================================
-       LIGHTBOX
-       ============================================================ */
     function openDbLightbox(imagesArr, index = 0) {
         if (!imagesArr || imagesArr.length === 0) return;
         lbImagesArr = imagesArr; lbCurrentIndex = index;

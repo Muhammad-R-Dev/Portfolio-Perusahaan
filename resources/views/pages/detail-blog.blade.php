@@ -51,7 +51,7 @@
             margin-bottom: 22px;
         }
 
-        /* Header hijau: full lebar dari pojok kiri ke pojok kanan, tombol kembali di dalamnya */
+        /* Header hijau: full lebar dari pojok kiri ke pojok kanan */
         .top-header {
             width: 100%;
             background: var(--primary);
@@ -59,10 +59,11 @@
             top: 0;
             z-index: 50;
         }
+        
+        /* DIUBAH: Lebar 100% dan padding kiri-kanan kecil supaya mepet ujung layar */
         .top-header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 5%;
+            width: 100%;
+            padding: 0 16px; 
             height: 60px;
             display: flex;
             align-items: center;
@@ -109,7 +110,6 @@
             min-width: 0;
         }
 
-        /* 1. Judul rata kiri, tegas & besar */
         .detail-header {
             text-align: left;
             margin-bottom: 20px;
@@ -124,7 +124,6 @@
             color: var(--primary);
         }
 
-        /* 2. Tanggal + kategori sejajar, dengan ikon, rata kiri */
         .detail-meta {
             display: flex;
             align-items: center;
@@ -158,7 +157,6 @@
             text-transform: uppercase;
         }
 
-        /* 3. Gambar utama */
         .detail-image-frame {
             width: 100%;
             border-radius: 14px;
@@ -179,7 +177,6 @@
             .detail-image { aspect-ratio: 4 / 3; }
         }
 
-        /* 4. Isi artikel, rata kiri agar mudah dibaca (bukan justify) */
         .detail-body {
             font-size: 1.02rem;
             line-height: 1.85;
@@ -254,7 +251,6 @@
             background: transparent;
         }
 
-        /* ===== Heading gaya "tab": label solid menempel di atas garis ===== */
         .sidebar-heading {
             margin: 0 0 22px;
         }
@@ -348,7 +344,7 @@
     </style>
 </head>
 <body>
-    {{-- Header hijau (kiri ke kanan) berisi tombol kembali --}}
+    {{-- Header hijau dengan tombol kembali mepet pojok kiri full --}}
     <header class="top-header">
         <div class="top-header-inner">
             <button type="button" class="back-button" id="backButton" aria-label="Kembali">
@@ -364,8 +360,6 @@
         <div class="detail-shell">
 
             @php
-                // Pisahkan artikel lainnya menjadi: kategori sama (Rekomendasi)
-                // dan kategori berbeda (Lainnya). Aman walaupun $blogLainnya kosong.
                 $blogRekomendasi = $blogLainnya->where('kategori', $blog->kategori);
                 $blogBerbeda     = $blogLainnya->where('kategori', '!=', $blog->kategori);
             @endphp
@@ -373,8 +367,6 @@
             <div class="detail-layout">
                 {{-- KOLOM KIRI: KONTEN UTAMA --}}
                 <article class="detail-main">
-                    {{-- 1. Judul besar rata kiri --}}
-                    {{-- 2. Tanggal + kategori sejajar dengan ikon di bawah judul --}}
                     <div class="detail-header">
                         <h1 class="detail-title">{{ $blog->judul }}</h1>
                         <div class="detail-meta">
@@ -389,7 +381,6 @@
                         </div>
                     </div>
 
-                    {{-- 3. Gambar di dalam bingkai/card --}}
                     <div class="detail-image-frame">
                         <img
                             src="{{ $blog->gambar ? asset('storage/'.$blog->gambar) : 'https://placehold.co/1200x600/png' }}"
@@ -398,9 +389,6 @@
                         >
                     </div>
 
-                    {{-- 4. Isi konten paling bawah --}}
-                    {{-- Konten dari WYSIWYG editor dirender langsung sebagai HTML, --}}
-                    {{-- JANGAN dibungkus e()/nl2br() karena akan merusak tag (p, strong, ul, img, dll) --}}
                     <div class="detail-body">
                         {!! $blog->konten !!}
                     </div>
@@ -410,7 +398,7 @@
                 <aside class="detail-sidebar">
                     <div class="sidebar-block">
 
-                        {{-- Rekomendasi: artikel dengan kategori yang sama --}}
+                        {{-- Rekomendasi --}}
                         <div class="sidebar-heading">
                             <span class="tab-label">Rekomendasi</span>
                             <span class="tab-line"></span>
@@ -434,7 +422,7 @@
                             @endif
                         </div>
 
-                        {{-- Lainnya: artikel dengan kategori yang berbeda --}}
+                        {{-- Lainnya --}}
                         <div class="sidebar-heading sidebar-subsep">
                             <span class="tab-label">Lainnya</span>
                             <span class="tab-line"></span>
@@ -465,8 +453,6 @@
     </div>
 
     <script>
-        // Tombol Back: kembali ke halaman sebelumnya kalau ada riwayatnya dari situs
-        // ini, kalau tidak (misal dibuka langsung dari link luar) balik ke halaman Blog
         document.getElementById('backButton').addEventListener('click', function () {
             if (document.referrer && document.referrer.includes(window.location.host) && window.history.length > 1) {
                 window.history.back();

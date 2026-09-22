@@ -123,7 +123,7 @@
         #content nav .notification { font-size: 20px; position: relative; }
         #content nav .notification .num { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--light); background: var(--red); color: var(--light); font-weight: 700; font-size: 12px; display: flex; justify-content: center; align-items: center; }
 
-        #content nav .notification-menu { display: none; position: absolute; top: 56px; right: 0; background: var(--light); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 15px; width: 250px; max-height: 300px; overflow-y: auto; z-index: 9999; font-family: var(--lato); }
+        #content nav .notification-menu { display: none; position: absolute; top: 56px; right: 0; background: var(--light); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 15px; width: 280px; max-height: 340px; overflow-y: auto; z-index: 9999; font-family: var(--lato); }
         #content nav .notification-menu.show { display: block; }
         #content nav .notification-menu ul { list-style: none; padding: 10px; margin: 0; }
         #content nav .notification-menu li { padding: 10px; border-bottom: 1px solid var(--grey); color: var(--dark); }
@@ -131,6 +131,15 @@
         #content nav .notification-menu li:hover a{ background-color: var(--dark-grey); color: var(--light); }
         body.dark #content nav .notification-menu li:hover { background-color: var(--light-blue); color: var(--light); }
         body.dark #content nav .notification-menu li a{ background-color: var(--dark-grey); color: var(--light); }
+
+        /* Item notifikasi deadline (dinamis) */
+        #content nav .notification-menu li.notif-item { cursor: pointer; }
+        #content nav .notification-menu li .notif-title { font-weight: 600; font-size: 13px; display: flex; align-items: center; grid-gap: 6px; }
+        #content nav .notification-menu li .notif-sub { font-size: 12px; color: var(--dark-grey); margin-top: 3px; }
+        #content nav .notification-menu li.notif-h1 .notif-title { color: var(--orange); }
+        #content nav .notification-menu li.notif-lewat .notif-title { color: var(--red); }
+        #content nav .notification-menu li.notif-empty { text-align: center; color: var(--dark-grey); cursor: default; border-bottom: none; }
+        #content nav .notification-menu li.notif-empty:hover { background-color: transparent; }
 
         #content nav .switch-mode { display: block; min-width: 50px; height: 25px; border-radius: 25px; background: var(--grey); cursor: pointer; position: relative; }
         #content nav .switch-mode::before { content: ''; position: absolute; top: 2px; left: 2px; bottom: 2px; width: calc(25px - 4px); background: var(--blue); border-radius: 50%; transition: all .3s ease; }
@@ -208,15 +217,11 @@
             <!-- Notification Bell -->
             <a href="#" class="notification" id="notificationIcon">
                 <i class='bx bxs-bell bx-tada-hover'></i>
-                <span class="num">8</span>
+                <span class="num" id="notificationCount" style="display: none;">0</span>
             </a>
             <div class="notification-menu" id="notificationMenu">
-                <ul>
-                    <li>New message from John</li>
-                    <li>Your order has been shipped</li>
-                    <li>New comment on your post</li>
-                    <li>Update available for your app</li>
-                    <li>Reminder: Meeting at 3PM</li>
+                <ul id="notificationList">
+                    <li class="notif-empty">Tidak ada notifikasi</li>
                 </ul>
             </div>
             

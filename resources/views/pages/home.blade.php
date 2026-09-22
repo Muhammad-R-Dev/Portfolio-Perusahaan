@@ -897,7 +897,7 @@ html #navHeader.scrolled {
     <h2>Teknologi</h2>
   </div>
   <img src="img/sun_rays.webp" alt="" class="sun-rays">
-  <img src="img/black_shadow.png" alt="" class="black-shadow">
+  <img src="img/black_shadow.webp" alt="" class="black-shadow">
   <img src="img/fo_1.png" data-speedx="0.12" data-distance="4200" data-rotation="0" data-speedz="0" data-speedy="0.01" alt="" class="parallax fog-1">
 
   <a href="{{ url('/') }}" class="brand-badge-home">

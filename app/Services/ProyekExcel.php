@@ -334,10 +334,32 @@ class ProyekExcel
     public function parse(string $path, string $extension): array
     {
         $extension = strtolower($extension);
-        $reader = $extension === 'csv' ? IOFactory::createReader('Csv') : IOFactory::createReaderForFile($path);
+
+        if ($extension === 'csv') {
+            $reader = IOFactory::createReader('Csv');
+            $reader->setDelimiter($this->detectCsvDelimiter($path));
+            $reader->setInputEncoding($this->detectCsvEncoding($path));
+        } else {
+            try {
+                $reader = IOFactory::createReaderForFile($path);
+            } catch (\Throwable $e) {
+                // Nama file .xlsx/.xls tapi isinya bukan format itu (mis. sebenarnya CSV/HTML yang di-rename).
+                throw new ProyekImportException(
+                    'File tidak bisa dibaca sebagai Excel. Kemungkinan file rusak, atau formatnya sebenarnya CSV/HTML yang cuma diganti nama jadi .xlsx/.xls. Buka lagi filenya di Excel lalu "Save As" ke .xlsx, atau gunakan template dari tombol Import Excel.'
+                );
+            }
+        }
         $reader->setReadDataOnly(true);
 
-        $book  = $reader->load($path);
+        try {
+            $book = $reader->load($path);
+        } catch (ProyekImportException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            throw new ProyekImportException(
+                'File tidak bisa dibaca. Pastikan file tidak terkunci/dilindungi password, tidak rusak, dan benar-benar format ' . strtoupper($extension) . '. Gunakan template dari tombol Import Excel kalau masih gagal.'
+            );
+        }
         $sheet = $book->getSheetByName(self::SHEET) ?: $book->getSheet(0);
 
         $highestRow = $sheet->getHighestDataRow();
@@ -741,6 +763,46 @@ class ProyekExcel
      * ===================================================================== */
 
     /** @return array{0:int, 1:array<string,int>} [indeks baris judul, peta kolom] */
+    /** Menebak pemisah kolom CSV (koma, titik koma, atau tab) dari baris pertama file. */
+    private function detectCsvDelimiter(string $path): string
+    {
+        $handle = fopen($path, 'r');
+        if ($handle === false) {
+            return ',';
+        }
+
+        $firstLine = fgets($handle) ?: '';
+        fclose($handle);
+
+        // Buang BOM UTF-8 kalau ada, supaya tidak ikut terhitung sebagai karakter aneh.
+        $firstLine = preg_replace('/^\xEF\xBB\xBF/', '', $firstLine);
+
+        $candidates = [',' => 0, ';' => 0, "\t" => 0];
+        foreach (array_keys($candidates) as $delim) {
+            $candidates[$delim] = substr_count($firstLine, $delim);
+        }
+        arsort($candidates);
+        $best = array_key_first($candidates);
+
+        // Kalau baris pertama tidak mengandung pemisah sama sekali, default ke koma.
+        return $candidates[$best] > 0 ? $best : ',';
+    }
+
+    /** Menebak encoding file CSV (Excel Windows biasanya menyimpan sebagai Windows-1252, bukan UTF-8). */
+    private function detectCsvEncoding(string $path): string
+    {
+        $sample = file_get_contents($path, false, null, 0, 8192) ?: '';
+
+        if (str_starts_with($sample, "\xEF\xBB\xBF")) {
+            return 'UTF-8';
+        }
+        if (str_starts_with($sample, "\xFF\xFE") || str_starts_with($sample, "\xFE\xFF")) {
+            return 'UTF-16';
+        }
+
+        return mb_check_encoding($sample, 'UTF-8') ? 'UTF-8' : 'Windows-1252';
+    }
+
     private function findHeader(array $grid): array
     {
         $limit = min(count($grid), 15);

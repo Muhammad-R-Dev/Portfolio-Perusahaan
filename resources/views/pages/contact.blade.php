@@ -64,7 +64,7 @@
 
             <!-- Kanan: info kontak, alamat, dan peta -->
             <div class="contact-info">
-                <h2>Butuh informasi lebih lanjut?<br>Hubungi kami</h2>
+                <h2>Informasi lebih lanjut</h2>
                 <p class="lead">Punya proyek yang ingin diwujudkan atau ingin berkonsultasi soal strategi digital? Tim kami siap membantu.</p>
 
                 <div class="map">

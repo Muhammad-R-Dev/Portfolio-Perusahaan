@@ -47,6 +47,38 @@ class ClientController extends Controller
     }
 
     /**
+     * Hapus banyak data Client sekaligus (tombol "Hapus Terpilih").
+     * Menerima JSON: { "ids": [1, 2, 3] }
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer|exists:clients,id',
+        ]);
+
+        $deleted = Client::whereIn('id', $validated['ids'])->delete();
+
+        return response()->json([
+            'message' => 'Deleted',
+            'deleted' => $deleted,
+        ]);
+    }
+
+    /**
+     * Hapus SEMUA data Client (tombol "Hapus Semua").
+     */
+    public function destroyAll()
+    {
+        $deleted = Client::query()->delete();
+
+        return response()->json([
+            'message' => 'Deleted all',
+            'deleted' => $deleted,
+        ]);
+    }
+
+    /**
      * Export data Client ke CSV
      */
     public function export()
@@ -89,45 +121,49 @@ class ClientController extends Controller
     }
 
     /**
-     * Import data Client dari file CSV
+     * Import data Client dari Frontend (Menerima Data Mentah dari SheetJS)
      */
     public function import(Request $request)
     {
-        // Validasi file yang masuk harus berformat CSV atau TXT
-        $request->validate([
-            'file' => 'required|mimes:csv,txt|max:2048',
-        ]);
+        // Tangkap data array yang dikirim dari Javascript
+        $rows = $request->input('data');
 
-        $file = $request->file('file');
-        $fileHandle = fopen($file->getPathname(), 'r');
-        
-        // Lewati baris pertama (karena isinya cuma judul kolom 'Nama Client', dll)
-        fgetcsv($fileHandle);
+        if (!$rows || !is_array($rows)) {
+            return response()->json(['success' => false, 'message' => 'Data tidak valid atau kosong.'], 400);
+        }
+
+        // Hapus baris pertama jika itu adalah judul kolom (Header)
+        if (isset($rows[0]) && is_array($rows[0]) && stripos($rows[0][0], 'Nama') !== false) {
+            array_shift($rows);
+        }
 
         $berhasil = 0;
 
-        // Looping baca baris demi baris dari file CSV
-        while (($row = fgetcsv($fileHandle)) !== false) {
-            // Pastikan baris tersebut punya 5 kolom (sesuai format export kita)
-            if (count($row) >= 5) {
-                // Abaikan kalau nama client kosong
-                if(trim($row[0]) == '') continue;
+        foreach ($rows as $row) {
+            // Pastikan minimal ada 5 kolom yang terisi (Nama, Project, Desk, Mulai, Deadline)
+            if (is_array($row) && count($row) >= 5) {
+                // Abaikan jika Nama Client kosong
+                if (trim($row[0]) == '') continue;
+
+                // Rapikan format tanggal
+                $tanggalMulai = date('Y-m-d', strtotime(trim($row[3])));
+                $deadline     = date('Y-m-d', strtotime(trim($row[4])));
 
                 Client::create([
                     'nama'         => trim($row[0]),
                     'project'      => trim($row[1]),
                     'deskripsi'    => trim($row[2]),
-                    'tanggal_awal' => trim($row[3]),
-                    'deadline'     => trim($row[4]),
+                    'tanggal_awal' => $tanggalMulai,
+                    'deadline'     => $deadline,
                 ]);
                 
                 $berhasil++;
             }
         }
 
-        fclose($fileHandle);
-
-        // Lempar kembali ke halaman tadi sambil bawa pesan sukses
-        return redirect()->back()->with('success', "$berhasil data client berhasil di-import!");
+        return response()->json([
+            'success' => true,
+            'message' => "$berhasil data client berhasil di-import!"
+        ]);
     }
 }

@@ -223,25 +223,75 @@
             white-space: nowrap;
             text-align: right;
         }
-        #content main .table-data .order table td.col-aksi .bx {
+        #content main .table-data .order table td.col-aksi .btn-edit {
+            border: none;
             cursor: pointer;
-            font-size: 18px;
-            padding: 6px;
-            border-radius: 8px;
-            margin-left: 4px;
-            transition: transform .15s ease, filter .15s ease;
+            font-family: var(--poppins);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--blue);
+            color: var(--light);
         }
-        #content main .table-data .order table td.col-aksi .bx:hover {
-            transform: translateY(-2px);
-            filter: brightness(.9);
+
+        /* TOMBOL MODE PILIH (HAPUS) & HAPUS TERPILIH */
+        #content main .table-data .head .btn-select-mode,
+        #content main .table-data .head .btn-bulk-delete {
+            height: 38px;
+            padding: 0 16px;
+            border-radius: 36px;
+            border: none;
+            cursor: pointer;
+            font-family: var(--poppins);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            grid-gap: 6px;
+            transition: all .2s ease;
+            white-space: nowrap;
         }
-        #content main .table-data .order table td.col-aksi .bx-edit {
-            color: var(--blue);
-            background: var(--light-blue);
+        #content main .table-data .head .btn-select-mode {
+            background: var(--red);
+            color: var(--light);
         }
-        #content main .table-data .order table td.col-aksi .bx-trash {
-            color: var(--red);
+        #content main .table-data .head .btn-select-mode:hover {
+            opacity: .9;
+        }
+        #content main .table-data .head .btn-select-mode.active {
+            background: var(--dark);
+            color: var(--light);
+        }
+        #content main .table-data .head .bulk-actions-group {
+            display: none;
+            align-items: center;
+            grid-gap: 10px;
+        }
+        #content main .table-data .head .bulk-actions-group.show {
+            display: flex;
+        }
+        #content main .table-data .head .btn-bulk-delete {
             background: var(--light-orange);
+            color: var(--red);
+        }
+        #content main .table-data .head .btn-bulk-delete:hover:not(:disabled) {
+            background: var(--red);
+            color: var(--light);
+        }
+        #content main .table-data .head .btn-bulk-delete:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+        #content main .table-data .order table th input[type="checkbox"],
+        #content main .table-data .order table td.col-aksi input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--blue);
+        }
+        #content main .table-data .order table tbody tr.row-selected {
+            background: var(--light-blue);
         }
 
         /* MODAL */
@@ -561,6 +611,14 @@
                                 <option value="10">10</option>
                                 <option value="20">20</option>
                             </select>
+                            <button type="button" class="btn-select-mode" id="btnToggleTimSelectMode" onclick="toggleTimSelectMode()">
+                                <i class='bx bx-list-check'></i> <span id="btnToggleTimSelectModeText">Hapus</span>
+                            </button>
+                            <div class="bulk-actions-group" id="timBulkActionsGroup">
+                                <button type="button" class="btn-bulk-delete" id="btnTimBulkDelete" disabled onclick="confirmBulkDeleteTim()">
+                                    <i class='bx bx-trash'></i> Hapus (<span id="timBulkDeleteCount">0</span>)
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <table id="timTable">
@@ -570,12 +628,12 @@
                                 <th>Nama</th>
                                 <th>Jabatan</th>
                                 <th>Divisi</th>
-                                <th style="text-align: right; padding-right: 16px;">Aksi</th>
+                                <th id="timAksiHeader" style="text-align: right; padding-right: 16px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="timTableBody">
                             @forelse($teams as $team)
-                            <tr class="tim-row" data-nama="{{ strtolower($team->nama) }}" data-jabatan="{{ strtolower($team->jabatan) }}" data-divisi="{{ strtolower($team->divisi) }}">
+                            <tr class="tim-row" data-id="{{ $team->id }}" data-nama="{{ strtolower($team->nama) }}" data-jabatan="{{ strtolower($team->jabatan) }}" data-divisi="{{ strtolower($team->divisi) }}">
                                 <td class="col-no">{{ $loop->iteration }}</td>
                                 <td class="col-nama">
                                     <img class="foto-zoomable" src="{{ $team->foto_url }}" alt="{{ $team->nama }}"
@@ -586,7 +644,7 @@
                                 <td>{{ $team->jabatan }}</td>
                                 <td class="col-divisi"><span>{{ $team->divisi }}</span></td>
                                 <td class="col-aksi">
-                                    <i class='bx bx-edit'
+                                    <button type="button" class="btn-edit"
                                         title="Edit"
                                         data-id="{{ $team->id }}"
                                         data-nama="{{ $team->nama }}"
@@ -594,8 +652,7 @@
                                         data-divisi="{{ $team->divisi }}"
                                         data-foto="{{ $team->foto_url }}"
                                         data-url="{{ route('admin.kelola-tim.update', $team->id) }}"
-                                        onclick="openModal('edit', this)"></i>
-                                    <i class='bx bx-trash' title="Hapus" onclick="confirmDelete({{ $team->id }})"></i>
+                                        onclick="openModal('edit', this)">Edit</button>
                                     <form id="deleteFormTim{{ $team->id }}" action="{{ route('admin.kelola-tim.destroy', $team->id) }}" method="POST" style="display:none;">
                                         @csrf
                                         @method('DELETE')
@@ -682,8 +739,8 @@
             <div class="modal-overlay" id="deleteConfirmModal">
                 <div class="modal-box modal-confirm">
                     <div class="confirm-icon"><i class='bx bx-trash'></i></div>
-                    <h2>Hapus Anggota Tim?</h2>
-                    <p>Yakin ingin menghapus anggota tim ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
+                    <h2 id="deleteConfirmTitle">Hapus Anggota Tim?</h2>
+                    <p id="deleteConfirmText">Yakin ingin menghapus anggota tim ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
                     <div class="modal-actions">
                         <button type="button" class="btn btn-cancel" id="btnCancelDelete">Batal</button>
                         <button type="button" class="btn btn-danger" id="btnConfirmDelete">Ya, Hapus</button>
@@ -773,6 +830,7 @@
             }
 
             renderTimPagination(filteredRows.length, perPage, totalPages);
+            syncTimSelectAllCheckbox();
         }
 
         function renderTimPagination(totalItems, perPage, totalPages) {
@@ -820,6 +878,110 @@
         }
 
         applyTimFilters(true);
+
+        /* ============================================================
+           MODE PILIH: kolom "Aksi" berubah jadi kolom checkbox
+           ============================================================ */
+        let timSelectMode = false;
+        let timSelectedIds = new Set();
+        const timActionCellCache = new Map(); // id -> HTML tombol aksi asli (Edit)
+
+        function toggleTimSelectMode() {
+            timSelectMode = !timSelectMode;
+            timSelectedIds.clear();
+            renderTimActionCells();
+            updateTimAksiHeader();
+            updateTimBulkToolbar();
+        }
+
+        function renderTimActionCells() {
+            document.querySelectorAll('#timTableBody tr.tim-row').forEach(function (tr) {
+                const id = tr.dataset.id;
+                const cell = tr.querySelector('td.col-aksi');
+                if (!id || !cell) return;
+
+                if (timSelectMode) {
+                    if (!timActionCellCache.has(id)) {
+                        timActionCellCache.set(id, cell.innerHTML);
+                    }
+                    const checked = timSelectedIds.has(id);
+                    cell.innerHTML = '<input type="checkbox" class="tim-row-checkbox" value="' + id + '" ' + (checked ? 'checked' : '') + ' onchange="toggleTimRowSelect(\'' + id + '\', this.checked)">';
+                    tr.classList.toggle('row-selected', checked);
+                } else {
+                    if (timActionCellCache.has(id)) {
+                        cell.innerHTML = timActionCellCache.get(id);
+                    }
+                    tr.classList.remove('row-selected');
+                }
+            });
+        }
+
+        function updateTimAksiHeader() {
+            const th = document.getElementById('timAksiHeader');
+            const toggleBtn = document.getElementById('btnToggleTimSelectMode');
+            const toggleBtnText = document.getElementById('btnToggleTimSelectModeText');
+            const bulkGroup = document.getElementById('timBulkActionsGroup');
+            if (!th) return;
+
+            if (timSelectMode) {
+                th.innerHTML = '<input type="checkbox" id="timSelectAll" title="Pilih semua di halaman ini" onclick="toggleTimSelectAllOnPage(this.checked)">';
+                toggleBtn.classList.add('active');
+                toggleBtnText.textContent = 'Batal';
+                bulkGroup.classList.add('show');
+            } else {
+                th.textContent = 'Aksi';
+                toggleBtn.classList.remove('active');
+                toggleBtnText.textContent = 'Hapus';
+                bulkGroup.classList.remove('show');
+            }
+        }
+
+        function toggleTimRowSelect(id, checked) {
+            if (checked) timSelectedIds.add(id);
+            else timSelectedIds.delete(id);
+
+            const cb = document.querySelector('.tim-row-checkbox[value="' + id + '"]');
+            const row = cb ? cb.closest('tr') : null;
+            if (row) row.classList.toggle('row-selected', checked);
+
+            syncTimSelectAllCheckbox();
+            updateTimBulkToolbar();
+        }
+
+        function getVisibleTimCheckboxes() {
+            return Array.from(document.querySelectorAll('#timTableBody .tim-row .tim-row-checkbox')).filter(function (cb) {
+                const tr = cb.closest('tr');
+                return tr && tr.style.display !== 'none';
+            });
+        }
+
+        function toggleTimSelectAllOnPage(checked) {
+            getVisibleTimCheckboxes().forEach(function (cb) {
+                cb.checked = checked;
+                const id = cb.value;
+                if (checked) timSelectedIds.add(id);
+                else timSelectedIds.delete(id);
+                const row = cb.closest('tr');
+                if (row) row.classList.toggle('row-selected', checked);
+            });
+            updateTimBulkToolbar();
+        }
+
+        function syncTimSelectAllCheckbox() {
+            const selectAll = document.getElementById('timSelectAll');
+            if (!selectAll) return; // hanya ada saat mode pilih aktif
+            const boxes = getVisibleTimCheckboxes();
+            if (!boxes.length) { selectAll.checked = false; selectAll.indeterminate = false; return; }
+            const checkedCount = boxes.filter(function (cb) { return cb.checked; }).length;
+            selectAll.checked = checkedCount === boxes.length;
+            selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+        }
+
+        function updateTimBulkToolbar() {
+            const count = timSelectedIds.size;
+            document.getElementById('timBulkDeleteCount').textContent = count;
+            document.getElementById('btnTimBulkDelete').disabled = count === 0;
+        }
 
         const timModal   = document.getElementById('timModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -943,28 +1105,90 @@
         const deleteConfirmModal = document.getElementById('deleteConfirmModal');
         const btnCancelDelete    = document.getElementById('btnCancelDelete');
         const btnConfirmDelete   = document.getElementById('btnConfirmDelete');
+        const deleteConfirmTitle = document.getElementById('deleteConfirmTitle');
+        const deleteConfirmText  = document.getElementById('deleteConfirmText');
         let formToDelete = null;
+        let timDeleteMode = 'single'; // 'single' | 'bulk'
 
-        function confirmDelete(id) {
-            formToDelete = document.getElementById('deleteFormTim' + id);
+        function openTimDeleteConfirm(title, text) {
+            deleteConfirmTitle.textContent = title;
+            deleteConfirmText.textContent = text;
             deleteConfirmModal.classList.add('show');
+        }
+
+        // Hapus satu anggota tim (tombol tong sampah lama / dipanggil manual)
+        function confirmDelete(id) {
+            timDeleteMode = 'single';
+            formToDelete = document.getElementById('deleteFormTim' + id);
+            openTimDeleteConfirm('Hapus Anggota Tim?', 'Yakin ingin menghapus anggota tim ini? Data yang sudah dihapus tidak dapat dikembalikan.');
+        }
+
+        // Hapus semua anggota tim yang dicentang (tombol "Hapus Terpilih")
+        function confirmBulkDeleteTim() {
+            if (timSelectedIds.size === 0) return;
+            timDeleteMode = 'bulk';
+            openTimDeleteConfirm(
+                'Hapus Anggota Tim Terpilih?',
+                'Yakin ingin menghapus ' + timSelectedIds.size + ' anggota tim yang dipilih? Data yang sudah dihapus tidak dapat dikembalikan.'
+            );
         }
 
         btnCancelDelete.addEventListener('click', function () {
             formToDelete = null;
+            timDeleteMode = 'single';
             deleteConfirmModal.classList.remove('show');
         });
 
-        btnConfirmDelete.addEventListener('click', function () {
-            if (formToDelete) {
-                formToDelete.submit();
+        btnConfirmDelete.addEventListener('click', async function () {
+            if (timDeleteMode === 'single') {
+                if (formToDelete) {
+                    formToDelete.submit();
+                }
+                deleteConfirmModal.classList.remove('show');
+                return;
             }
+
+            // Mode massal: kirim form hapus untuk tiap anggota tim yang dicentang
+            const ids = Array.from(timSelectedIds);
+            if (ids.length === 0) {
+                deleteConfirmModal.classList.remove('show');
+                return;
+            }
+
+            const originalText = btnConfirmDelete.innerHTML;
+            btnConfirmDelete.innerHTML = 'Menghapus...';
+            btnConfirmDelete.disabled = true;
+
+            let gagal = 0;
+            for (const id of ids) {
+                const form = document.getElementById('deleteFormTim' + id);
+                if (!form) { gagal++; continue; }
+                try {
+                    const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+                    if (!res.ok) gagal++;
+                } catch (e) {
+                    gagal++;
+                }
+            }
+
+            const berhasil = ids.length - gagal;
+            sessionStorage.setItem(
+                'timBulkDeleteMessage',
+                gagal === 0
+                    ? berhasil + ' anggota tim berhasil dihapus.'
+                    : berhasil + ' dari ' + ids.length + ' anggota tim berhasil dihapus.'
+            );
+
+            btnConfirmDelete.innerHTML = originalText;
+            btnConfirmDelete.disabled = false;
             deleteConfirmModal.classList.remove('show');
+            window.location.reload();
         });
 
         deleteConfirmModal.addEventListener('click', function (e) {
-            if (e.target === deleteConfirmModal) {
+            if (e.target === deleteConfirmModal && !btnConfirmDelete.disabled) {
                 formToDelete = null;
+                timDeleteMode = 'single';
                 deleteConfirmModal.classList.remove('show');
             }
         });
@@ -1014,8 +1238,15 @@
             if (e.key === 'Escape' && zoomFotoModal.classList.contains('show')) closeZoomFoto();
         });
 
+        const timBulkDeleteMessage = sessionStorage.getItem('timBulkDeleteMessage');
+        if (timBulkDeleteMessage) {
+            sessionStorage.removeItem('timBulkDeleteMessage');
+            showSuccessPopup(timBulkDeleteMessage);
+        }
         @if(session('success'))
-            showSuccessPopup(@json(session('success')));
+            else {
+                showSuccessPopup(@json(session('success')));
+            }
         @endif
 
         teamFoto.addEventListener('change', function () {
