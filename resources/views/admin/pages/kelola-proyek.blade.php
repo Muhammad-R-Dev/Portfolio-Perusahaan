@@ -257,7 +257,8 @@
     .detail-value { font-size: 14px; color: #0f172a; line-height: 1.6; }
     .detail-value img { max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in; }
 
-    /* ========== MODAL KONFIRMASI & NOTIFIKASI ========== */
+    /* ========== MODAL KONFIRMASI & NOTIFIKASI (HAPUS, SIMPAN/EDIT, BERHASIL) ==========
+       Tampilan disamakan dengan halaman Kelola Layanan */
     .modal-overlay {
         display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .5);
         z-index: 5000; justify-content: center; align-items: center; padding: 16px;
@@ -308,6 +309,21 @@
     .modal-import .import-note { margin: 4px 2px 0; font-size: 12px; line-height: 1.5; color: var(--dark-grey); }
     .modal-import .modal-actions { margin-top: 20px; }
 
+    .modal-box.modal-result { max-width: 520px; }
+    .modal-result .confirm-icon.warn { background: #fef3c7; color: #d97706; }
+    .result-stats { display: flex; gap: 10px; margin: 20px 0 0; }
+    .result-stats .stat { flex: 1; padding: 12px 6px; border-radius: 12px; background: #f1f5f9; }
+    .result-stats .stat b { display: block; font-size: 22px; font-weight: 600; color: #0f172a; }
+    .result-stats .stat span { font-size: 12px; color: #64748b; }
+    .result-stats .stat.ok b { color: #16a34a; }
+    .result-stats .stat.skip b { color: #d97706; }
+    .result-stats .stat.bad b { color: #dc2626; }
+    .result-errors { list-style: none; margin: 14px 0 0; padding: 0; max-height: 220px; overflow-y: auto; text-align: left; border: 1px solid #e2e8f0; border-radius: 12px; }
+    .result-errors li { display: flex; gap: 12px; padding: 9px 14px; font-size: 13px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+    .result-errors li:last-child { border-bottom: 0; }
+    .result-errors li b { flex: 0 0 64px; color: #0f172a; }
+    .result-hint { margin: 12px 2px 0 !important; font-size: 12.5px !important; text-align: left; }
+
     /* ========== LIGHTBOX ZOOM (GLOBAL) ========== */
     .db-lightbox { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
     .db-lightbox.show { display: flex; opacity: 1; }
@@ -351,7 +367,7 @@
         <!-- TOMBOL EXPORT, IMPORT, & TAMBAH CLIENT -->
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
 
-            <!-- Export: unduh semua data client sebagai file Excel (.csv) -->
+            <!-- Export: unduh semua data client sebagai file Excel (.xlsx) -->
             <a href="{{ route('admin.kelola-proyek.export') }}" class="btn-download btn-export" id="btnExportExcel" onclick="return chbHandleExportClick(event, this.href)">
                 <i class='bx bxs-file-export'></i>
                 <span class="text">Export Excel</span>
@@ -620,7 +636,7 @@
         </div>
     </div>
 
-    {{-- ===================== MODAL: NOTIFIKASI SUKSES (TAMBAH / EDIT / HAPUS) ===================== --}}
+    {{-- ===================== MODAL: NOTIFIKASI SUKSES (TAMBAH / EDIT / HAPUS / IMPORT) ===================== --}}
     <div class="modal-overlay" id="successModal">
         <div class="modal-box modal-confirm">
             <div class="confirm-icon success"><i class='bx bx-check-circle'></i></div>
@@ -632,11 +648,11 @@
         </div>
     </div>
 
-    {{-- ===================== MODAL: IMPORT EXCEL (SheetJS) ===================== --}}
+    {{-- ===================== MODAL: IMPORT EXCEL ===================== --}}
     <div class="modal-overlay" id="importModal">
         <div class="modal-box modal-import">
-            <!-- Form dimatikan action-nya, kita handle pakai JS/Fetch -->
-            <form onsubmit="event.preventDefault(); document.getElementById('importFile').click();" id="importForm">
+            <form action="{{ route('admin.kelola-proyek.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+                @csrf
                 <div class="import-head">
                     <div class="import-icon"><i class='bx bxs-file-import'></i></div>
                     <div>
@@ -646,9 +662,11 @@
                 </div>
 
                 <ol class="import-steps">
-                    <li>Siapkan file Excel dengan kolom: <b>Nama Client, Nama Project, Deskripsi, Tanggal Mulai, Deadline</b>.</li>
-                    <li>Pastikan baris pertama adalah judul kolom.</li>
-                    <li>Pilih file .xlsx, .xls, atau .csv di bawah ini.</li>
+                    <li>Unduh template lalu isi datanya.
+                        <a class="import-link" href="{{ route('admin.kelola-proyek.template') }}"><i class='bx bx-download'></i>Unduh template</a>
+                    </li>
+                    <li>Nama Client, Nama Project, Tanggal Mulai, dan Deadline wajib diisi.</li>
+                    <li>Pilih file yang sudah diisi di bawah ini.</li>
                 </ol>
 
                 <label class="import-drop" id="importDrop" for="importFile">
@@ -656,19 +674,83 @@
                     <strong id="importFileName">Klik untuk memilih file, atau seret ke sini</strong>
                     <small id="importFileHint">.xlsx, .xls, atau .csv, maksimal 5 MB</small>
                 </label>
-                <!-- Input file untuk SheetJS -->
-                <input type="file" name="file" id="importFile" accept=".xlsx,.xls,.csv" hidden onchange="handleImportFile(event)">
+                <input type="file" name="file" id="importFile" accept=".xlsx,.xls,.csv" hidden>
                 <p class="import-msg" id="importMsg" role="alert"></p>
-                <p class="import-note">Data akan diproses dan langsung ditambahkan ke tabel tanpa memuat ulang halaman.</p>
+                <p class="import-note">Data yang sama dengan yang sudah ada (Nama Client, Nama Project, dan Tanggal Mulai sama) akan dilewati, jadi file boleh diunggah ulang dengan aman.</p>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeImportModal()">Tutup</button>
-                    <!-- Tombol ini cuma trigger click ke input file -->
-                    <button type="button" class="btn-save" id="importSubmitBtn" onclick="document.getElementById('importFile').click()">Pilih File Excel</button>
+                    <button type="button" class="btn-cancel" onclick="closeImportModal()">Batal</button>
+                    <button type="submit" class="btn-save" id="importSubmitBtn" disabled>Import data</button>
                 </div>
             </form>
         </div>
     </div>
+
+    {{-- ===================== MODAL: HASIL IMPORT (file bermasalah, atau ada baris dilewati / gagal) ===================== --}}
+    @if(session('import_report'))
+        @php
+            $importReport     = session('import_report');
+            $importFatal      = $importReport['fatal'] ?? null;
+            $importErrors     = $importReport['errors'] ?? [];
+            $importErrorTotal = $importReport['error_total'] ?? count($importErrors);
+            $importInserted   = $importReport['inserted'] ?? 0;
+            $importSkipped    = $importReport['skipped'] ?? 0;
+        @endphp
+        <div class="modal-overlay show" id="importResultModal">
+            <div class="modal-box modal-confirm modal-result">
+                <div class="confirm-icon {{ $importFatal ? '' : 'warn' }}">
+                    <i class='bx {{ $importFatal ? 'bx-error-circle' : 'bx-info-circle' }}'></i>
+                </div>
+
+                @if($importFatal)
+                    <h2>Import gagal</h2>
+                    <p>{{ $importFatal }}</p>
+                @else
+                    <h2>{{ $importInserted > 0 ? 'Import selesai' : 'Tidak ada data baru yang ditambahkan' }}</h2>
+
+                    <div class="result-stats">
+                        <div class="stat ok"><b>{{ $importInserted }}</b><span>Ditambahkan</span></div>
+                        <div class="stat skip"><b>{{ $importSkipped }}</b><span>Dilewati (sudah ada)</span></div>
+                        <div class="stat bad"><b>{{ $importErrorTotal }}</b><span>Perlu diperbaiki</span></div>
+                    </div>
+
+                    @if(count($importErrors))
+                        <ul class="result-errors">
+                            @foreach($importErrors as $err)
+                                <li><b>Baris {{ $err['row'] }}</b><span>{{ $err['message'] }}</span></li>
+                            @endforeach
+                        </ul>
+                        @if($importErrorTotal > count($importErrors))
+                            <p class="result-hint">Menampilkan {{ count($importErrors) }} dari {{ $importErrorTotal }} baris bermasalah.</p>
+                        @endif
+                        <p class="result-hint">Perbaiki baris di atas lalu unggah file yang sama lagi. Data yang sudah masuk tidak akan terduplikasi.</p>
+                    @endif
+                @endif
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-save" onclick="closeImportResultModal()">OK</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            function closeImportResultModal() {
+                document.getElementById('importResultModal').classList.remove('show');
+            }
+            document.getElementById('importResultModal').addEventListener('click', function (e) {
+                if (e.target === this) closeImportResultModal();
+            });
+        </script>
+    @endif
+
+    {{-- Memunculkan modal success jika ada session 'success' dari controller (misal setelah Import berhasil penuh) --}}
+    @if(session('success'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('successModalText').textContent = @json(session('success'));
+                document.getElementById('successModal').classList.add('show');
+            });
+        </script>
+    @endif
 
     {{-- ===================== GLOBAL LIGHTBOX ZOOM ===================== --}}
     <div id="dbLightbox" class="db-lightbox">
@@ -682,9 +764,6 @@
 @endsection
 
 @push('scripts')
-<!-- Library SheetJS untuk baca Excel di Browser -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 <script>
     const CHB_CSRF = document.querySelector('meta[name="csrf-token"]').content;
     let chbClients = [];
@@ -718,126 +797,11 @@
         initEditorImageEvents();
         initSidebarOffset();
         initTableFilters();
-        initImportModalDragDrop();
+        initImportModal();
     });
 
     /* ============================================================
-       FUNGSI IMPORT EXCEL (MEMAKAI SHEETJS)
-       ============================================================ */
-    async function handleImportFile(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Validasi Ukuran (Max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            document.getElementById('importMsg').textContent = 'Ukuran file lebih dari 5 MB!';
-            document.getElementById('importFile').value = '';
-            return;
-        }
-
-        // Tampilan Visual saat Loading
-        const drop = document.getElementById('importDrop');
-        const name = document.getElementById('importFileName');
-        const hint = document.getElementById('importFileHint');
-        const btn  = document.getElementById('importSubmitBtn');
-        const originalBtnText = btn.innerHTML;
-
-        drop.classList.add('has-file');
-        name.textContent = file.name;
-        hint.style.display = 'none';
-        document.getElementById('importMsg').textContent = '';
-        
-        btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Memproses...";
-        btn.disabled = true;
-
-        const reader = new FileReader();
-        reader.onload = async function(ev) {
-            try {
-                const data = new Uint8Array(ev.target.result);
-                // Baca file Excel
-                const workbook = XLSX.read(data, {type: 'array', cellDates: true});
-                const firstSheet = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheet];
-                
-                // Convert jadi array of array (seperti CSV mentah)
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-                    header: 1, 
-                    raw: false, 
-                    dateNF: 'yyyy-mm-dd'
-                });
-                
-                // Kirim langsung ke Controller Laravel
-                const res = await fetch("{{ route('admin.kelola-proyek.import') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CHB_CSRF,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ data: jsonData })
-                });
-
-                const result = await res.json();
-
-                if (res.ok && result.success) {
-                    closeImportModal();
-                    document.getElementById('successModalText').textContent = result.message;
-                    document.getElementById('successModal').classList.add('show');
-                    await chbFetchClients(); // Auto Refresh Data Tabel
-                } else {
-                    document.getElementById('importMsg').textContent = 'Gagal: ' + (result.message || 'Data tidak valid.');
-                }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('importMsg').textContent = 'Format file rusak atau tidak bisa dibaca.';
-            } finally {
-                btn.innerHTML = originalBtnText;
-                btn.disabled = false;
-                document.getElementById('importFile').value = ''; // Reset uploader
-                drop.classList.remove('has-file');
-                name.textContent = 'Klik untuk memilih file, atau seret ke sini';
-                hint.style.display = '';
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function openImportModal() {
-        document.getElementById('importFile').value = '';
-        document.getElementById('importDrop').classList.remove('has-file', 'is-over');
-        document.getElementById('importFileName').textContent = 'Klik untuk memilih file, atau seret ke sini';
-        document.getElementById('importFileHint').style.display = '';
-        document.getElementById('importMsg').textContent = '';
-        document.getElementById('importSubmitBtn').disabled = false;
-        document.getElementById('importModal').classList.add('show');
-    }
-
-    function closeImportModal() {
-        if (document.getElementById('importSubmitBtn').disabled) return; // cegah tutup saat loading
-        document.getElementById('importModal').classList.remove('show');
-    }
-
-    // Efek Drag and Drop Upload Box
-    function initImportModalDragDrop() {
-        const drop = document.getElementById('importDrop');
-        const input = document.getElementById('importFile');
-        ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
-        ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('is-over'); }));
-        drop.addEventListener('drop', e => {
-            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
-            const dt = new DataTransfer();
-            dt.items.add(e.dataTransfer.files[0]);
-            input.files = dt.files;
-            
-            // Trigger onChange
-            const event = new Event('change');
-            input.dispatchEvent(event);
-        });
-        document.getElementById('importModal').addEventListener('click', e => { if (e.target === document.getElementById('importModal')) closeImportModal(); });
-    }
-
-    /* ============================================================
-       FUNGSI BAWAAN LAMA (TIDAK DIUBAH)
+       FUNGSI PENCARIAN & FILTER TABEL
        ============================================================ */
     function initTableFilters() {
         document.getElementById('clientSearch').addEventListener('input', function(e) {
@@ -859,6 +823,9 @@
         });
     }
 
+    /* ============================================================
+       PERBARUI DATA STATISTIK PADA KARTU (BOX INFO)
+       ============================================================ */
     function chbUpdateStats() {
         const totalClient = chbClients.length;
         let projectAktif = 0;
@@ -912,6 +879,9 @@
         setTimeout(chbSyncSidebarOffset, 400);
     }
 
+    /* ============================================================
+       EDITOR TEKS
+       ============================================================ */
     function formatDoc(cmd, value = null) {
         const editor = document.getElementById('chbDeskripsiEditor');
         editor.focus();
@@ -1063,6 +1033,9 @@
     }
     function stopResize() { if (!chbResizeState) return; chbResizeState = null; document.body.style.userSelect = ''; setTimeout(() => document.getElementById('chbImgSizeBadge').classList.remove('active'), 600); positionImgUI(); }
 
+    /* ============================================================
+       MODE PILIH: kolom "Aksi" berubah jadi kolom checkbox
+       ============================================================ */
     function chbToggleSelectMode() {
         chbSelectMode = !chbSelectMode;
         chbSelectedIds.clear();
@@ -1080,7 +1053,7 @@
             th.innerHTML = `<input type="checkbox" id="chbSelectAll" title="Pilih semua di halaman ini" onclick="chbToggleSelectAllOnPage(this.checked)"><span class="chb-select-label">Pilih</span>`;
             th.classList.add('select-mode-header');
             toggleBtn.classList.add('active');
-            toggleBtnText.textContent = 'Batal';
+            toggleBtnText.textContent = 'Batal Pilih';
             bulkGroup.classList.add('show');
         } else {
             th.textContent = 'Aksi';
@@ -1129,6 +1102,9 @@
         document.getElementById('btnBulkDelete').disabled = count === 0;
     }
 
+    /* ============================================================
+       CRUD CLIENT
+       ============================================================ */
     async function chbFetchClients() {
         try {
             const res = await fetch('/admin/clients');
@@ -1139,10 +1115,13 @@
         } catch (err) { console.error(err); }
     }
 
+    /* ============================================================
+       NOTIFIKASI LONCENG: Deadline H-1 & Deadline Sudah Lewat
+       ============================================================ */
     function chbUpdateNotifications() {
         const listEl = document.getElementById('notificationList');
         const countEl = document.getElementById('notificationCount');
-        if (!listEl || !countEl) return; 
+        if (!listEl || !countEl) return; // markup lonceng belum tersedia di halaman ini
 
         const hariIni = new Date();
         hariIni.setHours(0, 0, 0, 0);
@@ -1150,8 +1129,8 @@
         const besok = new Date(hariIni);
         besok.setDate(besok.getDate() + 1);
 
-        const notifBesok = [];  
-        const notifLewat = [];  
+        const notifBesok = [];  // deadline mendekati H-1 (jatuh tempo besok)
+        const notifLewat = [];  // deadline sudah lewat / selesai masa waktunya
 
         chbClients.forEach(client => {
             if (!client.deadline) return;
@@ -1165,6 +1144,7 @@
             }
         });
 
+        // Urutkan berdasarkan deadline terdekat
         notifBesok.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
         notifLewat.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
 
@@ -1263,6 +1243,7 @@
                 else if (diffHari === 1) isH1 = true;
             }
 
+            // Tentukan Class Border Kiri dan Tampilan Teks Deadline
             let borderClass = 'status-aktif';
             let deadlineHtml = chbFormatDate(client.deadline);
             let badgeHtml = `<span class="badge-aktif">Berjalan</span>`;
@@ -1284,7 +1265,6 @@
                 : `<td class="action-cell">
                     <button class="btn-detail" onclick="chbOpenDetailModal(${client.id})">Detail</button>
                     <button class="btn-edit" onclick="chbOpenEditModal(${client.id})">Edit</button>
-                    <button class="btn-delete" onclick="chbDeleteClient(${client.id})">Hapus</button>
                    </td>`;
 
             const tr = document.createElement('tr');
@@ -1382,6 +1362,9 @@
         document.getElementById('chbFormModalOverlay').classList.remove('show'); 
     }
 
+    /* ============================================================
+       MODAL KONFIRMASI SIMPAN / EDIT & SUCCESS
+       ============================================================ */
     function chbProcessFormSubmit(event) {
         event.preventDefault(); 
         deselectEditorImage();
@@ -1453,11 +1436,14 @@
         document.getElementById('successModal').classList.remove('show');
     }
 
+    /* ============================================================
+       MODAL KONFIRMASI HAPUS
+       ============================================================ */
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
     const btnCancelDelete = document.getElementById('btnCancelDelete');
     const btnConfirmDelete = document.getElementById('btnConfirmDelete');
     let chbIdToDelete = null;
-    let chbDeleteMode = 'single'; 
+    let chbDeleteMode = 'single'; // 'single' | 'bulk' | 'all'
 
     function chbOpenDeleteConfirm(title, text) {
         document.getElementById('deleteConfirmTitle').textContent = title;
@@ -1465,12 +1451,14 @@
         deleteConfirmModal.classList.add('show');
     }
 
+    // Hapus satu data (tombol "Hapus" per baris)
     function chbDeleteClient(id) {
         chbDeleteMode = 'single';
         chbIdToDelete = id;
         chbOpenDeleteConfirm('Hapus Client?', 'Yakin ingin menghapus client ini? Data yang sudah dihapus tidak dapat dikembalikan.');
     }
 
+    // Hapus semua data yang dicentang (tombol "Hapus Terpilih")
     function chbBulkDeleteSelected() {
         if (chbSelectedIds.size === 0) return;
         chbDeleteMode = 'bulk';
@@ -1545,6 +1533,7 @@
         }
     });
 
+    /* Klik area gelap di luar kotak = tutup popup (sama seperti Kelola Layanan) */
     deleteConfirmModal.addEventListener('click', function (e) {
         if (e.target === deleteConfirmModal && !btnConfirmDelete.disabled) {
             chbIdToDelete = null;
@@ -1565,6 +1554,9 @@
         if (e.target === chbSuccessModal) closeSuccessModal();
     });
 
+    /* ============================================================
+       EXPORT: konfirmasi dulu kalau data masih kosong
+       ============================================================ */
     const exportEmptyModal = document.getElementById('exportEmptyModal');
     const btnCancelExportEmpty = document.getElementById('btnCancelExportEmpty');
 
@@ -1574,7 +1566,7 @@
             exportEmptyModal.classList.add('show');
             return false;
         }
-        return true; 
+        return true; // data ada, lanjutkan link download seperti biasa
     }
 
     btnCancelExportEmpty.addEventListener('click', function () {
@@ -1587,6 +1579,85 @@
         }
     });
 
+    /* ============================================================
+       IMPORT EXCEL (popup unggah file)
+       ============================================================ */
+    const IMPORT_MAX_BYTES = 5 * 1024 * 1024;
+    const IMPORT_EXT = ['xlsx', 'xls', 'csv'];
+    const IMPORT_DEFAULT_LABEL = 'Klik untuk memilih file, atau seret ke sini';
+
+    function openImportModal() {
+        resetImportModal();
+        document.getElementById('importModal').classList.add('show');
+    }
+
+    function closeImportModal() {
+        if (document.getElementById('importSubmitBtn').dataset.busy === '1') return;
+        document.getElementById('importModal').classList.remove('show');
+    }
+
+    function resetImportModal() {
+        document.getElementById('importFile').value = '';
+        document.getElementById('importDrop').classList.remove('has-file', 'is-over');
+        document.getElementById('importFileName').textContent = IMPORT_DEFAULT_LABEL;
+        document.getElementById('importFileHint').style.display = '';
+        document.getElementById('importMsg').textContent = '';
+        document.getElementById('importSubmitBtn').disabled = true;
+    }
+
+    function initImportModal() {
+        const modal = document.getElementById('importModal');
+        const form  = document.getElementById('importForm');
+        const input = document.getElementById('importFile');
+        const drop  = document.getElementById('importDrop');
+        const name  = document.getElementById('importFileName');
+        const hint  = document.getElementById('importFileHint');
+        const msg   = document.getElementById('importMsg');
+        const btn   = document.getElementById('importSubmitBtn');
+
+        function checkFile() {
+            const file = input.files[0];
+            drop.classList.remove('has-file');
+            msg.textContent = '';
+            btn.disabled = true;
+
+            if (!file) { name.textContent = IMPORT_DEFAULT_LABEL; hint.style.display = ''; return; }
+
+            name.textContent = file.name;
+            hint.style.display = 'none';
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!IMPORT_EXT.includes(ext)) { msg.textContent = 'Format file tidak didukung. Pilih file .xlsx, .xls, atau .csv.'; return; }
+            if (file.size > IMPORT_MAX_BYTES) { msg.textContent = 'Ukuran file lebih dari 5 MB. Kecilkan atau pecah file-nya.'; return; }
+
+            drop.classList.add('has-file');
+            btn.disabled = false;
+        }
+
+        input.addEventListener('change', checkFile);
+
+        ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
+        ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('is-over'); }));
+        drop.addEventListener('drop', e => {
+            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+            const dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            input.files = dt.files;
+            checkFile();
+        });
+
+        form.addEventListener('submit', () => {
+            btn.dataset.busy = '1';
+            btn.disabled = true;
+            btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Mengimpor...";
+        });
+
+        modal.addEventListener('click', e => { if (e.target === modal) closeImportModal(); });
+    }
+
+    /* ============================================================
+       DETAIL
+       ============================================================ */
     function chbOpenDetailModal(id) {
         const client = chbClients.find(c => c.id === id); if (!client) return;
         document.getElementById('chbDetailContent').innerHTML = `
@@ -1602,6 +1673,9 @@
     }
     function chbCloseDetailModal() { document.getElementById('chbDetailModalOverlay').classList.remove('show'); }
 
+    /* ============================================================
+       LIGHTBOX
+       ============================================================ */
     function openDbLightbox(imagesArr, index = 0) {
         if (!imagesArr || imagesArr.length === 0) return;
         lbImagesArr = imagesArr; lbCurrentIndex = index;

@@ -77,9 +77,10 @@ Route::middleware('auth')->group(function () {
             return view('admin.pages.kelola-proyek');
         })->name('kelola-proyek');
 
-        // ---> RUTE EXPORT & IMPORT PROYEK DITAMBAHKAN DI SINI <---
+        // ---> RUTE EXPORT, IMPORT, & TEMPLATE PROYEK <---
         Route::get('/kelola-proyek/export', [ClientExcelController::class, 'export'])->name('kelola-proyek.export');
         Route::post('/kelola-proyek/import', [ClientExcelController::class, 'import'])->name('kelola-proyek.import');
+        Route::get('/kelola-proyek/template', [ClientExcelController::class, 'template'])->name('kelola-proyek.template');
 
         // 3. Kelola Layanan
         Route::resource('kelola-layanan', \App\Http\Controllers\AdminServiceController::class)->names([
@@ -92,12 +93,9 @@ Route::middleware('auth')->group(function () {
             'destroy' => 'kelola-layanan.destroy',
         ]);
 
-        // 4. Kelola Blog (parameter binding by "id" seperti yang kamu jelaskan di komentar)
+        // 4. Kelola Blog
         Route::get('/kelola-blog', [AdminBlogController::class, 'index'])->name('kelola-blog.index');
-        
-        // ---> RUTE EXPORT CSV DITAMBAHKAN DI SINI <---
         Route::get('/kelola-blog/export', [AdminBlogController::class, 'export'])->name('kelola-blog.export');
-        
         Route::post('/kelola-blog', [AdminBlogController::class, 'store'])->name('kelola-blog.store');
         Route::put('/kelola-blog/{blog:id}', [AdminBlogController::class, 'update'])->name('kelola-blog.update');
         Route::delete('/kelola-blog/{blog:id}', [AdminBlogController::class, 'destroy'])->name('kelola-blog.destroy');
@@ -123,15 +121,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/setting/username', [SettingController::class, 'updateUsername'])->name('setting.username.update');
         Route::post('/setting/password', [SettingController::class, 'updatePassword'])->name('setting.password.update');
 
-
         // PENTING: route spesifik (bulk-delete, delete-all) HARUS didaftarkan
         // SEBELUM Route::resource('clients', ...), supaya tidak "ketangkep"
-        // oleh route {client} milik resource (contoh: delete-all dikira id client).
-        // Juga jangan tulis ulang '/admin/...' di sini karena sudah di dalam
-        // Route::prefix('admin'), nanti URL-nya jadi dobel /admin/admin/...
         Route::post('clients/bulk-delete', [ClientController::class, 'bulkDestroy'])->name('clients.bulkDestroy');
         Route::delete('clients/delete-all', [ClientController::class, 'destroyAll'])->name('clients.destroyAll');
         Route::resource('clients', ClientController::class)->except(['create', 'edit', 'show']);
-        Route::get('kelola-proyek/template', [ClientExcelController::class, 'template'])->name('kelola-proyek.template');
     });
 });
