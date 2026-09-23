@@ -864,10 +864,6 @@
 										data-gambar="{{ $blog->gambar ? asset('storage/'.$blog->gambar) : '' }}"
 										data-update-url="{{ route('admin.kelola-blog.update', $blog->id) }}"
 										onclick="openEditModal(this)">Edit</button>
-									<form id="deleteFormBlog{{ $blog->id }}" action="{{ route('admin.kelola-blog.destroy', $blog->id) }}" method="POST" style="display:none;">
-										@csrf
-										@method('DELETE')
-									</form>
 								</td>
 							</tr>
 							@empty
@@ -880,6 +876,17 @@
 							</tr>
 						</tbody>
 					</table>
+
+					<!-- Form hapus disimpan terpisah di luar tabel, supaya TIDAK ikut terhapus
+					     saat kolom Aksi diganti jadi checkbox waktu mode pilih aktif. -->
+					<div style="display:none;">
+						@foreach($blogs as $blog)
+						<form id="deleteFormBlog{{ $blog->id }}" action="{{ route('admin.kelola-blog.destroy', $blog->id) }}" method="POST">
+							@csrf
+							@method('DELETE')
+						</form>
+						@endforeach
+					</div>
 
 					<!-- AREA PAGINASI DINAMIS -->
 					<div class="pagination-container" id="paginationWrapper">
