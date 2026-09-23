@@ -164,19 +164,22 @@
         
         /* PENGATURAN LEBAR KOLOM AGAR RAPI MENYAMBUNG KANAN */
         #content main .table-data .order table th:nth-child(1),
-        #content main .table-data .order table td:nth-child(1) { width: 60px; text-align: center; } /* No */
+        #content main .table-data .order table td:nth-child(1) { width: 50px; text-align: center; } /* No */
 
         #content main .table-data .order table th:nth-child(2),
-        #content main .table-data .order table td:nth-child(2) { width: 30%; } /* Nama */
+        #content main .table-data .order table td:nth-child(2) { width: 70px; text-align: center; } /* Foto */
 
         #content main .table-data .order table th:nth-child(3),
-        #content main .table-data .order table td:nth-child(3) { width: 28%; } /* Jabatan */
+        #content main .table-data .order table td:nth-child(3) { width: 27%; } /* Nama */
 
         #content main .table-data .order table th:nth-child(4),
-        #content main .table-data .order table td:nth-child(4) { width: 25%; } /* Divisi */
+        #content main .table-data .order table td:nth-child(4) { width: 25%; } /* Jabatan */
 
         #content main .table-data .order table th:nth-child(5),
-        #content main .table-data .order table td:nth-child(5) { width: 110px; text-align: right; padding-right: 16px; } /* Aksi */
+        #content main .table-data .order table td:nth-child(5) { width: 22%; } /* Divisi */
+
+        #content main .table-data .order table th:nth-child(6),
+        #content main .table-data .order table td:nth-child(6) { width: 110px; text-align: right; padding-right: 16px; } /* Aksi */
 
         #content main .table-data .order table td {
             padding: 14px 10px;
@@ -204,11 +207,11 @@
         #content main .table-data .order table td img.foto-zoomable:hover {
             transform: scale(1.12);
         }
+        #content main .table-data .order table td.col-foto {
+            text-align: center;
+        }
         #content main .table-data .order table td.col-nama {
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            grid-gap: 10px;
         }
         #content main .table-data .order table td.col-divisi span {
             background: var(--light-blue);
@@ -625,6 +628,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>Foto</th>
                                 <th>Nama</th>
                                 <th>Jabatan</th>
                                 <th>Divisi</th>
@@ -635,12 +639,12 @@
                             @forelse($teams as $team)
                             <tr class="tim-row" data-id="{{ $team->id }}" data-nama="{{ strtolower($team->nama) }}" data-jabatan="{{ strtolower($team->jabatan) }}" data-divisi="{{ strtolower($team->divisi) }}">
                                 <td class="col-no">{{ $loop->iteration }}</td>
-                                <td class="col-nama">
+                                <td class="col-foto">
                                     <img class="foto-zoomable" src="{{ $team->foto_url }}" alt="{{ $team->nama }}"
                                     data-jabatan="{{ $team->jabatan }}" data-divisi="{{ $team->divisi }}"
                                     onclick="openZoomFoto(this.src, this.alt, this.dataset.jabatan, this.dataset.divisi)">
-                                    {{ $team->nama }}
                                 </td>
+                                <td class="col-nama">{{ $team->nama }}</td>
                                 <td>{{ $team->jabatan }}</td>
                                 <td class="col-divisi"><span>{{ $team->divisi }}</span></td>
                                 <td class="col-aksi">
@@ -661,11 +665,11 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" style="text-align:center; color: var(--dark-grey);">Belum ada anggota tim.</td>
+                                <td colspan="6" style="text-align:center; color: var(--dark-grey);">Belum ada anggota tim.</td>
                             </tr>
                             @endforelse
                             <tr class="no-result-row" id="timNoResult" style="display:none;">
-                                <td colspan="5">Data tidak ditemukan.</td>
+                                <td colspan="6">Data tidak ditemukan.</td>
                             </tr>
                         </tbody>
                     </table>
