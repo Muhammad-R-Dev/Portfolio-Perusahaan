@@ -401,7 +401,6 @@
 					<div class="head">
 						<i class='bx bxs-user-detail'></i>
 						<h3>Edit Akun</h3>
-						<p>Perbarui username dan/atau kata sandi yang digunakan untuk masuk ke portal.</p>
 					</div>
 
 					<form id="accountForm" action="{{ route('admin.setting.username.update') }}" method="POST">
