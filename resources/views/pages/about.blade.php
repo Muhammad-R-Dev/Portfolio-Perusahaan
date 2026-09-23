@@ -412,14 +412,17 @@
         content: none;
     }
 
-    /* Hanya tint gelap tipis di bagian bawah foto */
+    /* Tint gelap tipis di bagian bawah foto + "selimut" tint tipis merata
+       di seluruh foto supaya warnanya lebih menyatu dengan background band */
     .about-image::after {
         content: '';
         position: absolute;
         inset: 0;
         z-index: 2;
         pointer-events: none;
-        background: linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%);
+        background:
+            linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%),
+            rgba(13, 67, 88, 0.22);
     }
 
     /* ===== Ikon sosial media =====
@@ -491,18 +494,28 @@
                foto yang bisa "bocor" akibat pembulatan sub-piksel.) */
             -webkit-mask-image: linear-gradient(90deg,
                 transparent 0%,
-                transparent 2%,
-                rgba(0, 0, 0, 0.15) 12%,
-                rgba(0, 0, 0, 0.5) 20%,
-                rgba(0, 0, 0, 0.85) 30%,
-                #000 42%);
+                rgba(0, 0, 0, 0.03) 7%,
+                rgba(0, 0, 0, 0.10) 14%,
+                rgba(0, 0, 0, 0.22) 21%,
+                rgba(0, 0, 0, 0.35) 28%,
+                rgba(0, 0, 0, 0.50) 35%,
+                rgba(0, 0, 0, 0.65) 42%,
+                rgba(0, 0, 0, 0.78) 49%,
+                rgba(0, 0, 0, 0.90) 56%,
+                rgba(0, 0, 0, 0.97) 63%,
+                #000 70%);
             mask-image: linear-gradient(90deg,
                 transparent 0%,
-                transparent 2%,
-                rgba(0, 0, 0, 0.15) 12%,
-                rgba(0, 0, 0, 0.5) 20%,
-                rgba(0, 0, 0, 0.85) 30%,
-                #000 42%);
+                rgba(0, 0, 0, 0.03) 7%,
+                rgba(0, 0, 0, 0.10) 14%,
+                rgba(0, 0, 0, 0.22) 21%,
+                rgba(0, 0, 0, 0.35) 28%,
+                rgba(0, 0, 0, 0.50) 35%,
+                rgba(0, 0, 0, 0.65) 42%,
+                rgba(0, 0, 0, 0.78) 49%,
+                rgba(0, 0, 0, 0.90) 56%,
+                rgba(0, 0, 0, 0.97) 63%,
+                #000 70%);
         }
 
         /* Blur hanya di sisi kiri (sempit), memudar ke kanan lewat mask */
@@ -514,15 +527,39 @@
             pointer-events: none;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 6%, transparent 26%);
-            mask-image: linear-gradient(90deg, #000 0%, #000 6%, transparent 26%);
+            -webkit-mask-image: linear-gradient(90deg,
+                #000 0%,
+                rgba(0, 0, 0, 0.97) 3%,
+                rgba(0, 0, 0, 0.90) 6%,
+                rgba(0, 0, 0, 0.78) 10%,
+                rgba(0, 0, 0, 0.65) 13%,
+                rgba(0, 0, 0, 0.50) 16%,
+                rgba(0, 0, 0, 0.35) 19%,
+                rgba(0, 0, 0, 0.22) 22%,
+                rgba(0, 0, 0, 0.10) 26%,
+                rgba(0, 0, 0, 0.03) 29%,
+                transparent 32%);
+            mask-image: linear-gradient(90deg,
+                #000 0%,
+                rgba(0, 0, 0, 0.97) 3%,
+                rgba(0, 0, 0, 0.90) 6%,
+                rgba(0, 0, 0, 0.78) 10%,
+                rgba(0, 0, 0, 0.65) 13%,
+                rgba(0, 0, 0, 0.50) 16%,
+                rgba(0, 0, 0, 0.35) 19%,
+                rgba(0, 0, 0, 0.22) 22%,
+                rgba(0, 0, 0, 0.10) 26%,
+                rgba(0, 0, 0, 0.03) 29%,
+                transparent 32%);
         }
 
         /* Fade ke warna section kini ditangani mask di .about-image, jadi
            overlay teal horizontal tidak diperlukan lagi (itulah yang dulu
            menimbulkan garis putih tipis di tepi kiri). Sisakan tint bawah. */
         .about-image::after {
-            background: linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%);
+            background:
+                linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%),
+                rgba(13, 67, 88, 0.22);
         }
     }
 

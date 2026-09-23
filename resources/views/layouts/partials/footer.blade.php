@@ -374,9 +374,9 @@
         
         <div class="footer-contact">
             <h4>Hubungi Kami</h4>
-            <p><i class="fa-solid fa-location-dot"></i> <span>Jl. Teknologi Raya No. 88, Jakarta Selatan, Indonesia</span></p>
-            <p><i class="fa-solid fa-phone"></i> <span>+62 812 3456 7890</span></p>
-            <p><i class="fa-solid fa-envelope"></i> <span>hello@astabrata.com</span></p>
+            <p><i class="fa-solid fa-location-dot"></i> <span>Jl.STPP karanglo, Area Sawah/Kebun, Glagahombo, Tegalrejo, Magelang, Jawa Tengah 56192</span></p>
+            <p><i class="fa-solid fa-phone"></i> <span>+62 882 0066 44656</span></p>
+            <p><i class="fa-solid fa-envelope"></i> <span>astabratamgl@gmail.com</span></p>
         </div>
     </div>
     
