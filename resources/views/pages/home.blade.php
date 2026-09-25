@@ -1948,7 +1948,7 @@ if ('paintWorklet' in CSS) {
               <div class="swiper-slide__block">
                 <div class="swiper-slide__block__img" data-swiper-parallax-y="70%">
                   @if($service->image)
-                    <img src="{{ asset('images/services/' . $service->image) }}" alt="{{ $service->title }}">
+                    <img src="{{ $service->image_url }}" alt="{{ $service->title }}">
                   @else
                     <img src="https://images.unsplash.com/photo-1456518563096-0ff5ee08204e?auto=format&fit=crop&w=1351&q=60" alt="">
                   @endif

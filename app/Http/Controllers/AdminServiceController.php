@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminServiceController extends Controller
 {
     public function index()
     {
-        $services = \App\Models\Service::all();
+        $services = Service::all();
         return view('admin.pages.kelola-layanan', compact('services'));
     }
 
@@ -19,21 +21,17 @@ class AdminServiceController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
+        $validated = $request->validate([
+            'title'       => 'required',
             'description' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->all();
-
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images/services'), $imageName);
-            $data['image'] = $imageName;
+            $validated['image'] = $request->file('image')->store('services', 'public');
         }
 
-        \App\Models\Service::create($data);
+        Service::create($validated);
 
         return redirect()->route('admin.kelola-layanan.index')->with('success', 'Layanan berhasil ditambahkan.');
     }
@@ -48,31 +46,42 @@ class AdminServiceController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'title' => 'required',
+        $validated = $request->validate([
+            'title'       => 'required',
             'description' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $service = \App\Models\Service::findOrFail($id);
-        $data = $request->all();
+        $service = Service::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images/services'), $imageName);
-            $data['image'] = $imageName;
+            // Ganti gambar: hapus file lama, simpan yang baru
+            $this->hapusGambarLama($service->image);
+            $validated['image'] = $request->file('image')->store('services', 'public');
+        } elseif ($request->boolean('hapus_gambar')) {
+            // User menekan "hapus gambar" tanpa upload gambar baru
+            $this->hapusGambarLama($service->image);
+            $validated['image'] = null;
         }
 
-        $service->update($data);
+        $service->update($validated);
 
         return redirect()->route('admin.kelola-layanan.index')->with('success', 'Layanan berhasil diupdate.');
     }
 
     public function destroy(string $id)
     {
-        $service = \App\Models\Service::findOrFail($id);
+        $service = Service::findOrFail($id);
+        $this->hapusGambarLama($service->image);
         $service->delete();
 
         return redirect()->route('admin.kelola-layanan.index')->with('success', 'Layanan berhasil dihapus.');
+    }
+
+    private function hapusGambarLama(?string $path): void
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }

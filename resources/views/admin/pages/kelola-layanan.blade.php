@@ -785,18 +785,14 @@
 							<tr class="layanan-row" data-id="{{ $service->id }}" data-title="{{ strtolower($service->title) }}" data-desc="{{ strtolower($service->description) }}" data-gambar="{{ $service->image ? 'ada' : 'tanpa' }}" data-status="{{ $service->status ?? 'aktif' }}">
 								<td style="text-align:center;">{{ $loop->iteration }}</td>
 								<td class="col-layanan">
-									@if($service->image)
-										<img src="{{ asset('images/services/' . $service->image) }}" class="table-thumb" onclick="openTableImageZoom(this)">
-									@else
-										<img src="https://placehold.co/600x400/png" class="table-thumb" onclick="openTableImageZoom(this)">
-									@endif
+									<img src="{{ $service->image_url }}" class="table-thumb" onclick="openTableImageZoom(this)">
 									<p>{{ $service->title }}</p>
 								</td>
 								<td>
 									<p class="desc-kategori">{{ Str::limit($service->description, 50) }}</p>
 								</td>
 								<td class="aksi action-cell">
-									<button type="button" class="btn-edit-text" onclick="openEditModal({{ $service->id }}, '{{ addslashes($service->title) }}', '{{ addslashes($service->description) }}', '{{ $service->image ? asset('images/services/' . $service->image) : '' }}')">
+									<button type="button" class="btn-edit-text" onclick="openEditModal({{ $service->id }}, '{{ addslashes($service->title) }}', '{{ addslashes($service->description) }}', '{{ $service->image ? $service->image_url : '' }}')">
 										Edit
 									</button>
 								</td>
