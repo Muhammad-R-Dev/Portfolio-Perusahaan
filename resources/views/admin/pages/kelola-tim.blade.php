@@ -322,7 +322,7 @@
             border-radius: 16px;
             padding: 28px;
             width: 100%;
-            max-width: 480px;
+            max-width: 980px;
             max-height: 90vh;
             overflow-y: auto;
             font-family: var(--poppins);
@@ -363,6 +363,169 @@
             font-weight: 600;
             margin-bottom: 6px;
         }
+
+        /* FORM TAMBAH / EDIT TIM - INPUT KIRI & MEDIA FOTO KANAN */
+        .tim-form-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(320px, 380px);
+            gap: 28px;
+            align-items: stretch;
+        }
+
+        .tim-form-left {
+            min-width: 0;
+        }
+
+        .tim-media-card {
+            border: 1px solid var(--grey);
+            background: var(--light);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .tim-media-card .media-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .tim-media-preview {
+            position: relative;
+            min-height: 250px;
+            border: 2px dashed var(--dark-grey);
+            border-radius: 12px;
+            background: var(--grey);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .tim-media-preview.has-image {
+            border-style: solid;
+            border-color: var(--grey);
+        }
+
+        .tim-media-preview img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .tim-media-empty {
+            text-align: center;
+            color: var(--dark-grey);
+            padding: 18px;
+        }
+
+        .tim-media-empty .bx {
+            font-size: 38px;
+            color: var(--blue);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .tim-media-empty strong {
+            display: block;
+            color: var(--dark);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .tim-media-empty span {
+            display: block;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .tim-media-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+            z-index: 3;
+        }
+
+        .tim-media-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, .75);
+            color: #fff;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background .15s ease, transform .15s ease;
+        }
+
+        .tim-media-btn:hover {
+            background: rgba(15, 23, 42, .95);
+            transform: translateY(-1px);
+        }
+
+        .tim-media-btn.danger:hover {
+            background: var(--red);
+        }
+
+        .tim-media-preview.upload-clickable {
+            cursor: pointer;
+            transition: border-color .15s ease, background .15s ease, transform .15s ease;
+        }
+
+        .tim-media-preview.upload-clickable:hover {
+            border-color: var(--blue);
+            background: var(--light-blue);
+        }
+
+        .tim-media-preview.upload-clickable.has-image {
+            background: var(--grey);
+        }
+
+        .tim-media-preview.upload-clickable.has-image:hover {
+            background: var(--grey);
+        }
+
+        .tim-media-file-input {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            opacity: 0 !important;
+            cursor: pointer !important;
+            z-index: 1 !important;
+        }
+
+        .tim-media-actions {
+            pointer-events: none;
+        }
+
+        .tim-media-btn {
+            pointer-events: auto;
+        }
+
+        .tim-media-meta {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--dark-grey);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        @media screen and (max-width: 700px) {
+            .tim-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tim-media-card {
+                order: -1;
+            }
+        }
         .modal-box input[type="text"],
         .modal-box input[type="url"],
         .modal-box select {
@@ -382,6 +545,12 @@
         .modal-box select:focus {
             border-color: var(--blue);
             background: var(--light);
+        }
+        /* Placeholder tetap terbaca di light maupun dark mode (pakai variabel tema, bukan warna tetap) */
+        .modal-box input[type="text"]::placeholder,
+        .modal-box input[type="url"]::placeholder {
+            color: var(--dark-grey);
+            opacity: 1;
         }
         .custom-input-hidden {
             display: none;
@@ -588,7 +757,7 @@
                     </ul>
                 </div>
                 <button type="button" class="btn-download" id="btnTambahTim">
-                    <i class='bx bxs-plus-circle bx-fade-down-hover' ></i>
+                    <i class='bx bxs-plus-circle' ></i>
                     <span class="text">Tambah Tim</span>
                 </button>
             </div>
@@ -694,49 +863,78 @@
                         @csrf
                         <input type="hidden" name="_method" id="formMethod" value="">
 
-                        <div class="form-group">
-                            <label for="teamFoto">Foto Profil</label>
-                            <div class="upload-zone">
-                                <img src="{{ asset('image/profile.png') }}" alt="Preview" class="preview-img" id="previewFoto">
-                                <span id="uploadLabel">Klik untuk pilih foto (opsional, default: profile.png)</span>
-                                <input type="file" name="foto" id="teamFoto" accept="image/*">
+                        <div class="tim-form-grid">
+                            <div class="tim-form-left">
+                                <div class="form-group">
+                                    <label for="teamNama">Nama</label>
+                                    <input type="text" name="nama" id="teamNama" required maxlength="100" placeholder="Masukkan nama lengkap">
+                                </div>
+
+                                <!-- JABATAN DENGAN OPSI PILIH & KETIK MANUAL -->
+                                <div class="form-group">
+                                    <label for="selectJabatan">Jabatan</label>
+                                    <select id="selectJabatan" onchange="handleJabatanChange(this)">
+                                        <option value="" disabled selected>Pilih Jabatan</option>
+                                        <option value="Project Manager">Project Manager</option>
+                                        <option value="Fullstack Developer">Fullstack Developer</option>
+                                        <option value="Frontend Developer">Frontend Developer</option>
+                                        <option value="Backend Developer">Backend Developer</option>
+                                        <option value="UI/UX Designer">UI/UX Designer</option>
+                                        <option value="Quality Assurance">Quality Assurance</option>
+                                        <option value="Lainnya">Lainnya (Ketik Manual)...</option>
+                                    </select>
+                                    <input type="text" name="jabatan" id="inputJabatanManual" class="custom-input-hidden" placeholder="Ketik jabatan baru..." maxlength="100">
+                                </div>
+
+                                <!-- DIVISI DENGAN OPSI PILIH & KETIK MANUAL -->
+                                <div class="form-group">
+                                    <label for="selectDivisi">Divisi</label>
+                                    <select id="selectDivisi" onchange="handleDivisiChange(this)">
+                                        <option value="" disabled selected>Pilih Divisi</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="UI/UX Design">UI/UX Design</option>
+                                        <option value="Project Management">Project Management</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Human Resources">Human Resources</option>
+                                        <option value="Lainnya">Lainnya (Ketik Manual)...</option>
+                                    </select>
+                                    <input type="text" name="divisi" id="inputDivisiManual" class="custom-input-hidden" placeholder="Ketik divisi baru..." maxlength="100">
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="teamNama">Nama</label>
-                            <input type="text" name="nama" id="teamNama" required maxlength="100">
-                        </div>
+                            <div class="tim-media-card">
+                                <div class="media-title">Media Foto</div>
 
-                        <!-- JABATAN DENGAN OPSI PILIH & KETIK MANUAL -->
-                        <div class="form-group">
-                            <label for="selectJabatan">Jabatan</label>
-                            <select id="selectJabatan" onchange="handleJabatanChange(this)">
-                                <option value="" disabled selected>Pilih Jabatan</option>
-                                <option value="Project Manager">Project Manager</option>
-                                <option value="Fullstack Developer">Fullstack Developer</option>
-                                <option value="Frontend Developer">Frontend Developer</option>
-                                <option value="Backend Developer">Backend Developer</option>
-                                <option value="UI/UX Designer">UI/UX Designer</option>
-                                <option value="Quality Assurance">Quality Assurance</option>
-                                <option value="Lainnya">Lainnya (Ketik Manual)...</option>
-                            </select>
-                            <input type="text" name="jabatan" id="inputJabatanManual" class="custom-input-hidden" placeholder="Ketik jabatan baru..." maxlength="100">
-                        </div>
+                                <div class="tim-media-preview upload-clickable" id="timMediaPreview" title="Klik untuk memilih foto">
+                                    <div class="tim-media-empty" id="timMediaEmpty">
+                                        <i class='bx bx-image-add'></i>
+                                        <strong>Upload Foto</strong>
+                                        <span>Klik area ini untuk memilih foto</span>
+                                    </div>
 
-                        <!-- DIVISI DENGAN OPSI PILIH & KETIK MANUAL -->
-                        <div class="form-group">
-                            <label for="selectDivisi">Divisi</label>
-                            <select id="selectDivisi" onchange="handleDivisiChange(this)">
-                                <option value="" disabled selected>Pilih Divisi</option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="UI/UX Design">UI/UX Design</option>
-                                <option value="Project Management">Project Management</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Human Resources">Human Resources</option>
-                                <option value="Lainnya">Lainnya (Ketik Manual)...</option>
-                            </select>
-                            <input type="text" name="divisi" id="inputDivisiManual" class="custom-input-hidden" placeholder="Ketik divisi baru..." maxlength="100">
+                                    <img
+                                        src="{{ asset('image/profile.png') }}"
+                                        alt="Preview Foto"
+                                        id="previewFoto"
+                                        style="display:none;"
+                                    >
+
+                                    <div class="tim-media-actions" id="timMediaActions" style="display:none;">
+                                        <button type="button" class="tim-media-btn" id="btnZoomMedia" title="Zoom Foto">
+                                            <i class='bx bx-fullscreen'></i>
+                                        </button>
+                                        <button type="button" class="tim-media-btn danger" id="btnRemoveMedia" title="Hapus Foto">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </div>
+
+                                    <input type="file" name="foto" id="teamFoto" accept="image/*" class="tim-media-file-input">
+                                </div>
+
+                                <div class="tim-media-meta">
+                                    PNG, JPG, JPEG · Maks. 2MB
+                                </div>
+                            </div>
                         </div>
 
                         <div class="modal-actions">
@@ -1000,9 +1198,13 @@
         const timForm    = document.getElementById('timForm');
         const formMethod = document.getElementById('formMethod');
 
-        const teamFoto    = document.getElementById('teamFoto');
-        const previewFoto = document.getElementById('previewFoto');
-        const uploadLabel = document.getElementById('uploadLabel');
+        const teamFoto       = document.getElementById('teamFoto');
+        const previewFoto    = document.getElementById('previewFoto');
+        const timMediaPreview = document.getElementById('timMediaPreview');
+        const timMediaEmpty   = document.getElementById('timMediaEmpty');
+        const timMediaActions = document.getElementById('timMediaActions');
+        const btnZoomMedia    = document.getElementById('btnZoomMedia');
+        const btnRemoveMedia  = document.getElementById('btnRemoveMedia');
 
         const teamNama    = document.getElementById('teamNama');
         
@@ -1043,10 +1245,33 @@
             }
         }
 
-        function openModal(mode, el) {
+        function setTimMediaPreview(src, fileName) {
+            if (src) {
+                previewFoto.src = src;
+                previewFoto.style.display = 'block';
+                timMediaEmpty.style.display = 'none';
+                timMediaActions.style.display = 'flex';
+                timMediaPreview.classList.add('has-image');
+            } else {
+                previewFoto.src = DEFAULT_FOTO;
+                previewFoto.style.display = 'none';
+                timMediaEmpty.style.display = 'block';
+                timMediaActions.style.display = 'none';
+                timMediaPreview.classList.remove('has-image');
+            }
+        }
+
+        function removeTimMedia() {
+            teamFoto.value = '';
+            setTimMediaPreview('', '');
+        }
+
+                function openModal(mode, el) {
             timForm.reset();
-            previewFoto.src = DEFAULT_FOTO;
-            uploadLabel.textContent = 'Klik untuk pilih foto (opsional, default: profile.png)';
+
+            if (typeof setTimMediaPreview === 'function') {
+                setTimMediaPreview('', '');
+            }
 
             inputJabatanManual.classList.remove('show');
             inputDivisiManual.classList.remove('show');
@@ -1058,8 +1283,12 @@
                 timForm.action = el.dataset.url;
                 formMethod.value = 'PUT';
 
-                teamNama.value    = el.dataset.nama;
-                previewFoto.src   = el.dataset.foto;
+                teamNama.value = el.dataset.nama;
+                if (el.dataset.foto) {
+                    setTimMediaPreview(el.dataset.foto, 'Ganti Foto');
+                } else {
+                    setTimMediaPreview('', '');
+                }
 
                 // Set logika Jabatan
                 const valJabatan = el.dataset.jabatan;
@@ -1264,18 +1493,56 @@
         teamFoto.addEventListener('change', function () {
             const file = this.files[0];
             if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                this.value = '';
+                setTimMediaPreview('', '');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function (e) {
-                previewFoto.src = e.target.result;
+                setTimMediaPreview(e.target.result, file.name);
             };
             reader.readAsDataURL(file);
-            uploadLabel.textContent = file.name;
         });
 
-        document.getElementById('btnTambahTim').addEventListener('click', function (e) {
+        btnRemoveMedia.addEventListener('click', function (e) {
             e.preventDefault();
-            openModal('add');
+            e.stopPropagation();
+            removeTimMedia();
         });
+
+        timMediaPreview.addEventListener('click', function (e) {
+            if (e.target.closest('.tim-media-btn')) return;
+            teamFoto.click();
+        });
+
+        btnZoomMedia.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (!previewFoto.src || previewFoto.style.display === 'none') return;
+
+            zoomFotoImg.src = previewFoto.src;
+            zoomFotoImg.alt = teamNama.value || 'Preview Foto';
+            zoomFotoNama.textContent = teamNama.value || 'Preview Foto';
+
+            const jabatan = inputJabatanManual.value || selectJabatan.value || '';
+            const divisi = inputDivisiManual.value || selectDivisi.value || '';
+            zoomFotoInfo.textContent = [jabatan, divisi].filter(Boolean).join(' • ');
+
+            zoomFotoModal.classList.add('show');
+        });
+
+        const btnTambahTim = document.getElementById('btnTambahTim');
+
+        if (btnTambahTim) {
+            btnTambahTim.addEventListener('click', function (e) {
+                e.preventDefault();
+                openModal('add');
+            });
+        }
 
         document.getElementById('btnCancelModal').addEventListener('click', closeModal);
         document.getElementById('btnCloseModal').addEventListener('click', closeModal);

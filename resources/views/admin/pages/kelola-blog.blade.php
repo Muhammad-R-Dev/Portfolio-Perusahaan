@@ -518,18 +518,18 @@
 
 		/* WYSIWYG EDITOR */
 		.editor-box {
-			border: 1px solid var(--grey);
+			border: 1px solid #cbd5e1;
 			border-radius: 10px;
 			background: #fff;
 			transition: border-color 0.2s;
 			display: flex;
 			flex-direction: column;
 			height: 100%;
-			min-height: 460px;
+			min-height: 0;
 			overflow: hidden;
 		}
 		.editor-box:focus-within {
-			border-color: var(--blue);
+			border-color: #3b82f6;
 			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 		}
 		.editor-toolbar {
@@ -538,8 +538,8 @@
 			flex-wrap: wrap;
 			gap: 6px;
 			padding: 8px 12px;
-			border-bottom: 1px solid var(--grey);
-			background: var(--grey);
+			border-bottom: 1px solid #cbd5e1;
+			background: #f8fafc;
 			flex-shrink: 0;
 		}
 		.editor-toolbar select {
@@ -550,7 +550,8 @@
 			background: #fff;
 			cursor: pointer;
 			outline: none;
-			color: var(--dark);
+			color: #334155;
+			font-family: var(--poppins), sans-serif;
 			width: auto;
 		}
 		.editor-btn {
@@ -560,7 +561,7 @@
 			font-size: 16px;
 			cursor: pointer;
 			border-radius: 6px;
-			color: var(--dark-grey);
+			color: #475569;
 			width: 30px;
 			height: 30px;
 			transition: 0.2s;
@@ -568,18 +569,18 @@
 			align-items: center;
 			justify-content: center;
 		}
-		.editor-btn:hover { background: #e2e8f0; color: var(--dark); }
-		.editor-btn.is-image { color: var(--blue); }
+		.editor-btn:hover { background: #e2e8f0; color: #0f172a; }
+		.editor-btn.is-image { color: #2563eb; }
 		.editor-divider { width: 1px; height: 18px; background: #cbd5e1; margin: 0 4px; }
 
 		.editor-canvas { position: relative; flex: 1; min-height: 0; display: flex; }
 		.editor-content {
 			flex: 1; min-height: 220px; overflow-y: auto; padding: 18px 20px;
-			font-size: 14px; line-height: 1.7; outline: none; color: var(--dark);
+			font-size: 14px; line-height: 1.7; outline: none; color: #1e293b;
 		}
 		.editor-content:empty:before { content: attr(data-placeholder); color: #94a3b8; }
 		.editor-content img { max-width: 100%; height: auto; border-radius: 6px; cursor: pointer; }
-		.editor-content img.is-selected { outline: 2px solid var(--blue); outline-offset: 1px; }
+		.editor-content img.is-selected { outline: 2px solid #3b82f6; outline-offset: 1px; }
 
 		/* Frame resize gambar */
 		.img-frame { position: absolute; display: none; pointer-events: none; z-index: 20; }
@@ -778,6 +779,97 @@
 			background: var(--red);
 			color: var(--light);
 		}
+		/* ============================================================
+		   DARK MODE - EDITOR DESKRIPSI SAMA DENGAN KELola PROYEK
+		   ============================================================ */
+		body.dark #blogModal .modal-box {
+			background: var(--light) !important;
+			color: var(--dark) !important;
+		}
+
+		body.dark #blogModal h2,
+		body.dark #blogModal .form-group label {
+			color: var(--dark) !important;
+		}
+
+		body.dark #blogModal .form-group input,
+		body.dark #blogModal .form-group select,
+		body.dark #blogModal .form-group textarea {
+			background: var(--grey) !important;
+			border-color: var(--grey) !important;
+			color: var(--dark) !important;
+		}
+
+		body.dark #blogModal .form-group input::placeholder,
+		body.dark #blogModal .form-group textarea::placeholder {
+			color: var(--dark-grey) !important;
+		}
+
+		/* WYSIWYG editor */
+		body.dark #blogModal .editor-box {
+			background: var(--light) !important;
+			border-color: var(--grey) !important;
+		}
+
+		body.dark #blogModal .editor-toolbar {
+			background: var(--grey) !important;
+			border-bottom-color: var(--grey) !important;
+		}
+
+		body.dark #blogModal .editor-toolbar select {
+			background: var(--light) !important;
+			border-color: var(--grey) !important;
+			color: var(--dark) !important;
+			color-scheme: dark;
+		}
+
+		body.dark #blogModal .editor-btn {
+			color: var(--dark-grey) !important;
+		}
+
+		body.dark #blogModal .editor-btn:hover {
+			background: var(--grey) !important;
+			color: var(--dark) !important;
+		}
+
+		body.dark #blogModal .editor-btn.is-image {
+			color: var(--blue) !important;
+		}
+
+		body.dark #blogModal .editor-divider {
+			background: var(--grey) !important;
+		}
+
+		body.dark #blogModal .editor-content {
+			background: var(--light) !important;
+			color: var(--dark) !important;
+		}
+
+		body.dark #blogModal .editor-content:empty:before {
+			color: var(--dark-grey) !important;
+		}
+
+		body.dark #blogModal .img-frame .handle {
+			background: var(--light) !important;
+		}
+
+		body.dark #blogModal .chb-modal .form-actions,
+		body.dark #blogModal .modal-actions {
+			background: var(--light) !important;
+			border-top-color: var(--grey) !important;
+		}
+
+		/* Tombol Batal tambah/update tetap merah */
+		body.dark #blogModal .btn-cancel,
+		body.dark #blogModal .btn-cancel:hover,
+		body.dark #blogModal .btn-cancel:focus,
+		body.dark #blogModal .btn-cancel:active {
+			background: var(--red) !important;
+			color: #fff !important;
+			filter: none !important;
+			box-shadow: none !important;
+		}
+
 </style>
 @endpush
 
@@ -796,7 +888,7 @@
 					</ul>
 				</div>
 				<button type="button" class="btn-download" id="btnTambahBlog">
-					<i class='bx bxs-plus-circle bx-fade-down-hover' ></i>
+					<i class='bx bxs-plus-circle' ></i>
 					<span class="text">Tambah Blog</span>
 				</button>
 			</div>
@@ -921,7 +1013,7 @@
 							<div class="form-col-left">
 								<div class="form-group">
 									<label>Judul</label>
-									<input type="text" name="judul" id="inputJudul" value="{{ old('judul') }}" required>
+									<input type="text" name="judul" id="inputJudul" value="{{ old('judul') }}" required placeholder="Masukkan judul blog">
 								</div>
 
 								<div class="form-group">
@@ -994,7 +1086,7 @@
 											<button type="button" class="editor-btn" onclick="formatDoc('insertOrderedList')" title="Numbering"><i class='bx bx-list-ol'></i></button>
 											<div class="editor-divider"></div>
 											<button type="button" class="editor-btn" onclick="addLink()" title="Link"><i class='bx bx-link'></i></button>
-											<button type="button" class="editor-btn is-image" onclick="triggerEditorImage()" title="Sisipkan Gambar"><i class='bx bx-image-add'></i></button>
+											<button type="button" class="editor-btn" onclick="triggerEditorImage()" title="Sisipkan Gambar"><i class='bx bx-image-add'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('removeFormat')" title="Hapus Format"><i class='bx bx-eraser'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('undo')" title="Undo"><i class='bx bx-undo'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('redo')" title="Redo"><i class='bx bx-redo'></i></button>

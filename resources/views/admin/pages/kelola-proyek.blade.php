@@ -556,13 +556,40 @@
         border-top-color: var(--grey) !important;
     }
 
-    .chb-modal .btn-cancel {
-        color: var(--dark-grey);
+    /* ---------- Input tanggal: ikon kalender harus terlihat di dark mode ---------- */
+    .chb-modal .form-group input[type="date"] {
+        color-scheme: light;
     }
 
-    .chb-modal .btn-cancel:hover {
-        background: var(--grey) !important;
-        color: var(--dark) !important;
+    .chb-modal .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 1;
+        cursor: pointer;
+    }
+
+    body.dark .chb-modal .form-group input[type="date"] {
+        color-scheme: dark !important;
+    }
+
+    body.dark .chb-modal .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 1 !important;
+        -webkit-filter: brightness(0) invert(1) !important;
+        filter: brightness(0) invert(1) !important;
+        cursor: pointer;
+    }
+
+    /* ---------- Tombol Batal tambah/update tetap merah, tanpa efek hover ---------- */
+    .chb-modal.modal-full .btn-cancel {
+        background: var(--red, #ef4444) !important;
+        color: #fff !important;
+    }
+
+    .chb-modal.modal-full .btn-cancel:hover,
+    .chb-modal.modal-full .btn-cancel:focus,
+    .chb-modal.modal-full .btn-cancel:active {
+        background: var(--red, #ef4444) !important;
+        color: #fff !important;
+        filter: none !important;
+        box-shadow: none !important;
     }
 
     /* ---------- Modal hasil import ---------- */

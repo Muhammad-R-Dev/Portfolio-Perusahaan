@@ -227,66 +227,211 @@
 		.modal-box {
 			background: var(--light);
 			width: 100%;
-			max-width: 460px;
-			border-radius: 16px;
+			max-width: 760px;
+			border-radius: 18px;
 			padding: 28px;
 			font-family: var(--poppins);
 			max-height: 90vh;
 			overflow-y: auto;
+			box-shadow: 0 20px 60px rgba(0,0,0,.16);
 		}
-		.modal-box h2 {
-			font-size: 20px;
-			color: var(--dark);
+		/* Judul modal - dipaksa tetap gelap agar tidak putih/hilang saat dark mode */
+		#galleryModal .modal-box h2,
+		#galleryModal #modalTitle {
+			color: var(--dark) !important;
+			margin: 0 0 24px;
+		}
+
+		/* FORM TAMBAH / EDIT GALERI - INPUT KIRI & MEDIA FOTO KANAN */
+		#galleryModal .gallery-form-layout {
+			display: grid;
+			grid-template-columns: minmax(0, 1.45fr) minmax(320px, 380px);
+			gap: 28px;
+			align-items: stretch;
+			margin-top: 4px;
+		}
+		#galleryModal .gallery-form-left,
+		#galleryModal .gallery-form-right {
+			min-width: 0;
+		}
+		#galleryModal .gallery-form-right .form-group {
+			margin-bottom: 0;
+		}
+
+		/* Menyeragamkan tampilan label & input/select agar sejajar dan rapi */
+		#galleryModal .gallery-form-left .form-group {
+			margin-top: 18px;
 			margin-bottom: 20px;
 		}
-		.modal-box .form-group {
-			margin-bottom: 16px;
+		#galleryModal .gallery-form-left .form-group:first-child {
+			margin-top: 0;
 		}
-		.modal-box label {
+		#galleryModal .gallery-form-left .form-group:last-child {
+			margin-bottom: 0;
+		}
+		#galleryModal .gallery-form-left .form-group label {
 			display: block;
+			margin-top: 4px;
+			margin-bottom: 10px;
+			font-size: 13px;
+			font-weight: 600;
+			color: var(--dark) !important;
+		}
+		#galleryModal .gallery-form-left .form-group input[type="text"],
+		#galleryModal .gallery-form-left .form-group select {
+			display: block;
+			width: 100%;
+			height: 44px;
+			padding: 0 14px;
+			box-sizing: border-box;
+			border: 1px solid var(--grey);
+			border-radius: 10px;
+			background: var(--light) !important;
+			color: var(--dark) !important;
+			font-family: var(--poppins);
+			font-size: 14px;
+			line-height: 44px;
+		}
+		#galleryModal .gallery-form-left .form-group select {
+			cursor: pointer;
+		}
+		#galleryModal .gallery-form-left .form-group input[type="text"]:focus,
+		#galleryModal .gallery-form-left .form-group select:focus {
+			outline: none;
+			border-color: var(--blue);
+		}
+
+		#galleryModal .gallery-media-card {
+			border: 1px solid var(--grey);
+			background: var(--light);
+			border-radius: 14px;
+			padding: 16px;
+		}
+		#galleryModal .gallery-media-card .media-title {
 			font-size: 13px;
 			font-weight: 600;
 			color: var(--dark);
-			margin-bottom: 6px;
+			margin-bottom: 10px;
 		}
-		.modal-box input[type="text"],
-		.modal-box select,
-		.modal-box textarea {
-			width: 100%;
-			padding: 10px 14px;
-			border-radius: 10px;
-			border: 1px solid var(--grey);
-			background: var(--grey);
-			outline: none;
-			font-family: var(--poppins);
-			font-size: 14px;
-			color: var(--dark);
-		}
-		.modal-box .upload-zone {
+
+		#galleryModal .gallery-media-preview {
+			position: relative;
+			min-height: 250px;
 			border: 2px dashed var(--dark-grey);
 			border-radius: 12px;
-			padding: 24px;
+			background: var(--grey);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+		}
+		#galleryModal .gallery-media-preview.has-image {
+			border-style: solid;
+			border-color: var(--grey);
+		}
+
+		#galleryModal .gallery-media-preview img {
+			width: 100%;
+			height: 250px;
+			object-fit: cover;
+			display: block;
+		}
+		#galleryModal .gallery-media-empty {
 			text-align: center;
-			cursor: pointer;
-			position: relative;
 			color: var(--dark-grey);
-			transition: .2s ease;
+			padding: 18px;
 		}
-		.modal-box .upload-zone:hover {
-			border-color: var(--blue);
+		#galleryModal .gallery-media-empty .bx {
+			font-size: 38px;
 			color: var(--blue);
-		}
-		.modal-box .upload-zone .bx {
-			font-size: 32px;
 			display: block;
 			margin-bottom: 8px;
 		}
-		.modal-box .upload-zone input[type="file"] {
-			position: absolute;
-			inset: 0;
-			opacity: 0;
-			cursor: pointer;
+		#galleryModal .gallery-media-empty strong {
+			display: block;
+			color: var(--dark);
+			font-size: 13px;
+			margin-bottom: 4px;
 		}
+		#galleryModal .gallery-media-empty span {
+			display: block;
+			font-size: 11px;
+			line-height: 1.5;
+		}
+
+		#galleryModal .gallery-media-actions {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			display: flex;
+			gap: 6px;
+			z-index: 3;
+			pointer-events: none;
+		}
+		#galleryModal .gallery-media-btn {
+			width: 32px;
+			height: 32px;
+			border: none;
+			border-radius: 8px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(15, 23, 42, .72);
+			color: #fff;
+			cursor: pointer;
+			font-size: 15px;
+			pointer-events: auto;
+			transition: background .15s ease;
+		}
+		#galleryModal .gallery-media-btn:hover {
+			background: var(--blue);
+		}
+		#galleryModal .gallery-media-btn.danger:hover {
+			background: var(--red);
+		}
+
+		#galleryModal .gallery-media-preview.upload-clickable {
+			cursor: pointer;
+			transition: border-color .15s ease, background .15s ease;
+		}
+		#galleryModal .gallery-media-preview.upload-clickable:hover {
+			border-color: var(--blue);
+			background: var(--light-blue);
+		}
+		#galleryModal .gallery-media-preview.upload-clickable.has-image {
+			background: var(--grey);
+		}
+		#galleryModal .gallery-media-preview.upload-clickable.has-image:hover {
+			background: var(--grey);
+		}
+
+		#galleryModal .gallery-media-file-input {
+			position: absolute !important;
+			inset: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			opacity: 0 !important;
+			cursor: pointer !important;
+			z-index: 1 !important;
+		}
+
+		#galleryModal .gallery-media-meta {
+			margin-top: 8px;
+			font-size: 11px;
+			color: var(--dark-grey);
+			text-align: center;
+			line-height: 1.5;
+		}
+
+		@media screen and (max-width: 700px) {
+			#galleryModal .gallery-form-layout {
+				grid-template-columns: 1fr;
+			}
+			#galleryModal .gallery-media-card {
+				order: -1;
+			}
+		}
+
 		/* MODAL KONFIRMASI & NOTIFIKASI */
 		.modal-box.modal-confirm {
 			max-width: 380px;
@@ -326,42 +471,6 @@
 			color: var(--light);
 		}
 
-		.modal-box .preview-wrap {
-			position: relative;
-			display: none;
-			margin-top: 12px;
-		}
-		.modal-box .preview-wrap.show {
-			display: block;
-		}
-		.modal-box .preview-img {
-			display: block;
-			width: 100%;
-			max-height: 180px;
-			object-fit: cover;
-			border-radius: 12px;
-		}
-		.modal-box .btn-remove-preview {
-			position: absolute;
-			top: 8px;
-			right: 8px;
-			width: 28px;
-			height: 28px;
-			border-radius: 50%;
-			border: none;
-			background: rgba(0, 0, 0, .55);
-			color: var(--light);
-			font-size: 16px;
-			line-height: 1;
-			cursor: pointer;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			transition: background .15s ease;
-		}
-		.modal-box .btn-remove-preview:hover {
-			background: var(--red);
-		}
 		.modal-box .form-error {
 			color: var(--red);
 			font-size: 12px;
@@ -387,7 +496,6 @@
 			background: var(--grey);
 			color: var(--dark);
 		}
-		/* Khusus tombol Batal di form Tambah/Edit Galeri -> merah */
 		#galleryModal .btn-cancel {
 			background: var(--red);
 			color: var(--light);
@@ -577,7 +685,7 @@
 			accent-color: var(--blue);
 		}
 		#content main .gallery-table tbody tr.row-selected {
-			background: var(--light-blue);
+			background: transparent;
 		}
 
 		#content main .table-responsive {
@@ -604,12 +712,12 @@
 			text-transform: uppercase;
 			letter-spacing: .02em;
 			padding: 14px 16px;
-			border-bottom: 1px solid var(--grey);
+			border-bottom: none;
 			white-space: nowrap;
 		}
 		#content main .gallery-table tbody td {
 			padding: 12px 16px;
-			border-bottom: 1px solid var(--grey);
+			border-bottom: none;
 			color: var(--dark);
 			font-size: 14px;
 			vertical-align: middle;
@@ -618,7 +726,7 @@
 			border-bottom: none;
 		}
 		#content main .gallery-table tbody tr:hover {
-			background: var(--light-blue);
+			background: transparent;
 		}
 		#content main .gallery-table .table-thumb {
 			width: 64px;
@@ -627,11 +735,10 @@
 			border-radius: 10px;
 			cursor: zoom-in;
 			display: block;
-			transition: transform .2s ease, box-shadow .2s ease;
 		}
 		#content main .gallery-table .table-thumb:hover {
-			transform: scale(1.06);
-			box-shadow: 0 6px 16px rgba(0,0,0,.15);
+			transform: none;
+			box-shadow: none;
 		}
 		#content main .gallery-table .table-category-tag {
 			display: inline-block;
@@ -794,6 +901,21 @@
 			background: var(--red);
 		}
 
+		/* Responsive modal form */
+		@media screen and (max-width: 700px) {
+			#galleryModal .modal-box {
+				max-width: calc(100% - 24px);
+				padding: 22px;
+			}
+			#galleryModal .gallery-form-layout {
+				grid-template-columns: 1fr;
+				gap: 18px;
+			}
+			#galleryModal .upload-zone {
+				min-height: 240px;
+			}
+		}
+
 		@media screen and (max-width: 576px) {
 			#content main .gallery-table {
 				min-width: 560px;
@@ -818,7 +940,7 @@
 					</ul>
 				</div>
 				<button type="button" class="btn-download" id="btnAddGallery">
-					<i class='bx bxs-plus-circle bx-fade-down-hover' ></i>
+					<i class='bx bxs-plus-circle' ></i>
 					<span class="text">Tambah Foto</span>
 				</button>
 			</div>
@@ -964,33 +1086,61 @@
 						@csrf
 						<input type="hidden" name="_method" id="formMethod" value="">
 
-						<div class="form-group">
-							<label for="photoTitle">Judul Foto</label>
-							<input type="text" name="judul" id="photoTitle" required maxlength="150">
-						</div>
+						<div class="gallery-form-layout">
+							<div class="gallery-form-left">
+								<div class="form-group">
+									<label for="photoTitle">Judul Foto</label>
+									<input type="text" name="judul" id="photoTitle" required maxlength="150" placeholder="Masukkan judul foto">
+								</div>
 
-						<div class="form-group">
-							<label for="photoCategory">Kategori</label>
-							<select name="kategori" id="photoCategory" required>
-								<option value="kegiatan">Kegiatan</option>
-								<option value="fasilitas">Fasilitas</option>
-								<option value="tim">Tim</option>
-								<option value="acara">Acara</option>
-							</select>
-						</div>
+								<div class="form-group">
+									<label for="photoCategory">Kategori</label>
+									<select name="kategori" id="photoCategory" required>
+										<option value="kegiatan">Kegiatan</option>
+										<option value="fasilitas">Fasilitas</option>
+										<option value="tim">Tim</option>
+										<option value="acara">Acara</option>
+									</select>
+								</div>
+							</div>
 
-						<div class="form-group">
-							<label>Foto</label>
-							<div class="upload-zone">
-								<i class='bx bx-cloud-upload'></i>
-								<span id="uploadLabel">Klik atau seret foto ke sini</span>
-								<input type="file" name="foto" id="photoInput" accept="image/*">
+							<div class="gallery-form-right">
+								<div class="gallery-media-card">
+									<div class="media-title">Media Foto</div>
+
+									<div class="gallery-media-preview upload-clickable" id="galleryMediaPreview" title="Klik untuk memilih foto">
+										<div class="gallery-media-empty" id="galleryMediaEmpty">
+											<i class='bx bx-image-add'></i>
+											<strong>Upload Foto</strong>
+											<span>Klik area ini untuk memilih foto</span>
+										</div>
+
+										<img
+											src=""
+											alt="Preview Foto"
+											id="previewImg"
+											style="display:none;"
+										>
+
+										<div class="gallery-media-actions" id="galleryMediaActions" style="display:none;">
+											<button type="button" class="gallery-media-btn" id="btnPreviewZoom" title="Zoom Foto" aria-label="Zoom Foto">
+												<i class='bx bx-fullscreen'></i>
+											</button>
+											<button type="button" class="gallery-media-btn danger" id="btnRemovePreview" title="Hapus Foto" aria-label="Hapus Foto">
+												<i class='bx bx-trash'></i>
+											</button>
+										</div>
+
+										<input type="file" name="foto" id="photoInput" accept="image/*" class="gallery-media-file-input">
+									</div>
+
+									<div class="gallery-media-meta">
+										JPG, JPEG, PNG, WEBP · Maks. 2MB
+									</div>
+								</div>
+
+								<input type="hidden" name="hapus_gambar" id="hapusGambarInput" value="0">
 							</div>
-							<div class="preview-wrap" id="previewWrap">
-								<img src="" alt="Preview" class="preview-img" id="previewImg">
-								<button type="button" class="btn-remove-preview" id="btnRemovePreview" title="Batal foto">&times;</button>
-							</div>
-							<input type="hidden" name="hapus_gambar" id="hapusGambarInput" value="0">
 						</div>
 
 						<div class="modal-actions">
@@ -1374,39 +1524,63 @@
 		const modalTitle     = document.getElementById('modalTitle');
 		const formMethod     = document.getElementById('formMethod');
 
-		const photoTitle    = document.getElementById('photoTitle');
-		const photoCategory = document.getElementById('photoCategory');
-		const photoInput    = document.getElementById('photoInput');
-		const previewImg    = document.getElementById('previewImg');
-		const previewWrap   = document.getElementById('previewWrap');
-		const uploadLabel   = document.getElementById('uploadLabel');
-		const hapusGambarInput  = document.getElementById('hapusGambarInput');
-		const btnRemovePreview  = document.getElementById('btnRemovePreview');
+		const photoTitle       = document.getElementById('photoTitle');
+		const photoCategory    = document.getElementById('photoCategory');
+		const photoInput       = document.getElementById('photoInput');
+		const previewImg       = document.getElementById('previewImg');
+		const galleryMediaPreview = document.getElementById('galleryMediaPreview');
+		const galleryMediaEmpty   = document.getElementById('galleryMediaEmpty');
+		const galleryMediaActions = document.getElementById('galleryMediaActions');
+		const hapusGambarInput    = document.getElementById('hapusGambarInput');
+		const btnPreviewZoom      = document.getElementById('btnPreviewZoom');
+		const btnRemovePreview    = document.getElementById('btnRemovePreview');
 
 		const STORE_URL = "{{ route('admin.kelola-galeri.store') }}";
 
+		function setGalleryMediaPreview(src) {
+			if (src) {
+				previewImg.src = src;
+				previewImg.style.display = 'block';
+				galleryMediaEmpty.style.display = 'none';
+				galleryMediaActions.style.display = 'flex';
+				galleryMediaPreview.classList.add('has-image');
+			} else {
+				previewImg.src = '';
+				previewImg.style.display = 'none';
+				galleryMediaEmpty.style.display = 'block';
+				galleryMediaActions.style.display = 'none';
+				galleryMediaPreview.classList.remove('has-image');
+			}
+		}
+
+		function removeGalleryMedia() {
+			photoInput.value = '';
+			setGalleryMediaPreview('');
+		}
+
 		function openModal(mode, data = null) {
 			galleryForm.reset();
-			previewWrap.classList.remove('show');
-			previewImg.src = '';
-			uploadLabel.textContent = 'Klik atau seret foto ke sini';
-			photoInput.required = true;
+			setGalleryMediaPreview('');
 			hapusGambarInput.value = '0';
+			photoInput.required = true;
 
 			if (mode === 'edit' && data) {
 				modalTitle.textContent = 'Edit Foto Galeri';
 				galleryForm.action = data.url;
 				formMethod.value = 'PUT';
-				photoInput.required = false; // opsional saat edit
+				photoInput.required = false;
 
 				photoTitle.value = data.judul;
 				photoCategory.value = data.kategori;
-				previewImg.src = data.foto;
-				previewWrap.classList.add('show');
+
+				if (data.foto) {
+					setGalleryMediaPreview(data.foto);
+				}
 			} else {
 				modalTitle.textContent = 'Tambah Foto Galeri';
 				galleryForm.action = STORE_URL;
 				formMethod.value = '';
+				photoCategory.value = 'kegiatan';
 			}
 
 			galleryModal.classList.add('show');
@@ -1419,7 +1593,12 @@
 		btnAddGallery.addEventListener('click', () => openModal('add'));
 		btnCancelModal.addEventListener('click', closeModal);
 
-		// Edit foto (delegasi event, berlaku untuk grid & tabel)
+		// Tutup modal galeri saat klik area gelap
+		galleryModal.addEventListener('click', function (e) {
+			if (e.target === galleryModal) closeModal();
+		});
+
+		// Edit foto
 		document.addEventListener('click', function (e) {
 			const editBtn = e.target.closest('.btn-edit');
 			if (!editBtn) return;
@@ -1432,28 +1611,63 @@
 			});
 		});
 
-		// Preview foto sebelum disimpan
+		// Pilih foto
 		photoInput.addEventListener('change', function () {
 			const file = this.files[0];
 			if (!file) return;
+
+			if (!file.type.startsWith('image/')) {
+				this.value = '';
+				setGalleryMediaPreview('');
+				return;
+			}
+
+			if (file.size > 2 * 1024 * 1024) {
+				this.value = '';
+				setGalleryMediaPreview('');
+				alert('Ukuran foto maksimal 2MB.');
+				return;
+			}
+
 			const reader = new FileReader();
 			reader.onload = function (e) {
-				previewImg.src = e.target.result;
-				previewWrap.classList.add('show');
-				uploadLabel.textContent = file.name;
+				setGalleryMediaPreview(e.target.result);
 				hapusGambarInput.value = '0';
 			};
 			reader.readAsDataURL(file);
 		});
 
-		// Tombol silang di pojok kanan atas foto -> batalkan foto yang dipilih/ditampilkan
-		btnRemovePreview.addEventListener('click', function () {
-			photoInput.value = '';
-			previewImg.src = '';
-			previewWrap.classList.remove('show');
-			uploadLabel.textContent = 'Klik atau seret foto ke sini';
-			// Menandai foto lama (saat edit) untuk dihapus jika form disimpan tanpa foto baru
+		// Tombol zoom
+		btnPreviewZoom.addEventListener('click', function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			if (!previewImg.src || previewImg.style.display === 'none') return;
+
+			const categoryText = photoCategory.options[photoCategory.selectedIndex]
+				? photoCategory.options[photoCategory.selectedIndex].text
+				: '';
+
+			openZoom(
+				previewImg.src,
+				photoTitle.value || 'Preview Foto',
+				categoryText
+			);
+		});
+
+		// Tombol hapus foto
+		btnRemovePreview.addEventListener('click', function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			removeGalleryMedia();
 			hapusGambarInput.value = '1';
+		});
+
+		// Klik area media untuk memilih file
+		galleryMediaPreview.addEventListener('click', function (e) {
+			if (e.target.closest('.gallery-media-actions')) return;
+			photoInput.click();
 		});
 
 		/* ---------- ZOOM MODE FOTO ---------- */
@@ -1490,6 +1704,7 @@
 		}
 		document.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape' && zoomModal.classList.contains('show')) closeZoom();
+			if (e.key === 'Escape' && galleryModal.classList.contains('show')) closeModal();
 		});
 
 		// Inisialisasi awal
