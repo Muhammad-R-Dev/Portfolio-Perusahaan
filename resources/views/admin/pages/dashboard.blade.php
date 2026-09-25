@@ -241,8 +241,38 @@
             <div class="preview-card-body">
                 <div class="mini-preview-list">
                     @forelse($recentLayanan as $layanan)
+                        @php
+                            $layananImageUrl = 'https://placehold.co/100x100/png';
+
+                            if (!empty($layanan->image)) {
+                                $imagePath = ltrim(trim($layanan->image), '/');
+
+                                if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                                    // Jika database menyimpan URL lengkap.
+                                    $layananImageUrl = $imagePath;
+                                } elseif (file_exists(public_path($imagePath))) {
+                                    // Jika database menyimpan path seperti images/services/nama.jpg.
+                                    $layananImageUrl = asset($imagePath);
+                                } elseif (file_exists(public_path('images/services/' . $imagePath))) {
+                                    // Jika file berada di public/images/services dan DB hanya menyimpan nama file.
+                                    $layananImageUrl = asset('images/services/' . $imagePath);
+                                } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists($imagePath)) {
+                                    // Jika upload menggunakan Laravel Storage (storage/app/public).
+                                    $layananImageUrl = \Illuminate\Support\Facades\Storage::url($imagePath);
+                                } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists('services/' . $imagePath)) {
+                                    // Jika DB hanya menyimpan nama file, sedangkan file ada di storage/app/public/services.
+                                    $layananImageUrl = \Illuminate\Support\Facades\Storage::url('services/' . $imagePath);
+                                }
+                            }
+                        @endphp
                         <div class="mini-preview-item">
-                            <img class="thumb" src="{{ $layanan->image ? asset('images/services/'.$layanan->image) : 'https://placehold.co/100x100/png' }}" alt="{{ $layanan->title }}">
+                            <img
+                                class="thumb"
+                                src="{{ $layananImageUrl }}"
+                                alt="{{ $layanan->title }}"
+                                loading="lazy"
+                                onerror="this.onerror=null;this.src='https://placehold.co/100x100/png';"
+                            >
                             <div class="info">
                                 <p class="judul">{{ $layanan->title }}</p>
                                 <div class="sub">{{ \Illuminate\Support\Str::limit($layanan->description, 40) }}</div>

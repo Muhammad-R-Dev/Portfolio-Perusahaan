@@ -123,22 +123,24 @@
         #content nav .notification { font-size: 20px; position: relative; }
         #content nav .notification .num { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--light); background: var(--red); color: var(--light); font-weight: 700; font-size: 12px; display: flex; justify-content: center; align-items: center; }
 
-        #content nav .notification-menu { display: none; position: absolute; top: 56px; right: 0; background: var(--light); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 15px; width: 280px; max-height: 340px; overflow-y: auto; z-index: 9999; font-family: var(--lato); }
-        #content nav .notification-menu.show { display: block; }
-        #content nav .notification-menu ul { list-style: none; padding: 10px; margin: 0; }
-        #content nav .notification-menu li { padding: 10px; border-bottom: 1px solid var(--grey); color: var(--dark); }
-        #content nav .notification-menu li:hover { background-color: var(--light-blue); color: var(--dark); }
-        #content nav .notification-menu li:hover a{ background-color: var(--dark-grey); color: var(--light); }
-        body.dark #content nav .notification-menu li:hover { background-color: var(--light-blue); color: var(--light); }
-        body.dark #content nav .notification-menu li a{ background-color: var(--dark-grey); color: var(--light); }
+        #content nav .notification-menu { display: none; position: absolute; top: 56px; right: 0; background: var(--light); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); border-radius: 15px; width: 300px; max-height: 380px; overflow: hidden; z-index: 9999; font-family: var(--lato); flex-direction: column; }
+        #content nav .notification-menu.show { display: flex; }
+        #content nav .notification-menu .notif-header { padding: 14px 16px; font-size: 14px; font-weight: 700; color: var(--dark); border-bottom: 1px solid var(--grey); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        #content nav .notification-menu .notif-header .notif-header-count { font-size: 11px; font-weight: 600; color: var(--dark-grey); }
+        #content nav .notification-menu ul { list-style: none; padding: 6px; margin: 0; overflow-y: auto; }
+        #content nav .notification-menu li { padding: 10px 10px; border-radius: 10px; color: var(--dark); }
+        #content nav .notification-menu li:not(.notif-empty):hover { background-color: var(--light-blue); }
 
         /* Item notifikasi deadline (dinamis) */
-        #content nav .notification-menu li.notif-item { cursor: pointer; }
-        #content nav .notification-menu li .notif-title { font-weight: 600; font-size: 13px; display: flex; align-items: center; grid-gap: 6px; }
-        #content nav .notification-menu li .notif-sub { font-size: 12px; color: var(--dark-grey); margin-top: 3px; }
+        #content nav .notification-menu li.notif-item { cursor: pointer; border-left: 3px solid transparent; }
+        #content nav .notification-menu li .notif-title { font-weight: 600; font-size: 12px; display: flex; align-items: center; grid-gap: 6px; text-transform: uppercase; letter-spacing: .02em; }
+        #content nav .notification-menu li .notif-project { font-weight: 600; font-size: 13.5px; color: var(--dark); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #content nav .notification-menu li .notif-sub { font-size: 12px; color: var(--dark-grey); margin-top: 2px; }
+        #content nav .notification-menu li.notif-h1 { border-left-color: var(--orange); }
         #content nav .notification-menu li.notif-h1 .notif-title { color: var(--orange); }
+        #content nav .notification-menu li.notif-lewat { border-left-color: var(--red); }
         #content nav .notification-menu li.notif-lewat .notif-title { color: var(--red); }
-        #content nav .notification-menu li.notif-empty { text-align: center; color: var(--dark-grey); cursor: default; border-bottom: none; }
+        #content nav .notification-menu li.notif-empty { text-align: center; padding: 28px 10px; color: var(--dark-grey); cursor: default; font-size: 13px; }
         #content nav .notification-menu li.notif-empty:hover { background-color: transparent; }
 
         #content nav .switch-mode { display: block; min-width: 50px; height: 25px; border-radius: 25px; background: var(--grey); cursor: pointer; position: relative; }
@@ -220,8 +222,12 @@
                 <span class="num" id="notificationCount" style="display: none;">0</span>
             </a>
             <div class="notification-menu" id="notificationMenu">
+                <div class="notif-header">
+                    <span>Notifikasi</span>
+                    <span class="notif-header-count" id="notificationHeaderCount"></span>
+                </div>
                 <ul id="notificationList">
-                    <li class="notif-empty">Tidak ada notifikasi</li>
+                    <li class="notif-empty">Memuat notifikasi...</li>
                 </ul>
             </div>
             
@@ -297,17 +303,125 @@
         });
 
         // Notification Menu Toggle
-        document.querySelector('.notification').addEventListener('click', function () {
+        document.querySelector('.notification').addEventListener('click', function (e) {
+            e.preventDefault();
             document.querySelector('.notification-menu').classList.toggle('show');
         });
 
         // Tutup menu notifikasi jika klik di luar
         window.addEventListener('click', function (e) {
-            if (!e.target.closest('.notification')) {
+            if (!e.target.closest('.notification') && !e.target.closest('.notification-menu')) {
                 const notifMenu = document.querySelector('.notification-menu');
                 if(notifMenu) notifMenu.classList.remove('show');
             }
         });
+
+        /* ============================================================
+           NOTIFIKASI LONCENG (GLOBAL)
+           Berlaku di SEMUA halaman admin (bukan cuma Kelola Proyek).
+           Sumber data: GET /admin/clients (data proyek & deadline).
+           Klik notifikasi -> menuju halaman Kelola Proyek & langsung
+           membuka detail proyek yang bersangkutan.
+           ============================================================ */
+        const KELOLA_PROYEK_URL = '/admin/kelola-proyek'; // sesuaikan jika path halaman Kelola Proyek berbeda
+
+        function globalNotifFormatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr + 'T00:00:00');
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function globalNotifEscape(str) {
+            const div = document.createElement('div');
+            div.textContent = str == null ? '' : str;
+            return div.innerHTML;
+        }
+
+        async function globalLoadNotifications() {
+            const listEl   = document.getElementById('notificationList');
+            const countEl  = document.getElementById('notificationCount');
+            const headerEl = document.getElementById('notificationHeaderCount');
+            if (!listEl || !countEl) return;
+
+            try {
+                const res = await fetch('/admin/clients', { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) throw new Error('Gagal memuat data proyek');
+                const clients = await res.json();
+
+                const hariIni = new Date();
+                hariIni.setHours(0, 0, 0, 0);
+                const besok = new Date(hariIni);
+                besok.setDate(besok.getDate() + 1);
+
+                const notifBesok = []; // deadline jatuh tempo besok (H-1)
+                const notifLewat = []; // deadline sudah lewat
+
+                clients.forEach(function (client) {
+                    if (!client.deadline) return;
+                    const dDate = new Date(client.deadline + 'T00:00:00');
+                    dDate.setHours(0, 0, 0, 0);
+
+                    if (dDate.getTime() === besok.getTime()) {
+                        notifBesok.push(client);
+                    } else if (dDate.getTime() < hariIni.getTime()) {
+                        client._terlambatHari = Math.round((hariIni - dDate) / 86400000);
+                        notifLewat.push(client);
+                    }
+                });
+
+                notifBesok.sort(function (a, b) { return new Date(a.deadline) - new Date(b.deadline); });
+                notifLewat.sort(function (a, b) { return new Date(b.deadline) - new Date(a.deadline); });
+
+                let itemsHtml = '';
+
+                notifBesok.forEach(function (client) {
+                    itemsHtml += '' +
+                        '<li class="notif-item notif-h1" onclick="globalGoToProjectNotif(' + client.id + ')">' +
+                            '<div class="notif-title"><i class="bx bxs-time-five"></i> Deadline besok</div>' +
+                            '<div class="notif-project">' + globalNotifEscape(client.project) + '</div>' +
+                            '<div class="notif-sub">' + globalNotifEscape(client.nama) + ' &bull; jatuh tempo ' + globalNotifFormatDate(client.deadline) + '</div>' +
+                        '</li>';
+                });
+
+                notifLewat.forEach(function (client) {
+                    const hariText = 'Terlambat ' + client._terlambatHari + ' hari';
+                    itemsHtml += '' +
+                        '<li class="notif-item notif-lewat" onclick="globalGoToProjectNotif(' + client.id + ')">' +
+                            '<div class="notif-title"><i class="bx bxs-error-circle"></i> ' + hariText + '</div>' +
+                            '<div class="notif-project">' + globalNotifEscape(client.project) + '</div>' +
+                            '<div class="notif-sub">' + globalNotifEscape(client.nama) + ' &bull; deadline ' + globalNotifFormatDate(client.deadline) + '</div>' +
+                        '</li>';
+                });
+
+                listEl.innerHTML = itemsHtml || '<li class="notif-empty">Tidak ada notifikasi</li>';
+
+                const totalNotif = notifBesok.length + notifLewat.length;
+                countEl.textContent = totalNotif > 99 ? '99+' : totalNotif;
+                countEl.style.display = totalNotif > 0 ? 'flex' : 'none';
+                if (headerEl) headerEl.textContent = totalNotif > 0 ? totalNotif + ' baru' : '';
+            } catch (err) {
+                console.error('Gagal memuat notifikasi:', err);
+                listEl.innerHTML = '<li class="notif-empty">Gagal memuat notifikasi</li>';
+            }
+        }
+
+        function globalGoToProjectNotif(id) {
+            const notifMenu = document.getElementById('notificationMenu');
+            if (notifMenu) notifMenu.classList.remove('show');
+
+            // Sudah berada di halaman Kelola Proyek -> langsung buka detail tanpa reload
+            const currentPath = window.location.pathname.replace(/\/$/, '');
+            if (typeof chbOpenDetailModal === 'function' && currentPath === KELOLA_PROYEK_URL) {
+                chbOpenDetailModal(id);
+                return;
+            }
+
+            // Dari halaman lain -> pindah ke Kelola Proyek dan otomatis buka detail proyek tsb
+            window.location.href = KELOLA_PROYEK_URL + '?highlight=' + id;
+        }
+
+        document.addEventListener('DOMContentLoaded', globalLoadNotifications);
 
         // Fungsi buka/tutup menu generik
         function toggleMenu(menuId) {

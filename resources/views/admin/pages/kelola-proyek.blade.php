@@ -791,14 +791,32 @@
     let pendingSaveUrl = '';
     let pendingSaveMethod = '';
 
-    document.addEventListener('DOMContentLoaded', function () {
-        chbFetchClients();
+    document.addEventListener('DOMContentLoaded', async function () {
+        await chbFetchClients();
         initLightboxEvents();
         initEditorImageEvents();
         initSidebarOffset();
         initTableFilters();
         initImportModal();
+        chbOpenHighlightFromUrl();
     });
+
+    /* ============================================================
+       Buka otomatis detail proyek saat halaman ini diakses dari klik
+       notifikasi lonceng di halaman lain, mis: /admin/kelola-proyek?highlight=5
+       ============================================================ */
+    function chbOpenHighlightFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const highlightId = parseInt(params.get('highlight'), 10);
+        if (!highlightId) return;
+
+        chbOpenDetailModal(highlightId);
+
+        // Bersihkan parameter dari URL supaya tidak terbuka lagi saat refresh
+        params.delete('highlight');
+        const sisaQuery = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (sisaQuery ? '?' + sisaQuery : ''));
+    }
 
     /* ============================================================
        FUNGSI PENCARIAN & FILTER TABEL
@@ -1111,73 +1129,18 @@
             chbClients = await res.json();
             chbRenderTable();
             chbUpdateStats();
-            chbUpdateNotifications();
         } catch (err) { console.error(err); }
     }
 
     /* ============================================================
-       NOTIFIKASI LONCENG: Deadline H-1 & Deadline Sudah Lewat
+       Notifikasi lonceng (fetch data, hitung H-1/lewat, render list)
+       sekarang ditangani secara GLOBAL di admin.layouts.app supaya
+       tampil di semua halaman, bukan cuma di Kelola Proyek.
+       Lihat: globalLoadNotifications() & globalGoToProjectNotif().
+
+       Halaman ini hanya perlu tahu cara MEMBUKA detail proyek saat
+       diarahkan dari notifikasi (lihat chbOpenHighlightFromUrl di bawah).
        ============================================================ */
-    function chbUpdateNotifications() {
-        const listEl = document.getElementById('notificationList');
-        const countEl = document.getElementById('notificationCount');
-        if (!listEl || !countEl) return; // markup lonceng belum tersedia di halaman ini
-
-        const hariIni = new Date();
-        hariIni.setHours(0, 0, 0, 0);
-
-        const besok = new Date(hariIni);
-        besok.setDate(besok.getDate() + 1);
-
-        const notifBesok = [];  // deadline mendekati H-1 (jatuh tempo besok)
-        const notifLewat = [];  // deadline sudah lewat / selesai masa waktunya
-
-        chbClients.forEach(client => {
-            if (!client.deadline) return;
-            const dDate = new Date(client.deadline + 'T00:00:00');
-            dDate.setHours(0, 0, 0, 0);
-
-            if (dDate.getTime() === besok.getTime()) {
-                notifBesok.push(client);
-            } else if (dDate.getTime() < hariIni.getTime()) {
-                notifLewat.push(client);
-            }
-        });
-
-        // Urutkan berdasarkan deadline terdekat
-        notifBesok.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-        notifLewat.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
-
-        let itemsHtml = '';
-
-        notifBesok.forEach(client => {
-            itemsHtml += `
-                <li class="notif-item notif-h1" onclick="chbNotifGoToDetail(${client.id})">
-                    <div class="notif-title"><i class='bx bxs-time-five'></i> H-1 Deadline: ${chbEscape(client.project)}</div>
-                    <div class="notif-sub">${chbEscape(client.nama)} &bull; jatuh tempo ${chbFormatDate(client.deadline)}</div>
-                </li>`;
-        });
-
-        notifLewat.forEach(client => {
-            itemsHtml += `
-                <li class="notif-item notif-lewat" onclick="chbNotifGoToDetail(${client.id})">
-                    <div class="notif-title"><i class='bx bxs-error-circle'></i> Deadline Lewat: ${chbEscape(client.project)}</div>
-                    <div class="notif-sub">${chbEscape(client.nama)} &bull; deadline ${chbFormatDate(client.deadline)}</div>
-                </li>`;
-        });
-
-        listEl.innerHTML = itemsHtml || '<li class="notif-empty">Tidak ada notifikasi</li>';
-
-        const totalNotif = notifBesok.length + notifLewat.length;
-        countEl.textContent = totalNotif;
-        countEl.style.display = totalNotif > 0 ? 'flex' : 'none';
-    }
-
-    function chbNotifGoToDetail(id) {
-        const menu = document.getElementById('notificationMenu');
-        if (menu) menu.classList.remove('show');
-        chbOpenDetailModal(id);
-    }
     function chbFormatDate(dateStr) {
         if (!dateStr) return '-'; const d = new Date(dateStr + 'T00:00:00'); if (isNaN(d)) return dateStr;
         return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
