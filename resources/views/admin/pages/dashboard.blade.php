@@ -278,6 +278,102 @@
         #content { width: calc(100% - 60px); left: 200px; }
         .galeri-preview-grid { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ============================================================
+       DARK MODE / THEME COMPATIBILITY
+       Mengikuti CSS variable yang dipakai halaman Kelola Layanan.
+       ============================================================ */
+    #content main .box-info-content .stat-card,
+    #content main .content-preview-grid > .preview-card,
+    .preview-table-wrap {
+        background: var(--light) !important;
+        color: var(--dark) !important;
+    }
+
+    #content main .box-info-content .stat-card .text h3,
+    #content main .section-heading,
+    #content main .content-preview-grid .head h3,
+    .preview-table .table-title {
+        color: var(--dark) !important;
+    }
+
+    #content main .box-info-content .stat-card .text p,
+    #content main .box-info-content .stat-card .text span.sub-stat,
+    .preview-table .table-desc,
+    .preview-table .table-sub,
+    .preview-table .muted,
+    .preview-table .no-col,
+    .preview-table .date-col,
+    .preview-empty {
+        color: var(--dark-grey) !important;
+    }
+
+    #content main .content-preview-grid .head .btn-lihat-semua {
+        color: var(--blue) !important;
+    }
+
+    #content main .content-preview-grid .head .btn-lihat-semua:hover {
+        color: var(--blue) !important;
+        filter: brightness(.9);
+    }
+
+    .preview-table-wrap {
+        border-color: var(--grey) !important;
+    }
+
+    .preview-table th,
+    .preview-table td {
+        border-bottom-color: var(--grey) !important;
+    }
+
+    .preview-table th {
+        background: var(--grey) !important;
+        color: var(--dark-grey) !important;
+    }
+
+    .preview-table tbody tr:hover {
+        background: var(--grey) !important;
+    }
+
+    .preview-table .service-thumb,
+    .preview-table .blog-thumb,
+    .preview-table .team-thumb {
+        background: var(--grey) !important;
+    }
+
+    .preview-card-body::-webkit-scrollbar-thumb {
+        background: var(--grey) !important;
+    }
+
+    /* Status agar tetap nyaman dibaca di mode gelap */
+    .preview-table .badge-lewat,
+    .badge-lewat {
+        background: var(--light-orange) !important;
+        color: var(--red) !important;
+    }
+
+    .preview-table .badge-aktif,
+    .badge-aktif {
+        background: var(--light-blue) !important;
+        color: var(--blue) !important;
+    }
+
+    /* Nomor proyek */
+    .preview-table .number-badge {
+        background: var(--light-blue) !important;
+        color: var(--blue) !important;
+    }
+
+    /* Thumbnail galeri */
+    .galeri-preview-item {
+        background: var(--grey) !important;
+    }
+
+    /* Kartu ringkasan: gunakan warna tema untuk 3 ikon utama */
+    .stat-icon-sky,
+    .stat-icon-blue { background: var(--light-blue) !important; color: var(--blue) !important; }
+    .stat-icon-yellow { background: var(--light-yellow) !important; color: var(--yellow) !important; }
+
 </style>
 @endpush
 

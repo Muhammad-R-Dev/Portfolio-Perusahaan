@@ -143,11 +143,48 @@
     }
 
     /* ========== PAGINATION ========== */
-    .pagination-container { display: flex; align-items: center; justify-content: flex-end; grid-gap: 8px; margin-top: 24px; }
-    .pagination-container button { border: none; background: #f1f5f9; color: #475569; width: 32px; height: 32px; border-radius: 8px; font-family: var(--poppins), sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-    .pagination-container button:hover:not(:disabled) { background: #e2e8f0; color: #1e293b; }
-    .pagination-container button.active { background: #3b82f6; color: #fff; }
-    .pagination-container button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .pagination-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        grid-gap: 6px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    /* Disamakan dengan pagination Kelola Layanan */
+    .pagination-container button {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 8px;
+        border: 1px solid var(--grey);
+        background: var(--light);
+        color: var(--dark);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .2s ease;
+        font-family: var(--poppins), sans-serif;
+    }
+
+    .pagination-container button:hover:not(:disabled) {
+        background: var(--grey);
+    }
+
+    .pagination-container button.active {
+        background: var(--blue) !important;
+        color: var(--light) !important;
+        border-color: var(--blue) !important;
+    }
+
+    .pagination-container button:disabled {
+        opacity: .4;
+        cursor: not-allowed;
+    }
 
     /* ========== MODAL LAYOUT & ANIMASI ========== */
     .chb-modal-overlay {
@@ -350,6 +387,219 @@
         .db-lightbox-btn.prev { left: 10px; }
         .db-lightbox-btn.next { right: 10px; }
     }
+
+    /* ============================================================
+       DARK MODE / THEME COMPATIBILITY
+       Mengikuti CSS variable yang dipakai halaman Kelola Layanan.
+       ============================================================ */
+    #content main .box-info li,
+    #content main .table-data > div {
+        background: var(--light) !important;
+        color: var(--dark) !important;
+    }
+
+    #content main .box-info li .text h3,
+    #content main .table-data .head h3,
+    #content main .table-data .client table td {
+        color: var(--dark) !important;
+    }
+
+    #content main .box-info li .text p,
+    #content main .table-data .client table td.desc-cell,
+    #content main .table-data .client table th,
+    #content main .table-data .head .search-box .bx {
+        color: var(--dark-grey) !important;
+    }
+
+    #content main .table-data .head .search-box,
+    #content main .table-data .head select.filter-select,
+    #content main .table-data .client table tr:hover,
+    #content main .table-data .head .btn-bulk-delete,
+    #content main .table-data .client table tr.row-selected,
+    #content main .table-data .client table th,
+    #content main .table-data .client table td {
+        border-color: var(--grey);
+    }
+
+    #content main .table-data .head .search-box,
+    #content main .table-data .head select.filter-select {
+        background: var(--grey) !important;
+        color: var(--dark) !important;
+    }
+
+    #content main .table-data .head .search-box input {
+        color: var(--dark) !important;
+    }
+
+    #content main .table-data .head .search-box input::placeholder {
+        color: var(--dark-grey) !important;
+    }
+
+    #content main .table-data .client table th {
+        border-bottom: 2px solid var(--grey) !important;
+        color: var(--dark-grey) !important;
+    }
+
+    #content main .table-data .client table td {
+        border-bottom: 1px solid var(--grey) !important;
+    }
+
+    #content main .table-data .client table tbody tr:hover {
+        background: var(--grey) !important;
+    }
+
+    #content main .table-data .client table tr.row-selected {
+        background: var(--light-blue) !important;
+    }
+
+    #content main .table-data .head .btn-select-mode.active {
+        background: var(--dark) !important;
+        color: var(--light) !important;
+    }
+
+    #content main .table-data .head .btn-bulk-delete {
+        background: var(--light-orange) !important;
+        color: var(--red) !important;
+    }
+
+    /* ---------- Modal utama ---------- */
+    .chb-modal,
+    .modal-full-header,
+    .chb-modal .field-card,
+    .detail-item {
+        background: var(--light) !important;
+        color: var(--dark) !important;
+    }
+
+    .chb-modal h3,
+    .modal-full-header h3,
+    .chb-modal .form-group label,
+    .detail-value,
+    .modal-box.modal-confirm h2,
+    .modal-import h2,
+    .result-errors li b,
+    .result-stats .stat b {
+        color: var(--dark) !important;
+    }
+
+    .modal-full-header,
+    .modal-full-body,
+    .chb-modal.modal-full .form-actions,
+    .detail-item,
+    .result-errors {
+        border-color: var(--grey) !important;
+    }
+
+    .modal-full-header .modal-subtitle,
+    .detail-label,
+    .modal-import .import-sub,
+    .modal-import .import-note,
+    .modal-box.modal-confirm p,
+    .result-stats .stat span,
+    .result-errors li {
+        color: var(--dark-grey) !important;
+    }
+
+    .chb-modal .form-group input,
+    .chb-modal .form-group select,
+    .chb-modal .form-group textarea {
+        background: var(--grey) !important;
+        border-color: var(--grey) !important;
+        color: var(--dark) !important;
+    }
+
+    .chb-modal .form-group input::placeholder,
+    .chb-modal .form-group textarea::placeholder {
+        color: var(--dark-grey) !important;
+    }
+
+    .editor-box {
+        background: var(--light) !important;
+        border-color: var(--grey) !important;
+    }
+
+    .editor-toolbar {
+        background: var(--grey) !important;
+        border-bottom-color: var(--grey) !important;
+    }
+
+    .editor-toolbar select {
+        background: var(--light) !important;
+        border-color: var(--grey) !important;
+        color: var(--dark) !important;
+    }
+
+    .editor-btn {
+        color: var(--dark-grey) !important;
+    }
+
+    .editor-btn:hover {
+        background: var(--grey) !important;
+        color: var(--dark) !important;
+    }
+
+    .editor-divider {
+        background: var(--grey) !important;
+    }
+
+    .editor-content {
+        color: var(--dark) !important;
+        background: var(--light) !important;
+    }
+
+    .img-frame .handle {
+        background: var(--light) !important;
+    }
+
+    .chb-modal .form-actions {
+        background: var(--light) !important;
+        border-top-color: var(--grey) !important;
+    }
+
+    .chb-modal .btn-cancel {
+        color: var(--dark-grey);
+    }
+
+    .chb-modal .btn-cancel:hover {
+        background: var(--grey) !important;
+        color: var(--dark) !important;
+    }
+
+    /* ---------- Modal hasil import ---------- */
+    .result-stats .stat {
+        background: var(--grey) !important;
+    }
+
+    .result-errors {
+        border-color: var(--grey) !important;
+    }
+
+    .result-errors li {
+        border-bottom-color: var(--grey) !important;
+    }
+
+    /* ---------- Import file ---------- */
+    .import-drop {
+        background: var(--grey) !important;
+        border-color: var(--grey) !important;
+        color: var(--dark-grey) !important;
+    }
+
+    .import-drop:hover,
+    .import-drop.is-over {
+        background: var(--light-blue) !important;
+        border-color: var(--blue) !important;
+    }
+
+    .import-drop strong {
+        color: var(--dark) !important;
+    }
+
+    .import-drop small,
+    .import-drop .bx {
+        color: var(--dark-grey) !important;
+    }
+
 </style>
 @endpush
 

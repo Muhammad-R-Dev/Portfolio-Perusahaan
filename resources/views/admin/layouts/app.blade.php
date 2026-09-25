@@ -183,7 +183,25 @@
             box-shadow: none !important;
         }
         #content main select:focus, #content main .table-data .head select.filter-select:focus { border-color: var(--blue) !important; }
-        body.dark #content main select, body.dark #content main .table-data .head select.filter-select { background-color: var(--grey) !important; color: var(--light) !important; border-color: #444 !important; }
+        body.dark #content main select,
+        body.dark #content main .table-data .head select.filter-select {
+            background-color: var(--grey) !important;
+            color: var(--dark) !important;
+            border-color: #444 !important;
+            color-scheme: dark;
+        }
+
+        /* Dropdown filter di Dark Mode: teks opsi harus tetap terlihat */
+        body.dark #content main select option {
+            background-color: var(--light) !important;
+            color: var(--dark) !important;
+        }
+
+        body.dark #content main select option:checked,
+        body.dark #content main select option:hover {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+        }
     </style>
 
     @stack('styles')
