@@ -678,8 +678,32 @@
         border-radius: var(--card-border-radius);
         overflow: hidden;
         box-shadow: var(--shadow-soft);
-        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease-out;
         cursor: pointer;
+        /* ===== Animasi scroll kartu: tersembunyi dulu, lalu muncul halus saat
+           discroll masuk viewport, dan halus lagi saat discroll keluar (dua arah).
+           Digabung dalam satu deklarasi transition supaya tidak menimpa
+           transition hover (transform/box-shadow) di bawah. ===== */
+        opacity: 0;
+        transform: translateY(34px);
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                    box-shadow 0.45s ease-out,
+                    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: opacity, transform;
+    }
+    /* Stagger halus per baris grid (4 kolom di desktop) supaya kartu tidak muncul serentak */
+    .projects-container .project-card:nth-child(4n+2) { transition-delay: 0.08s; }
+    .projects-container .project-card:nth-child(4n+3) { transition-delay: 0.16s; }
+    .projects-container .project-card:nth-child(4n+4) { transition-delay: 0.24s; }
+    .project-card.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .project-card {
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease-out;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
     }
     .project-card:hover {
         transform: translateY(-6px);
@@ -898,27 +922,40 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const revealEls = document.querySelectorAll('.reveal');
+    // --- Reveal saat discroll untuk kartu blog: muncul halus saat masuk viewport,
+    //     dan halus lagi saat keluar viewport -- baik discroll ke bawah maupun ke atas.
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            const revealEls = document.querySelectorAll('.reveal');
+            if (!revealEls.length) return;
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = 'translateY(0)';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        revealEls.forEach(el => {
-            el.style.opacity = 0;
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease-out';
-            observer.observe(el);
-        });
+            if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+                revealEls.forEach(el => el.classList.add('in-view'));
+                return;
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // toggle, bukan cuma add + unobserve, supaya animasi terus jalan
+                    // setiap kali kartu masuk/keluar viewport (scroll ke atas & ke bawah).
+                    entry.target.classList.toggle('in-view', entry.isIntersecting);
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+
+            revealEls.forEach(el => observer.observe(el));
+        } catch (err) {
+            // Jaring pengaman: kalau ada error tak terduga, jangan sampai kartu hilang permanen.
+            document.querySelectorAll('.reveal').forEach(el => el.classList.add('in-view'));
+            console.error('Reveal animation error:', err);
+        }
     });
+</script>
+@endpush
 
+@push('scripts')
+<script>
     /* ===== Search + Filter Blog ===== */
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('blogSearch');

@@ -72,7 +72,7 @@
         display: block;
         font-size: 0.7rem;
         font-weight: 400;
-        color: #2f6e4e;
+        color: #094356;
         letter-spacing: 0.08em;
         text-transform: uppercase;
     }
@@ -189,7 +189,7 @@
     }
 
     .bg-panel.first {
-      background-color: var(--color-primary, #9fd6b9);
+      background-color: var(--color-primary, #4FA8B5);
     }
 
     .bg-panel.second {
@@ -239,7 +239,7 @@
 
     .eyebrow {
       z-index: 1;
-      color: var(--color-primary, #2f6e4e);
+      color: var(--color-primary, #094356);
       text-transform: uppercase;
       font-family: monospace;
       font-weight: 400;
@@ -249,7 +249,7 @@
 
     .menu-link-bg {
       z-index: 0;
-      background-color: #2f6e4e;
+      background-color: #094356;
       transform-origin: 50% 100%;
       transform-style: preserve-3d;
       transition: transform .55s cubic-bezier(.65, .05, 0, 1);
@@ -292,9 +292,9 @@
       align-items: center;
       justify-content: center;
       background-color: #FFFFFF;
-      border: 1px solid rgba(11, 74, 86, 0.16);
-      color: #093B45;
-      box-shadow: 0 2px 10px rgba(9, 59, 69, 0.08);
+      border: 1px solid rgba(9, 67, 86, 0.16);
+      color: #094356;
+      box-shadow: 0 2px 10px rgba(9, 67, 86, 0.08);
       transition: background-color 0.3s ease, color 0.3s ease,
                   border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
       flex-shrink: 0;
@@ -308,11 +308,11 @@
 
     @media (hover: hover) {
       .social-icon-link:hover {
-        background-color: #0B4A56;
-        border-color: #0B4A56;
+        background-color: #094356;
+        border-color: #094356;
         color: #FFFFFF;
         transform: translateY(-3px);
-        box-shadow: 0 8px 18px rgba(9, 59, 69, 0.28);
+        box-shadow: 0 8px 18px rgba(9, 67, 86, 0.28);
       }
 
       .social-icon-link:hover svg {
@@ -407,7 +407,7 @@
         bottom: 0;
         width: 100%;
         height: 1px;
-        background: var(--color-primary, #2f6e4e);
+        background: var(--color-primary, #094356);
         transform-origin: right center;
         transform: scale(0, 1);
         transition: transform 0.4s cubic-bezier(.65, .05, 0, 1);
@@ -493,9 +493,9 @@
       width: 42px;
       height: 42px;
       border-radius: 14px;
-      border: 1px solid rgba(47, 110, 78, 0.18);
+      border: 1px solid rgba(9, 67, 86, 0.18);
       background: linear-gradient(135deg, #eaf6ef 0%, #ffffff 100%);
-      color: #2f6e4e;
+      color: #094356;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -516,14 +516,14 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: #2f6e4e;
+      background: #094356;
       transform: translateY(100%);
       transition: transform 0.35s cubic-bezier(.65, .05, 0, 1);
     }
     .back-button:hover {
       color: #ffffff;
-      border-color: #2f6e4e;
-      box-shadow: 0 8px 20px rgba(47, 110, 78, 0.3);
+      border-color: #094356;
+      box-shadow: 0 8px 20px rgba(9, 67, 86, 0.3);
     }
     .back-button:hover::before { transform: translateY(0); }
     .back-button:hover svg { transform: translateX(-3px); }
@@ -538,11 +538,11 @@
         border-radius: 10px;
         background: rgba(255, 255, 255, 0.55);
         backdrop-filter: blur(6px);
-        border-color: rgba(47, 110, 78, 0.12);
+        border-color: rgba(9, 67, 86, 0.12);
         box-shadow: none;
       }
       .back-button svg { width: 14px; height: 14px; }
-      .back-button:hover { box-shadow: 0 4px 12px rgba(47, 110, 78, 0.25); }
+      .back-button:hover { box-shadow: 0 4px 12px rgba(9, 67, 86, 0.25); }
     }
 </style>
 

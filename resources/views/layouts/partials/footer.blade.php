@@ -2,15 +2,15 @@
 /* ============ FOOTER CTA BANNER ============ */
 .footer-cta {
     position: relative;
-    background-color: #123C44;
+    background-color: #094356;
     background-image:
         linear-gradient(90deg,
-            #123C44 0%,
-            #123C44 32%,
-            rgba(18, 60, 68, 0.92) 45%,
-            rgba(18, 60, 68, 0.55) 62%,
-            rgba(18, 60, 68, 0.15) 80%,
-            rgba(18, 60, 68, 0) 100%
+            #094356 0%,
+            #094356 32%,
+            rgba(9, 67, 86, 0.92) 45%,
+            rgba(9, 67, 86, 0.55) 62%,
+            rgba(9, 67, 86, 0.15) 80%,
+            rgba(9, 67, 86, 0) 100%
         ),
         url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
     background-repeat: no-repeat;
@@ -51,7 +51,7 @@
     align-items: center;
     gap: 0.6rem;
     background: #ffffff;
-    color: #123C44;
+    color: #094356;
     font-weight: 600;
     font-size: 0.95rem;
     padding: 0.9rem 1.6rem;
@@ -90,9 +90,9 @@
     .footer-cta {
         background-image:
             linear-gradient(180deg,
-                rgba(18, 60, 68, 0.75) 0%,
-                rgba(18, 60, 68, 0.88) 40%,
-                #123C44 75%
+                rgba(9, 67, 86, 0.75) 0%,
+                rgba(9, 67, 86, 0.88) 40%,
+                #094356 75%
             ),
             url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
         background-position: center center;
@@ -142,7 +142,7 @@
 
 /* ============ FOOTER ============ */
 .custom-footer {
-    background-color: #123C44;
+    background-color: #094356;
     color: rgba(255, 255, 255, 0.7);
     padding: 3rem 2rem 2rem;
     font-family: 'Poppins', sans-serif;
@@ -215,7 +215,7 @@
 }
 .social-links a:hover {
     background: #ffffff;
-    color: #123C44;
+    color: #094356;
     transform: translateY(-4px);
     box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
 }

@@ -70,6 +70,42 @@ button, input, textarea, select {
   font-family: var(--font-sans);
 }
 
+/* ===== Animasi scroll global: teks & elemen lain muncul halus saat discroll,
+   dan halus juga saat "hilang lagi" ketika discroll ke atas.
+   Class .in-view ditambah/dilepas oleh JS lewat IntersectionObserver di bawah. ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(38px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* varian arah/gaya, opsional dipakai bareng .reveal */
+.reveal-scale { transform: translateY(24px) scale(0.94); }
+.reveal-scale.in-view { transform: translateY(0) scale(1); }
+.reveal-left { transform: translateX(-52px); }
+.reveal-left.in-view { transform: translateX(0); }
+.reveal-right { transform: translateX(52px); }
+.reveal-right.in-view { transform: translateX(0); }
+/* delay bertingkat supaya beberapa elemen tidak muncul serentak */
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+.reveal-delay-5 { transition-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-scale, .reveal-left, .reveal-right {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
 
 /* ===== Hero frame: bingkai terang di sekeliling gambar hero + efek inverted border-radius ===== */
 .hero-frame {
@@ -273,6 +309,18 @@ main {
   left: 0;
   pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 65%, rgba(0, 0, 0, 0.7));
+}
+
+/* lapisan gradien hitam di belakang judul hero, supaya teks lebih kontras & mudah dibaca */
+.hero-gradient {
+  position: absolute;
+  z-index: 8;
+  width: 100%;
+  height: 65%;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0.62) 100%);
 }
 
 /* tombol izin giroskop untuk iOS */
@@ -593,6 +641,11 @@ main {
 .faq-item:first-child {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
+.faq-item.reveal:nth-child(1) { transition-delay: 0s; }
+.faq-item.reveal:nth-child(2) { transition-delay: 0.08s; }
+.faq-item.reveal:nth-child(3) { transition-delay: 0.16s; }
+.faq-item.reveal:nth-child(4) { transition-delay: 0.24s; }
+.faq-item.reveal:nth-child(5) { transition-delay: 0.32s; }
 .faq-item.active {
   background: transparent;
   border-color: rgba(0, 0, 0, 0.1);
@@ -691,6 +744,9 @@ main {
 }
 
 /* media queries */
+@media (min-width: 1101px) {
+  .text { top: calc(50% - 6%); }
+}
 @media (max-width: 1100px) {
   .text h1 { font-size: 5.8rem; }
   .text h2 { font-size: 4.7rem; }
@@ -698,6 +754,8 @@ main {
 @media (max-width: 725px) {
   .text h1 { font-size: 5rem; line-height: 1.1; }
   .text h2 { font-size: 4.1rem; line-height: 1.1; }
+
+  .sun-rays { display: none; }
 
   .hero-frame { padding: 14px; }
   main { height: calc(100vh - 28px); border-radius: 24px; }
@@ -717,10 +775,22 @@ main {
 
   .bg-img { width: initial; height: 311.104%; }
   .fog-7 { width: initial; height: 211.2%; }
-  .mountain-10 { width: initial; height: 114.432%; }
+  /* Gedung ke-3 (mountain-10): dipindah ke pojok bawah supaya bagian gambar yang terpotong
+     tersembunyi di luar frame, bukan terlihat "menutupi" di tengah layar */
+  .mountain-10 {
+    width: initial;
+    height: 114.432%;
+    top: auto;
+    bottom: -6%;
+    left: auto;
+    right: -8%;
+  }
   .fog-6 { width: initial; height: 204%; }
-  .mountain-9 { width: initial; height: 51.44%; }
-  .mountain-8 { width: initial; height: 87.328%; }
+  /* Gedung ke-2 (mountain-9) disembunyikan di mobile */
+  .mountain-9 { display: none; }
+  /* Gedung ke-1 / paling depan (mountain-8, z-index tertinggi di antara gedung) disembunyikan di mobile
+     karena ukurannya terlalu besar & menutupi tampilan hero */
+  .mountain-8 { display: none; }
   .mountain-7 { width: initial; height: 49.888%; }
   .mountain-6 { width: initial; height: 42.688%; }
   .mountain-5 { width: initial; height: 59.776%; }
@@ -824,14 +894,14 @@ html #navHeader.scrolled {
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 1rem;
-  line-height: 1.2;
-  color: #094356;
+  line-height: 1.25;
+  color: #1A2024;
 }
 .brand-badge-home .brand-text span {
   display: block;
   font-size: 0.65rem;
-  font-weight: 400;
-  color: #2f6e4e;
+  font-weight: 500;
+  color: #7A8288;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -885,6 +955,7 @@ html #navHeader.scrolled {
 
 <main>
   <div class="vignette"></div>
+  <div class="hero-gradient"></div>
   <img src="img/bg.webp" loading="eager" data-speedx="0.3" data-distance="-200" data-rotation="0" data-speedy="0.38" data-speedz="0" alt="" class="parallax bg-img">
   <img src="img/fo_7.png" loading="lazy" data-speedx="0.27" data-distance="850" data-rotation="0" data-speedz="0" data-speedy="0.32" alt="" class="parallax fog-7">
   <img src="img/g10v2.webp" data-speedx="0.195" data-distance="1100" data-rotation="0" data-speedz="0" data-speedy="0.305" alt="" class="parallax mountain-10">
@@ -1283,13 +1354,13 @@ html #navHeader.scrolled {
       <div class="tab-layout-container">
         <div class="tab-container">
           <div class="tab-container-top">
-            <h1 class="tab-layout-heading reveal">PT Astabrata Teknologi</h1>
+            <h1 class="tab-layout-heading reveal reveal-delay-1">PT Astabrata Teknologi</h1>
           </div>
           <div class="tab-container-bottom">
             <div data-tabs="content-wrap" class="tab-content-wrap">
               <div data-tabs="content-item" class="tab-content-item active">
-                <h2 data-tabs-fade="" class="tab-content__heading">Solusi Digital Terpadu</h2>
-                <p data-tabs-fade="" class="content-p">
+                <h2 data-tabs-fade="" class="tab-content__heading reveal">Solusi Digital Terpadu</h2>
+                <p data-tabs-fade="" class="content-p reveal reveal-delay-1">
                   PT Astabrata Teknologi adalah perusahaan teknologi yang berfokus pada perancangan dan
                   pengembangan solusi digital untuk membantu bisnis tumbuh di era yang serba terhubung.
                   Kami memadukan strategi, desain, dan rekayasa perangkat lunak untuk menghadirkan produk
@@ -1304,7 +1375,7 @@ html #navHeader.scrolled {
 
     <!-- Gambar Tampil di Bawah Deskripsi pada Layar HP -->
     <div class="tab-layout-col">
-      <div data-tabs="visual-wrap" class="tab-visual-wrap">
+      <div data-tabs="visual-wrap" class="tab-visual-wrap reveal reveal-scale reveal-delay-2">
       <div data-tabs="visual-item" class="tab-visual-item active">
     <img src="{{ asset('image/beranda.jpeg') }}" loading="lazy" alt="Tim PT Astabrata Teknologi berkolaborasi" class="tab-image">
 </div>
@@ -1709,13 +1780,13 @@ if ('paintWorklet' in CSS) {
         text-transform: uppercase;
         font-family: var(--font-sans);
         font-weight: 800;
-        font-size: 2.6em;
+        font-size: 3.2em;
         letter-spacing: 1px;
         margin: 0;
         text-shadow: 7px 7px 16px #d2d2d2;
         overflow: hidden;
         line-height: 1.05;
-        height: 68px;
+        height: 96px;
         word-break: break-word;
     }
     .swiper-slide__block .main__title span { color: #ff2d71; }
@@ -1758,7 +1829,7 @@ if ('paintWorklet' in CSS) {
     }
     @media screen and (max-width: 1199px) {
         .swiper-slide__block .paragraphe {
-            margin-top: 8px;
+            margin-top: 4px;
         }
     }
     .swiper-slide__block .number {
@@ -1858,10 +1929,10 @@ if ('paintWorklet' in CSS) {
 @endpush
 
 <section class="layanan-container">
-    <div class="layanan-header reveal">
-        <span class="eyebrow">Apa yang Kami Kerjakan</span>
-        <h3>Layanan Kami</h3>
-        <p class="section-subtitle">
+    <div class="layanan-header">
+        <span class="eyebrow reveal">Apa yang Kami Kerjakan</span>
+        <h3 class="reveal reveal-delay-1">Layanan Kami</h3>
+        <p class="section-subtitle reveal reveal-delay-2">
             Dari perencanaan hingga peluncuran, kami menyediakan layanan teknologi yang menyeluruh
             untuk mendukung transformasi digital bisnis Anda.
         </p>
@@ -1953,18 +2024,30 @@ if ('paintWorklet' in CSS) {
             });
         }
 
-        // ===== Auto-fit ukuran font judul layanan: ukur tinggi asli teks, lalu kecilkan font sampai benar-benar muat (tidak dipotong) =====
+        // ===== Auto-fit ukuran font judul layanan: semua judul dipaksa memakai SATU ukuran font yang sama =====
+        // (sebelumnya tiap judul dikecilkan sendiri-sendiri sesuai panjang teksnya, sehingga judul pertama
+        // terlihat besar sementara judul lain mengecil karena teksnya lebih panjang; sekarang dicari ukuran
+        // terkecil yang aman untuk judul terpanjang, lalu ukuran itu diterapkan ke SEMUA judul supaya seragam)
         function autoFitLayananTitles() {
             var minFontSizePx = 14; // batas paling kecil supaya tetap terbaca
+            var titles = document.querySelectorAll('.swiper-slide__block .main__title');
+            if (!titles.length) return;
 
-            document.querySelectorAll('.swiper-slide__block .main__title').forEach(function (el) {
-                // Reset dulu ke ukuran default dari CSS sebelum mengukur ulang
+            // Reset dulu ke ukuran & tinggi default dari CSS sebelum mengukur ulang
+            titles.forEach(function (el) {
                 el.style.fontSize = '';
+                el.style.height = '';
+                el.style.overflow = '';
+            });
 
-                var maxHeight = el.clientHeight; // tinggi kotak judul yang sudah tetap (diatur lewat CSS per breakpoint)
+            var baseFontSize = parseFloat(window.getComputedStyle(titles[0]).fontSize);
+            var smallestFit = baseFontSize;
+
+            titles.forEach(function (el) {
+                var maxHeight = el.clientHeight; // tinggi kotak judul bawaan CSS (dipakai sebagai batas ukur saja)
                 if (!maxHeight) return;
 
-                var fontSize = parseFloat(window.getComputedStyle(el).fontSize);
+                var fontSize = baseFontSize;
                 el.style.fontSize = fontSize + 'px';
 
                 var guard = 60; // pengaman supaya loop tidak berjalan tanpa henti
@@ -1973,6 +2056,17 @@ if ('paintWorklet' in CSS) {
                     el.style.fontSize = fontSize + 'px';
                     guard--;
                 }
+
+                if (fontSize < smallestFit) smallestFit = fontSize;
+            });
+
+            // Terapkan satu ukuran font yang sama ke semua judul, lalu lepaskan tinggi tetapnya
+            // supaya kotak judul menyusut mengikuti tinggi teks asli (tidak menyisakan ruang kosong
+            // di atas deskripsi).
+            titles.forEach(function (el) {
+                el.style.fontSize = smallestFit + 'px';
+                el.style.height = 'auto';
+                el.style.overflow = 'visible';
             });
         }
 
@@ -1992,14 +2086,14 @@ if ('paintWorklet' in CSS) {
     <div class="faq-layout">
       <div class="faq-text">
         <span class="faq-eyebrow reveal">FAQ</span>
-        <h3 class="reveal">Pertanyaan Umum</h3>
-        <p class="section-subtitle reveal faq-desc">
+        <h3 class="reveal reveal-delay-1">Pertanyaan Umum</h3>
+        <p class="section-subtitle reveal reveal-delay-2 faq-desc">
           Beberapa hal yang paling sering ditanyakan calon klien sebelum memulai proyek bersama kami.
         </p>
       </div>
 
-      <div class="faq-list reveal">
-        <div class="faq-item active">
+      <div class="faq-list">
+        <div class="faq-item active reveal">
           <button class="faq-question" type="button" aria-expanded="true">
             <span>Berapa lama estimasi waktu pengerjaan proyek?</span>
             <span class="faq-icon">
@@ -2017,7 +2111,7 @@ if ('paintWorklet' in CSS) {
           </div>
         </div>
 
-        <div class="faq-item">
+        <div class="faq-item reveal">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Bagaimana sistem pembayarannya?</span>
             <span class="faq-icon">
@@ -2034,7 +2128,7 @@ if ('paintWorklet' in CSS) {
           </div>
         </div>
 
-        <div class="faq-item">
+        <div class="faq-item reveal">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Apakah tersedia revisi setelah pengerjaan?</span>
             <span class="faq-icon">
@@ -2051,7 +2145,7 @@ if ('paintWorklet' in CSS) {
           </div>
         </div>
 
-        <div class="faq-item">
+        <div class="faq-item reveal">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Apakah ada garansi atau dukungan setelah proyek selesai?</span>
             <span class="faq-icon">
@@ -2068,7 +2162,7 @@ if ('paintWorklet' in CSS) {
           </div>
         </div>
 
-        <div class="faq-item">
+        <div class="faq-item reveal">
           <button class="faq-question" type="button" aria-expanded="false">
             <span>Bagaimana cara memulai proyek dengan kami?</span>
             <span class="faq-icon">
@@ -2166,6 +2260,7 @@ if ('paintWorklet' in CSS) {
 
   // --- Mobile: sentuh & geser (touch drag) ---
   let touchActive = false;
+  const touchSensitivity = 2.2; // makin besar angka ini, makin sensitif efek parallax terhadap geseran jari
 
   main.addEventListener("touchstart", (e) => {
     touchActive = true;
@@ -2174,9 +2269,13 @@ if ('paintWorklet' in CSS) {
   main.addEventListener("touchmove", (e) => {
     if (isAnimating() || !touchActive) return;
     const touch = e.touches[0];
-    xValue = touch.clientX - window.innerWidth / 2;
-    yValue = touch.clientY - window.innerHeight / 2;
-    rotateDegree = (xValue / (window.innerWidth / 2)) * 20;
+    const halfW = window.innerWidth / 2;
+    const halfH = window.innerHeight / 2;
+    // Kalikan pergeseran jari dengan faktor sensitivitas, lalu batasi (clamp) supaya efeknya
+    // tetap proporsional dan tidak melebihi batas transform aslinya walau geseran jari kecil.
+    xValue = Math.max(-halfW, Math.min(halfW, (touch.clientX - halfW) * touchSensitivity));
+    yValue = Math.max(-halfH, Math.min(halfH, (touch.clientY - halfH) * touchSensitivity));
+    rotateDegree = (xValue / halfW) * 20;
     update(touch.clientX);
   }, { passive: true });
 
@@ -2254,19 +2353,47 @@ if ('paintWorklet' in CSS) {
     opacity: 0,
     duration: 1.5
   }, "3");
+})();
+</script>
+@endpush
 
-  // --- Reveal saat discroll (section penjelasan) ---
-  const revealEls = document.querySelectorAll(".reveal");
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("in-view");
-        observer.unobserve(entry.target);
-      }
+@push('scripts')
+<script>
+(function () {
+  // --- Reveal saat discroll: teks & elemen lain muncul halus saat masuk layar,
+  //     dan halus juga saat keluar layar lagi -- baik scroll ke bawah maupun ke atas.
+  // Script ini SENGAJA dipisah dari script parallax/GSAP di atas, supaya kalau ada
+  // error di script lain, animasi reveal tetap jalan dan konten tidak "hilang" (opacity 0 permanen).
+  try {
+    const revealEls = document.querySelectorAll(".reveal");
+    if (!revealEls.length) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+      // Kalau user memilih mengurangi animasi, atau browser tidak dukung
+      // IntersectionObserver, langsung tampilkan saja tanpa animasi.
+      revealEls.forEach(el => el.classList.add("in-view"));
+      return;
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        // toggle, bukan cuma add + unobserve, supaya animasi terus jalan
+        // setiap kali elemen masuk/keluar viewport (scroll ke atas & ke bawah).
+        entry.target.classList.toggle("in-view", entry.isIntersecting);
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: "0px 0px -8% 0px"
     });
-  }, { threshold: 0.15 });
 
-  revealEls.forEach(el => observer.observe(el));
+    revealEls.forEach(el => revealObserver.observe(el));
+  } catch (err) {
+    // Jaring pengaman terakhir: kalau ada error tak terduga, jangan sampai konten hilang.
+    document.querySelectorAll(".reveal").forEach(el => el.classList.add("in-view"));
+    console.error("Reveal animation error:", err);
+  }
 })();
 </script>
 @endpush
