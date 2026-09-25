@@ -508,6 +508,71 @@
 			color: var(--light);
 		}
 
+		/* ============================================================
+		   DARK MODE - TOMBOL TETAP KONTRAS (TIDAK PUTIH POLOS)
+		   ============================================================ */
+
+		/* Tombol "Tambah Foto" tetap biru, tulisan putih */
+		body.dark #content main .head-title .btn-download,
+		body.dark #content main .head-title .btn-download:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Edit" di tabel & di kartu galeri tetap kontras */
+		body.dark #content main .gallery-table .table-actions .btn-edit,
+		body.dark #content main .gallery-table .table-actions .btn-edit:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+		body.dark #content main .gallery-card .thumb .card-actions .btn-edit {
+			background: #fff !important;
+			color: var(--blue) !important;
+		}
+		body.dark #content main .gallery-card .thumb .card-actions .btn-delete {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Hapus" (mode pilih & hapus terpilih) tetap kontras */
+		body.dark #content main .table-section .btn-select-mode {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+		/* Tombol berubah jadi "Batal" saat mode pilih aktif -> warna kuning */
+		body.dark #content main .table-section .btn-select-mode.active {
+			background: var(--yellow) !important;
+			color: #1a1a1a !important;
+		}
+		/* Tombol "Hapus (n)" di sebelahnya -> merah polos, tanpa efek hover ganti warna lagi */
+		body.dark #content main .table-section .btn-bulk-delete,
+		body.dark #content main .table-section .btn-bulk-delete:hover:not(:disabled) {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Batal" tetap merah, tulisan putih */
+		body.dark #galleryModal .btn-cancel,
+		body.dark #galleryModal .btn-cancel:hover {
+			background: var(--red) !important;
+			color: #fff !important;
+			filter: none !important;
+		}
+
+		/* Tombol "Simpan" tetap biru, tulisan putih */
+		body.dark .modal-box .btn-save,
+		body.dark .modal-box .btn-save:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Ya, Hapus" di modal konfirmasi tetap merah, tulisan putih */
+		body.dark .modal-box.modal-confirm .btn-danger,
+		body.dark .modal-box.modal-confirm .btn-danger:hover {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+
 		#content main .menu, #content nav .menu {
 			display: none;
 			list-style-type: none;

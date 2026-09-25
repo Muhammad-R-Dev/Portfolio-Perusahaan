@@ -93,21 +93,21 @@
     #content main .table-data .client table th:nth-child(8) { width: 230px; }
     #content main .table-data .client table th#chbAksiHeader { display: flex; align-items: center; justify-content: center; text-align: center; grid-gap: 8px; }
     #content main .table-data .client table th#chbAksiHeader.select-mode-header {
-        display: grid;
-        grid-template-columns: 1fr 16px 1fr;
+        display: flex;
         align-items: center;
+        justify-content: flex-start;
+        grid-gap: 8px;
         text-align: left;
     }
     #content main .table-data .client table th#chbAksiHeader.select-mode-header #chbSelectAll {
-        grid-column: 2;
         margin: 0;
+        flex-shrink: 0;
     }
     #content main .table-data .client table th#chbAksiHeader.select-mode-header .chb-select-label {
-        grid-column: 3;
-        margin-left: 8px;
+        margin-left: 0;
         white-space: nowrap;
     }
-    #content main .table-data .client table td.select-cell { text-align: center; }
+    #content main .table-data .client table td.select-cell { text-align: left; }
     #content main .table-data .client table th input[type="checkbox"],
     #content main .table-data .client table td.select-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6; }
     #content main .table-data .client table tr.row-selected { background: #eff6ff; }
@@ -590,6 +590,85 @@
         color: #fff !important;
         filter: none !important;
         box-shadow: none !important;
+    }
+
+    /* ============================================================
+       DARK MODE - TOMBOL TETAP KONTRAS (TIDAK PUTIH POLOS)
+       ============================================================ */
+
+    /* Tombol "Tambah Client" tetap biru, tulisan putih (Export & Import dikecualikan, punya warna sendiri) */
+    body.dark #content main .head-title .btn-download:not(.btn-export):not(.btn-import),
+    body.dark #content main .head-title .btn-download:not(.btn-export):not(.btn-import):hover {
+        background: #3b82f6 !important;
+        color: #fff !important;
+    }
+
+    /* Tombol Export tetap hijau, Import tetap oranye walau dark mode aktif */
+    body.dark #content main .head-title .btn-export {
+        background: #10B981 !important;
+        color: #fff !important;
+    }
+    body.dark #content main .head-title .btn-export:hover {
+        background: #059669 !important;
+    }
+    body.dark #content main .head-title .btn-import {
+        background: #F59E0B !important;
+        color: #fff !important;
+    }
+    body.dark #content main .head-title .btn-import:hover {
+        background: #D97706 !important;
+    }
+
+    /* Tombol "Edit" / "Hapus" / "Detail" di tabel client tetap kontras */
+    body.dark #content main .table-data .client table .btn-detail {
+        background: #3b82f6 !important;
+        color: #fff !important;
+    }
+    body.dark #content main .table-data .client table .btn-edit {
+        background: #f59e0b !important;
+        color: #fff !important;
+    }
+    body.dark #content main .table-data .client table .btn-delete {
+        background: #ef4444 !important;
+        color: #fff !important;
+    }
+
+    /* Tombol "Hapus" (mode pilih) tetap merah */
+    body.dark #content main .table-data .head .btn-select-mode {
+        background: #ef4444 !important;
+        color: #fff !important;
+    }
+    /* Tombol berubah jadi "Batal" saat mode pilih aktif -> warna kuning */
+    body.dark #content main .table-data .head .btn-select-mode.active {
+        background: #f59e0b !important;
+        color: #1a1a1a !important;
+    }
+    /* Tombol "Hapus (n)" di sebelahnya -> merah polos, tanpa efek hover ganti warna lagi */
+    body.dark #content main .table-data .head .btn-bulk-delete,
+    body.dark #content main .table-data .head .btn-bulk-delete:hover:not(:disabled) {
+        background: #ef4444 !important;
+        color: #fff !important;
+    }
+
+    /* Tombol "Batal" di modal (form tambah/edit, konfirmasi, dll) tetap merah, tulisan putih */
+    body.dark .modal-box .btn-cancel,
+    body.dark .modal-box .btn-cancel:hover {
+        background: var(--red) !important;
+        color: #fff !important;
+    }
+
+    /* Tombol "Simpan" / "Ya, Edit dan Simpan" / "OK" tetap biru, tulisan putih */
+    body.dark .modal-box .btn-save,
+    body.dark .modal-box .btn-save:hover {
+        background: var(--blue) !important;
+        color: #fff !important;
+    }
+
+    /* Tombol "Ya, Hapus" tetap merah, tulisan putih */
+    body.dark .modal-box .btn-danger,
+    body.dark .modal-box .btn-danger:hover {
+        background: var(--red) !important;
+        color: #fff !important;
     }
 
     /* ---------- Modal hasil import ---------- */

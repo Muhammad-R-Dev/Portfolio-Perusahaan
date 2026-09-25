@@ -249,6 +249,36 @@
 			color: var(--light);
 		}
 
+		/* ============================================================
+		   DARK MODE - TOMBOL TETAP KONTRAS (TIDAK PUTIH POLOS)
+		   ============================================================ */
+
+		/* Tombol "Simpan" (update username/password) tetap biru, tulisan putih */
+		body.dark #content main .btn-save,
+		body.dark #content main .btn-save:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+		body.dark #content main .btn-save.outline {
+			background: transparent !important;
+			border-color: var(--dark-grey) !important;
+			color: var(--dark) !important;
+		}
+
+		/* Tombol "Batal" di modal konfirmasi tetap kontras */
+		body.dark .modal-box .btn-cancel,
+		body.dark .modal-box .btn-cancel:hover {
+			background: var(--grey) !important;
+			color: var(--dark) !important;
+		}
+
+		/* Tombol "Ya, Lanjutkan" / "OK" tetap biru, tulisan putih */
+		body.dark .modal-box .btn-confirm,
+		body.dark .modal-box .btn-confirm:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+
 		#content main .alert {
 			padding: 14px 18px;
 			border-radius: 10px;

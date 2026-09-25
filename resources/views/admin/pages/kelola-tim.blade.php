@@ -632,6 +632,63 @@
             color: var(--light);
         }
 
+        /* ============================================================
+           DARK MODE - TOMBOL TETAP KONTRAS (TIDAK PUTIH POLOS)
+           ============================================================ */
+
+        /* Tombol "Tambah Tim" tetap biru, tulisan putih */
+        body.dark #content main .head-title .btn-download,
+        body.dark #content main .head-title .btn-download:hover {
+            background: var(--blue) !important;
+            color: #fff !important;
+        }
+
+        /* Tombol "Edit" di tabel tetap biru, tulisan putih */
+        body.dark #content main .table-data .order table td.col-aksi .btn-edit,
+        body.dark #content main .table-data .order table td.col-aksi .btn-edit:hover {
+            background: var(--blue) !important;
+            color: #fff !important;
+        }
+
+        /* Tombol "Hapus" (mode pilih & hapus terpilih) tetap kontras */
+        body.dark #content main .table-data .head .btn-select-mode {
+            background: var(--red) !important;
+            color: #fff !important;
+        }
+        /* Tombol berubah jadi "Batal" saat mode pilih aktif -> warna kuning */
+        body.dark #content main .table-data .head .btn-select-mode.active {
+            background: var(--yellow) !important;
+            color: #1a1a1a !important;
+        }
+        /* Tombol "Hapus (n)" di sebelahnya -> merah polos, tanpa efek hover ganti warna lagi */
+        body.dark #content main .table-data .head .btn-bulk-delete,
+        body.dark #content main .table-data .head .btn-bulk-delete:hover:not(:disabled) {
+            background: var(--red) !important;
+            color: #fff !important;
+        }
+
+        /* Tombol "Batal" tetap merah, tulisan putih */
+        body.dark .modal-box .btn-cancel,
+        body.dark .modal-box .btn-cancel:hover {
+            background: var(--red) !important;
+            color: #fff !important;
+            filter: none !important;
+        }
+
+        /* Tombol "Simpan" tetap biru, tulisan putih */
+        body.dark .modal-box .btn-save,
+        body.dark .modal-box .btn-save:hover {
+            background: var(--blue) !important;
+            color: #fff !important;
+        }
+
+        /* Tombol "Ya, Hapus" di modal konfirmasi tetap merah, tulisan putih */
+        body.dark .modal-box .btn-danger,
+        body.dark .modal-box .btn-danger:hover {
+            background: var(--red) !important;
+            color: #fff !important;
+        }
+
         /* MODAL KONFIRMASI & NOTIFIKASI */
         .modal-box.modal-confirm {
             max-width: 380px;

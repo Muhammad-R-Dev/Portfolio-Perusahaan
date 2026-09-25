@@ -870,6 +870,55 @@
 			box-shadow: none !important;
 		}
 
+		/* Tombol Simpan tetap biru dengan tulisan putih, tidak hilang di dark mode */
+		body.dark #blogModal .btn-save,
+		body.dark #blogModal .btn-save:hover,
+		body.dark #blogModal .btn-save:focus,
+		body.dark #blogModal .btn-save:active {
+			background: var(--blue) !important;
+			color: #fff !important;
+			filter: none !important;
+			box-shadow: none !important;
+		}
+
+		/* Tombol "Tambah Blog" tetap biru dengan tulisan putih di dark mode */
+		body.dark #content main .head-title .btn-download,
+		body.dark #content main .head-title .btn-download:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Edit" di tabel tetap biru dengan tulisan putih di dark mode */
+		body.dark #content main .table-data .order table td.col-aksi .btn-edit,
+		body.dark #content main .table-data .order table td.col-aksi .btn-edit:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Hapus" (mode pilih & hapus terpilih) tetap kontras di dark mode */
+		body.dark #content main .table-data .head .btn-select-mode {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+		/* Tombol berubah jadi "Batal" saat mode pilih aktif -> warna kuning */
+		body.dark #content main .table-data .head .btn-select-mode.active {
+			background: var(--yellow) !important;
+			color: #1a1a1a !important;
+		}
+		/* Tombol "Hapus (n)" di sebelahnya -> merah polos, tanpa efek hover ganti warna lagi */
+		body.dark #content main .table-data .head .btn-bulk-delete,
+		body.dark #content main .table-data .head .btn-bulk-delete:hover:not(:disabled) {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol "Ya, Hapus" di modal konfirmasi hapus tetap kontras di dark mode */
+		body.dark .modal-box.modal-confirm .btn-danger,
+		body.dark .modal-box.modal-confirm .btn-danger:hover {
+			background: var(--red) !important;
+			color: #fff !important;
+		}
+
 </style>
 @endpush
 
