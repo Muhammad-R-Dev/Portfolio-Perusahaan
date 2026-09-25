@@ -657,10 +657,6 @@
                                         data-foto="{{ $team->foto_url }}"
                                         data-url="{{ route('admin.kelola-tim.update', $team->id) }}"
                                         onclick="openModal('edit', this)">Edit</button>
-                                    <form id="deleteFormTim{{ $team->id }}" action="{{ route('admin.kelola-tim.destroy', $team->id) }}" method="POST" style="display:none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
                                 </td>
                             </tr>
                             @empty
@@ -673,6 +669,18 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    <!-- Form hapus diletakkan TERPISAH dari tabel (bukan di dalam td.col-aksi) -->
+                    <!-- agar tidak ikut terhapus saat kolom Aksi diganti jadi checkbox pada mode pilih -->
+                    <div id="timDeleteForms" style="display:none;">
+                        @foreach($teams as $team)
+                        <form id="deleteFormTim{{ $team->id }}" action="{{ route('admin.kelola-tim.destroy', $team->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                        @endforeach
+                    </div>
+
                     <div class="table-pagination" id="timPagination"></div>
                 </div>
             </div>
