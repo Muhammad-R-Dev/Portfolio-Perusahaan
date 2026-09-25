@@ -82,21 +82,21 @@
                         <span class="icon"><i class="fa-solid fa-phone"></i></span>
                         <div>
                             <strong>Telepon</strong>
-                            <a href="tel:+6287762166795">+62 877-6216-6795</a>
+                            <a href="tel:+62882006644656">+62 882-0066-44656</a>
                         </div>
                     </li>
                     <li>
                         <span class="icon"><i class="fa-solid fa-envelope"></i></span>
                         <div>
                             <strong>Email</strong>
-                            <a href="mailto:hello@astabrata.tech">hello@astabrata.tech</a>
+                            <a href="mailto:astabratamgl@gmail.com">astabratamgl@gmail.com</a>
                         </div>
                     </li>
                     <li>
                         <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
                         <div>
                             <strong>Alamat</strong>
-                            <span>Jl. Teknologi No. 88, Kawasan Digital Raya,<br>Jakarta Selatan, Indonesia 12345</span>
+                            <span>Jl.STPP karanglo, Area Sawah/Kebun, Glagahombo,Tegalrejo, Magelang, Jawa Tengah 56192</span>
                         </div>
                     </li>
                 </ul>
