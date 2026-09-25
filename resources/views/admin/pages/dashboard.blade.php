@@ -132,7 +132,122 @@
     .mini-preview-item .info .tanggal { font-size: 11px; color: #94a3b8; }
     .preview-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
 
+    /* ========== TABEL PREVIEW ========== */
+    .preview-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+    }
+    .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    .preview-table th,
+    .preview-table td {
+        padding: 10px 10px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        vertical-align: middle;
+        font-size: 12px;
+    }
+    .preview-table th {
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .preview-table tbody tr:last-child td { border-bottom: none; }
+    .preview-table tbody tr { transition: background .2s ease; }
+    .preview-table tbody tr:hover { background: #f8fafc; }
+    .preview-table .no-col { width: 44px; text-align: center; color: #94a3b8; font-weight: 700; }
+    .preview-table .image-col { width: 58px; }
+    .preview-table .status-col { width: 118px; }
+    .preview-table .date-col { width: 88px; }
+    .preview-table .team-pos-col { width: 110px; }
+    .preview-table .project-client-col { width: 34%; }
+    .preview-table .service-thumb,
+    .preview-table .blog-thumb,
+    .preview-table .team-thumb {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        object-fit: cover;
+        display: block;
+        background: #f1f5f9;
+    }
+    .preview-table .team-thumb { border-radius: 50%; }
+    .preview-table .table-title {
+        display: block;
+        font-size: 12.5px;
+        line-height: 1.35;
+        font-weight: 700;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .preview-table .table-desc,
+    .preview-table .table-sub {
+        display: block;
+        margin-top: 2px;
+        color: #64748b;
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .preview-table .tag {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        padding: 3px 7px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .preview-table .tag-kategori { background: #ede9fe; color: #7c3aed; }
+    .preview-table .tag-divisi { background: #d1fae5; color: #059669; }
+    .preview-table .badge-lewat,
+    .preview-table .badge-aktif { margin-top: 0; }
+    .preview-table .badge-aktif,
+    .preview-table .badge-lewat {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+    .preview-table .muted { color: #94a3b8; font-size: 11px; }
+    .preview-table .number-badge {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 11px;
+        font-weight: 800;
+    }
+    .preview-card-body.table-body { max-height: 340px; padding-right: 0; }
+    .preview-card--wide .preview-card-body.table-body { max-height: 420px; }
+    @media screen and (max-width: 1200px) {
+        .preview-table { min-width: 520px; }
+        .preview-card--top .preview-table { min-width: 450px; }
+    }
+
     /* Galeri terbaru: grid thumbnail */
+
     .galeri-preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-gap: 10px; }
     /* Kartu galeri lebar: thumbnail dibuat lebih besar, jumlah kolom menyesuaikan lebar kartu */
     .preview-card--wide .galeri-preview-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); grid-gap: 14px; }
@@ -238,49 +353,53 @@
                     Lihat Semua <i class='bx bx-right-arrow-alt'></i>
                 </a>
             </div>
-            <div class="preview-card-body">
-                <div class="mini-preview-list">
-                    @forelse($recentLayanan as $layanan)
-                        @php
-                            $layananImageUrl = 'https://placehold.co/100x100/png';
-
-                            if (!empty($layanan->image)) {
-                                $imagePath = ltrim(trim($layanan->image), '/');
-
-                                if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
-                                    // Jika database menyimpan URL lengkap.
-                                    $layananImageUrl = $imagePath;
-                                } elseif (file_exists(public_path($imagePath))) {
-                                    // Jika database menyimpan path seperti images/services/nama.jpg.
-                                    $layananImageUrl = asset($imagePath);
-                                } elseif (file_exists(public_path('images/services/' . $imagePath))) {
-                                    // Jika file berada di public/images/services dan DB hanya menyimpan nama file.
-                                    $layananImageUrl = asset('images/services/' . $imagePath);
-                                } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists($imagePath)) {
-                                    // Jika upload menggunakan Laravel Storage (storage/app/public).
-                                    $layananImageUrl = \Illuminate\Support\Facades\Storage::url($imagePath);
-                                } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists('services/' . $imagePath)) {
-                                    // Jika DB hanya menyimpan nama file, sedangkan file ada di storage/app/public/services.
-                                    $layananImageUrl = \Illuminate\Support\Facades\Storage::url('services/' . $imagePath);
-                                }
-                            }
-                        @endphp
-                        <div class="mini-preview-item">
-                            <img
-                                class="thumb"
-                                src="{{ $layananImageUrl }}"
-                                alt="{{ $layanan->title }}"
-                                loading="lazy"
-                                onerror="this.onerror=null;this.src='https://placehold.co/100x100/png';"
-                            >
-                            <div class="info">
-                                <p class="judul">{{ $layanan->title }}</p>
-                                <div class="sub">{{ \Illuminate\Support\Str::limit($layanan->description, 40) }}</div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="preview-empty">Belum ada data layanan.</div>
-                    @endforelse
+            <div class="preview-card-body table-body">
+                <div class="preview-table-wrap">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th class="no-col">No</th>
+                                <th class="image-col">Foto</th>
+                                <th>Layanan</th>
+                                <th>Deskripsi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentLayanan as $index => $layanan)
+                                @php
+                                    $layananImageUrl = 'https://placehold.co/100x100/png';
+                                    if (!empty($layanan->image)) {
+                                        $imagePath = ltrim(trim($layanan->image), '/');
+                                        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                                            $layananImageUrl = $imagePath;
+                                        } elseif (file_exists(public_path($imagePath))) {
+                                            $layananImageUrl = asset($imagePath);
+                                        } elseif (file_exists(public_path('images/services/' . $imagePath))) {
+                                            $layananImageUrl = asset('images/services/' . $imagePath);
+                                        } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists($imagePath)) {
+                                            $layananImageUrl = \Illuminate\Support\Facades\Storage::url($imagePath);
+                                        } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists('services/' . $imagePath)) {
+                                            $layananImageUrl = \Illuminate\Support\Facades\Storage::url('services/' . $imagePath);
+                                        }
+                                    }
+                                @endphp
+                                <tr>
+                                    <td class="no-col">{{ $index + 1 }}</td>
+                                    <td class="image-col">
+                                        <img class="service-thumb" src="{{ $layananImageUrl }}" alt="{{ $layanan->title }}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/png';">
+                                    </td>
+                                    <td>
+                                        <span class="table-title">{{ $layanan->title }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="table-desc">{{ \Illuminate\Support\Str::limit($layanan->description, 45) }}</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="preview-empty">Belum ada data layanan.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -293,22 +412,34 @@
                     Lihat Semua <i class='bx bx-right-arrow-alt'></i>
                 </a>
             </div>
-            <div class="preview-card-body">
-                <div class="mini-preview-list">
-                    @forelse($recentBlogs as $blog)
-                        <div class="mini-preview-item">
-                            <img class="thumb" src="{{ $blog->gambar ? asset('storage/'.$blog->gambar) : 'https://placehold.co/100x100/png' }}" alt="{{ $blog->judul }}">
-                            <div class="info">
-                                <p class="judul">{{ $blog->judul }}</p>
-                                <div class="meta">
-                                    <span class="tag tag-kategori">{{ $blog->kategori }}</span>
-                                    <span class="tanggal">{{ $blog->created_at->format('d M Y') }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="preview-empty">Belum ada artikel blog.</div>
-                    @endforelse
+            <div class="preview-card-body table-body">
+                <div class="preview-table-wrap">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th class="no-col">No</th>
+                                <th class="image-col">Foto</th>
+                                <th>Judul</th>
+                                <th>Kategori</th>
+                                <th class="date-col">Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentBlogs as $index => $blog)
+                                <tr>
+                                    <td class="no-col">{{ $index + 1 }}</td>
+                                    <td class="image-col">
+                                        <img class="blog-thumb" src="{{ $blog->gambar ? asset('storage/'.$blog->gambar) : 'https://placehold.co/100x100/png' }}" alt="{{ $blog->judul }}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/png';">
+                                    </td>
+                                    <td><span class="table-title">{{ $blog->judul }}</span></td>
+                                    <td><span class="tag tag-kategori">{{ $blog->kategori }}</span></td>
+                                    <td><span class="muted">{{ $blog->created_at->format('d M Y') }}</span></td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="preview-empty">Belum ada artikel blog.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -321,30 +452,40 @@
                     Lihat Semua <i class='bx bx-right-arrow-alt'></i>
                 </a>
             </div>
-            <div class="preview-card-body">
-                <div class="mini-preview-list">
-                    @forelse($recentTeam as $team)
-                        <div class="mini-preview-item">
-                            <span class="avatar">
-                                @if($team->foto_url)
-                                    <img src="{{ $team->foto_url }}" alt="{{ $team->nama }}">
-                                @else
-                                    {{ strtoupper(substr($team->nama, 0, 1)) }}
-                                @endif
-                            </span>
-                            <div class="info">
-                                <p class="judul">{{ $team->nama }}</p>
-                                <div class="meta">
-                                    <span class="sub">{{ $team->jabatan }}</span>
-                                    @if($team->divisi)
-                                        <span class="tag tag-divisi">{{ $team->divisi }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="preview-empty">Belum ada anggota tim.</div>
-                    @endforelse
+            <div class="preview-card-body table-body">
+                <div class="preview-table-wrap">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th class="no-col">No</th>
+                                <th class="image-col">Foto</th>
+                                <th>Nama</th>
+                                <th>Jabatan</th>
+                                <th>Divisi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentTeam as $index => $team)
+                                <tr>
+                                    <td class="no-col">{{ $index + 1 }}</td>
+                                    <td class="image-col">
+                                        <img class="team-thumb" src="{{ $team->foto_url ?: 'https://placehold.co/100x100/png' }}" alt="{{ $team->nama }}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/png';">
+                                    </td>
+                                    <td><span class="table-title">{{ $team->nama }}</span></td>
+                                    <td><span class="table-sub">{{ $team->jabatan ?: '-' }}</span></td>
+                                    <td>
+                                        @if($team->divisi)
+                                            <span class="tag tag-divisi">{{ $team->divisi }}</span>
+                                        @else
+                                            <span class="muted">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="preview-empty">Belum ada anggota tim.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -357,9 +498,21 @@
                     Lihat Semua <i class='bx bx-right-arrow-alt'></i>
                 </a>
             </div>
-            <div class="preview-card-body">
-                <div class="mini-preview-list" id="dashProyekPreviewList">
-                    {{-- Diisi JavaScript --}}
+            <div class="preview-card-body table-body">
+                <div class="preview-table-wrap">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th class="no-col">No</th>
+                                <th>Proyek</th>
+                                <th class="project-client-col">Klien</th>
+                                <th class="status-col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashProyekPreviewList">
+                            {{-- Diisi JavaScript --}}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -457,11 +610,11 @@
             .slice(0, 5);
 
         if (recent.length === 0) {
-            list.innerHTML = '<div class="preview-empty">Belum ada data proyek.</div>';
+            list.innerHTML = '<tr><td colspan="4" class="preview-empty">Belum ada data proyek.</td></tr>';
             return;
         }
 
-        recent.forEach((client) => {
+        recent.forEach((client, index) => {
             let isLewat = false;
             if (client.deadline) {
                 const dDate = new Date(client.deadline + 'T00:00:00');
@@ -473,19 +626,12 @@
                 ? `<span class="badge-lewat">Lewat Deadline</span>`
                 : `<span class="badge-aktif">Berjalan</span>`;
 
-            const initial = client.nama ? client.nama.trim().charAt(0).toUpperCase() : '?';
-
-            const item = document.createElement('div');
-            item.className = 'mini-preview-item';
+            const item = document.createElement('tr');
             item.innerHTML = `
-                <span class="avatar">${initial}</span>
-                <div class="info">
-                    <p class="judul">${dashEscape(client.project)}</p>
-                    <div class="meta">
-                        <span class="sub">${dashEscape(client.nama)}</span>
-                        ${badgeHtml}
-                    </div>
-                </div>
+                <td class="no-col"><span class="number-badge">${index + 1}</span></td>
+                <td><span class="table-title">${dashEscape(client.project)}</span></td>
+                <td><span class="table-sub">${dashEscape(client.nama)}</span></td>
+                <td>${badgeHtml}</td>
             `;
             list.appendChild(item);
         });
