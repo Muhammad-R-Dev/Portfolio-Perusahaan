@@ -754,11 +754,16 @@ main {
 @media (max-width: 725px) {
   .text h1 { font-size: 5rem; line-height: 1.1; }
   .text h2 { font-size: 4.1rem; line-height: 1.1; }
+  /* Posisi judul di tengah dan digeser lebih ke bawah di mobile */
+  .text { top: 58%; }
 
   .sun-rays { display: none; }
 
   .hero-frame { padding: 14px; }
-  main { height: calc(100vh - 28px); border-radius: 24px; }
+  /* Hero dibuat landscape (lebar > tinggi) di mobile, bukan potret.
+     Pakai aspect-ratio supaya bentuknya pasti landscape di semua ukuran
+     layar HP, tidak lagi mengandalkan tinggi layar (100vh). */
+  main { height: auto; aspect-ratio: 1 / 1; max-height: none; border-radius: 24px; }
   .brand-badge { padding: 12px 16px 12px 12px; border-radius: 18px 0 18px 0; gap: 0.5rem; }
   .brand-badge::before, .brand-badge::after { width: 18px; height: 18px; }
   .brand-badge::before { right: -18px; box-shadow: -9px -9px 0 0 #FFFFFF; }
@@ -772,37 +777,36 @@ main {
   .trust-badge::after { left: -18px; box-shadow: 9px 9px 0 0 #FFFFFF; }
   .trust-badge h4 { font-size: 0.82rem; }
   .trust-badge p { font-size: 0.72rem; }
+  /* Hilangkan card "Teruji & Terpercaya" dan tulisan "Scroll" di mobile */
+  .trust-badge, .scroll-hint { display: none; }
 
-  .bg-img { width: initial; height: 311.104%; }
-  .fog-7 { width: initial; height: 211.2%; }
-  /* Gedung ke-3 (mountain-10): dipindah ke pojok bawah supaya bagian gambar yang terpotong
-     tersembunyi di luar frame, bukan terlihat "menutupi" di tengah layar */
-  .mountain-10 {
-    width: initial;
-    height: 114.432%;
-    top: auto;
-    bottom: -6%;
-    left: auto;
-    right: -8%;
-  }
-  .fog-6 { width: initial; height: 204%; }
+  /* Seluruh lapisan foto background + gedung digeser naik bersama (±8% dari
+     tinggi frame) supaya keduanya tetap sejajar/menyatu satu sama lain, dan
+     bagian bawah bingkai terisi gedung (bukan menyisakan celah kosong di
+     bawah). Semua nilai top/bottom di bawah ini adalah nilai asli dikurangi
+     (atau ditambah, untuk yang pakai "bottom") 8 poin persen secara merata. */
+  .bg-img { width: initial; height: 311.104%; top: -6.14%; }
+  .fog-7 { width: initial; height: 211.2%; top: 29.7%; }
+  /* Gedung ke-3 (mountain-10 / img/g10v2.webp) disembunyikan di mobile */
+  .mountain-10 { display: none; }
+  .fog-6 { width: initial; height: 204%; top: 53.73%; }
   /* Gedung ke-2 (mountain-9) disembunyikan di mobile */
   .mountain-9 { display: none; }
   /* Gedung ke-1 / paling depan (mountain-8, z-index tertinggi di antara gedung) disembunyikan di mobile
      karena ukurannya terlalu besar & menutupi tampilan hero */
   .mountain-8 { display: none; }
-  .mountain-7 { width: initial; height: 49.888%; }
-  .mountain-6 { width: initial; height: 42.688%; }
-  .mountain-5 { width: initial; height: 59.776%; }
-  .mountain-4 { width: initial; height: 79.664%; }
-  .mountain-3 { width: initial; height: 51.552%; }
-  .fog-5 { width: initial; height: 49.888%; }
-  .fog-4 { width: initial; height: 60.336%; }
-  .fog-3 { width: initial; height: 159.44%; }
-  .fog-2 { width: initial; height: 173.32%; }
-  .mountain-2 { width: initial; height: 76.656%; }
-  .mountain-1 { width: initial; height: 109.44%; }
-  .fog-1 { width: initial; height: 178.88%; }
+  .mountain-7 { width: initial; height: 49.888%; top: calc(50% + 13.11%); }
+  .mountain-6 { width: initial; height: 42.688%; top: calc(50% + 2.68%); }
+  .mountain-5 { width: initial; height: 59.776%; top: calc(50% + 25.09%); }
+  .mountain-4 { width: initial; height: 79.664%; top: calc(50% + 19.28%); }
+  .mountain-3 { width: initial; height: 51.552%; top: 53.35%; }
+  .fog-5 { width: initial; height: 49.888%; top: calc(50% + 13.11%); }
+  .fog-4 { width: initial; height: 60.336%; top: calc(50% + 21.88%); }
+  .fog-3 { width: initial; height: 159.44%; top: calc(50% + 10.43%); }
+  .fog-2 { width: initial; height: 173.32%; top: 60.14%; }
+  .mountain-2 { width: initial; height: 76.656%; top: 61.01%; }
+  .mountain-1 { width: initial; height: 109.44%; top: 44%; }
+  .fog-1 { width: initial; height: 178.88%; top: 51.26%; }
 
   .info { padding: 3.5rem 1.25rem 4rem; min-height: auto; }
   .info h3 { font-size: 1.7rem; }
@@ -2323,10 +2327,10 @@ if ('paintWorklet' in CSS) {
   }
 
   // --- Ukuran tinggi main sesuai lebar layar ---
+  // Di mobile, tinggi hero sekarang diatur lewat CSS "aspect-ratio" (landscape),
+  // jadi JS tidak lagi menimpa tingginya di sini supaya tidak konflik.
   if (window.innerWidth >= 725) {
     main.style.maxHeight = `${window.innerWidth * 0.45}px`;
-  } else {
-    main.style.maxHeight = `${window.innerWidth * 1.6}px`;
   }
 
   // --- Animasi masuk (GSAP) ---
