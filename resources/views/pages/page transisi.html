@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page Transition</title>
+<style>
+:root{--bg:#f4f2ee;--fg:#111;--muted:#666;--accent:#ff5a1f;--curtain:#111;--curtain-fg:#f4f2ee;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--fg:#f4f2ee;--muted:#999;--curtain:#f4f2ee;--curtain-fg:#111}}
+:root[data-theme="dark"]{--bg:#0e0e0e;--fg:#f4f2ee;--muted:#999;--curtain:#f4f2ee;--curtain-fg:#111}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Helvetica Neue",Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(20px + env(safe-area-inset-top,0px)) 5vw 20px;mix-blend-mode:difference;color:#fff}
+nav a{color:inherit;text-decoration:none;margin-left:24px;font-size:14px;letter-spacing:.05em;text-transform:uppercase}
+nav a:first-child{margin:0;font-weight:700}
+main{padding:0 5vw}
+.page{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:140px 0 80px;max-width:1100px}
+.page h1{font-size:clamp(44px,10vw,120px);line-height:.95;letter-spacing:-.03em;margin-bottom:28px}
+.page p{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:560px;line-height:1.6;margin-bottom:32px}
+.page a.btn{align-self:flex-start;background:var(--accent);color:#fff;padding:14px 28px;border-radius:99px;text-decoration:none;font-size:15px}
+.page .row{display:flex;gap:12px;flex-wrap:wrap}
+.page .card{border:1px solid var(--muted);border-radius:16px;padding:18px 22px;font-size:15px}
+.rv{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.go .rv{opacity:1;transform:none}
+.go .rv:nth-child(2){transition-delay:.08s}.go .rv:nth-child(3){transition-delay:.16s}.go .rv:nth-child(4){transition-delay:.24s}
+/* curtain */
+#curtain{position:fixed;inset:0;z-index:100;overflow:hidden;pointer-events:none}
+#curtain.active{pointer-events:all}
+.wv{position:absolute;top:0;bottom:0;left:0;width:300vw;display:flex;color:var(--c);transform:translate3d(100vw,0,0);will-change:transform}
+.wv svg{width:100vw;height:100%;flex:none;display:block}
+.wv svg.r{transform:scaleX(-1)}
+.wv div{flex:1;background:currentColor;margin:0 -1px} /* overlap 1px to avoid seams */
+#label{position:fixed;inset:0;z-index:101;display:flex;align-items:center;justify-content:center;pointer-events:none;
+  font-size:clamp(32px,8vw,96px);font-weight:700;letter-spacing:-.03em;color:#f4f2ee;opacity:0}
+</style>
+</head>
+<body>
+<nav>
+  <a href="#/">Studio</a>
+  <div><a href="#/">Home</a><a href="#/careers">Careers</a><a href="#/contact">Contact</a></div>
+</nav>
+<main id="view"></main>
+<div id="curtain"></div>
+<div id="label"></div>
+
+<script>
+const pages = {
+  "/": {name:"Home", html:`<section class="page">
+    <h1 class="rv">Halaman<br>Utama</h1>
+    <p class="rv">Klik menu untuk melihat transisi tirai antar halaman. Tombol back/forward browser juga berfungsi.</p>
+    <a class="btn rv" href="#/careers">Lihat Careers →</a></section>`},
+  "/careers": {name:"Careers", html:`<section class="page">
+    <h1 class="rv">Careers</h1>
+    <p class="rv">Bergabung dengan tim tempat inovasi bertemu dampak nyata.</p>
+    <div class="row rv"><span class="card">Flexible hours</span><span class="card">25 hari cuti</span><span class="card">Team events</span></div>
+    <br><a class="btn rv" href="#/contact">Hubungi Kami →</a></section>`},
+  "/contact": {name:"Contact", html:`<section class="page">
+    <h1 class="rv">Let’s<br>connect</h1>
+    <p class="rv">Kirim CV atau pertanyaan Anda, kami akan menghubungi kembali.</p>
+    <a class="btn rv" href="#/">← Kembali</a></section>`}
+};
+
+const view = document.getElementById("view");
+const curtain = document.getElementById("curtain");
+const label = document.getElementById("label");
+
+/* ---------- Wave curtain settings ---------- */
+const COLORS = ["#ff5a1f", "#ffc21a", "#15151c"]; // bottom → top
+const AMP = 22;         // 2nd animation belly depth (vw)
+const LEAN_IN = 8;      // 1st animation: how far the top lags behind (vw)
+const LEAN_OUT = 8;     // 2nd animation lag (vw)
+const AMP_IN = 34;      // 1st animation: depth of the round belly (vw)
+const STAGGER = 130;    // ms delay between layers
+
+// Edge shaped like elecctro.com: the top sits back with a tiny counter-bump, then one big
+// round belly sweeps forward at ~70% height and curves back at the bottom.
+// amp = 0 and lean = 0 → perfectly straight vertical line ("berdiri tegak").
+function pathD(amp, lean){
+  const t = 50 + lean, e = 50 + lean * .3, b = 50 - amp;
+  return `M100,0 L${t},0 C${t + amp * .12},22 ${b},42 ${b},70 C${b},86 ${e - amp * .3},97 ${e},100 L100,100 Z`;
+}
+const svgWave = cls =>
+  `<svg class="${cls}" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${pathD(AMP_IN, LEAN_IN)}" fill="currentColor"/></svg>`;
+
+const layers = COLORS.map(c => {
+  const w = document.createElement("div");
+  w.className = "wv"; w.style.setProperty("--c", c);
+  w.innerHTML = svgWave("l") + "<div></div>" + svgWave("r");
+  curtain.appendChild(w);
+  return { el: w, pl: w.querySelector("svg.l path"), pr: w.querySelector("svg.r path") };
+});
+
+// k = 0..1 strength of the wave/lean on each edge (mirrored svg gets flipped signs)
+function setLayer(L, x, kL, kR){
+  L.el.style.transform = `translate3d(${x}vw,0,0)`;
+  L.pl.setAttribute("d", pathD(AMP_IN * kL, LEAN_IN * kL));
+  L.pr.setAttribute("d", pathD(-AMP * kR, -LEAN_OUT * kR));
+}
+const resetLayers = () => layers.forEach(L => setLayer(L, 100, 1, 0));
+resetLayers();
+
+/* ---------- Smooth JS tween (rAF) ---------- */
+const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;   // smooth cubic
+const easeOut   = t => 1 - Math.pow(1 - t, 3);
+const smooth    = t => t*t*(3 - 2*t);
+
+function tween(duration, delay, fn){
+  return new Promise(res => {
+    const t0 = performance.now() + delay;
+    (function frame(now){
+      const p = Math.min(Math.max((now - t0) / duration, 0), 1);
+      fn(p);
+      p < 1 ? requestAnimationFrame(frame) : res();
+    })(performance.now());
+  });
+}
+
+/* Phase 1: waves sweep in from the right. The bottom tip reaches the left corner
+   first; the top waits, then catches up slowly while the edge straightens
+   into a vertical line. */
+const cover = () => Promise.all(layers.map((L, i) =>
+  tween(900, i * STAGGER, p => {
+    const e = easeInOut(p);
+    const x = 100 + (-50 - 100) * e;                       // top edge ends exactly at the left side
+    const k = 1 - smooth(Math.min(Math.max((p - .55) / .45, 0), 1));   // lean stays until the bottom is at the left, then relaxes
+    setLayer(L, x, k, 0);
+  })));
+
+/* Phase 3: waves keep moving left and leave. The trailing edge (bottom first)
+   slows down as it nears the left corner and settles as a straight vertical line. */
+const easeExit = t => 0.4 * easeInOut(t) + 0.6 * (1 - Math.pow(1 - t, 4));   // quick start, long soft landing
+const uncover = () => Promise.all(layers.map((L, i) =>
+  tween(700, (layers.length - 1 - i) * STAGGER, p => {
+    const e = easeExit(p);
+    const x = -100 + (-250 + 100) * e;      // trailing edge ends exactly at the left side
+    const k = 1 - smooth(e);              // wave relaxes → upright exactly when it arrives
+    setLayer(L, x, 0, k);
+  })));
+
+/* ---------- Router ---------- */
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let current = null, busy = false, queued = null;
+const routeOf = () => { const r = location.hash.slice(1) || "/"; return pages[r] ? r : "/"; };
+
+function render(route){
+  const p = pages[route];
+  view.innerHTML = p.html;
+  document.title = p.name + " — Page Transition";
+  scrollTo(0, 0);
+  requestAnimationFrame(() => requestAnimationFrame(() => view.classList.add("go")));
+}
+
+const run = (el, frames, opts) =>
+  el.animate(frames, {duration:800, easing:"cubic-bezier(.65,0,.35,1)", fill:"forwards", ...opts}).finished;
+
+// For real separate pages, replace with: const html = await (await fetch(url)).text()
+async function prepare(route){
+  const tmp = document.createElement("div");
+  tmp.innerHTML = pages[route].html;
+  await Promise.all([document.fonts ? document.fonts.ready : 0,
+    ...[...tmp.querySelectorAll("img")].map(i => i.decode ? i.decode().catch(() => {}) : 0)]);
+}
+
+async function go(route){
+  if (busy){ queued = route; return; }
+  if (route === current) return;
+  const p = pages[route];
+  if (reduce){ view.classList.remove("go"); render(route); current = route; return; }
+  busy = true;
+  curtain.classList.add("active");
+  label.textContent = p.name;
+  const ready = prepare(route);
+
+  resetLayers();
+  // 1. old page drifts slightly left while waves cover it
+  run(view, [{transform:"none",opacity:1},{transform:"translateX(-8vw)",opacity:.35}], {duration:1400});
+  await cover();
+
+  // 2. label in → swap content → label out
+  await run(label, [{opacity:0,transform:"translateY(30px)"},{opacity:1,transform:"none"}], {duration:500, easing:"cubic-bezier(.16,1,.3,1)"});
+  await ready;
+  view.getAnimations().forEach(a => a.cancel());
+  view.classList.remove("go");
+  render(route);
+  current = route;
+  await new Promise(r => setTimeout(r, 250));
+  await run(label, [{opacity:1,transform:"none"},{opacity:0,transform:"translateY(-30px)"}], {duration:450, easing:"cubic-bezier(.65,0,.35,1)"});
+
+  // 3. waves continue left and exit
+  await uncover();
+
+  resetLayers();
+  curtain.classList.remove("active");
+  busy = false;
+  if (queued && queued !== current){ const q = queued; queued = null; go(q); } else queued = null;
+}
+
+addEventListener("hashchange", () => go(routeOf()));
+current = routeOf();
+render(current);
+</script>
+</body>
+</html>

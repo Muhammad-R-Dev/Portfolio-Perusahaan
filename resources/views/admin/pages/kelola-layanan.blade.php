@@ -375,6 +375,7 @@
 			justify-content: center;
 			align-items: center;
 			padding: 16px;
+			box-sizing: border-box;
 		}
 		.modal-overlay.show {
 			display: flex;
@@ -450,6 +451,61 @@
 		.modal-box .btn-save {
 			background: var(--blue);
 			color: var(--light);
+		}
+
+		/* ============================================================
+		   FORM TAMBAH/EDIT LAYANAN DIPERBESAR (seperti Kelola Blog)
+		   Overlay layar penuh (sidebar tertutup abu-abu transparan), kotak form memenuhi area konten
+		   ============================================================ */
+		body.chb-modal-open { overflow: hidden; }
+		#modalLayanan {
+			padding: 32px;
+			align-items: stretch;
+			box-sizing: border-box;
+		}
+		#modalLayanan .modal-box {
+			max-width: none;
+			width: 100%;
+			height: 100%;
+			max-height: none;
+			padding: 28px 40px;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			box-sizing: border-box;
+		}
+		#modalLayanan .modal-head { flex-shrink: 0; }
+		#modalLayanan .modal-box form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+		#modalLayanan .form-cols {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
+			overflow-x: hidden;
+			overscroll-behavior: contain;
+			align-items: stretch;
+			grid-gap: 32px;
+			margin-bottom: 0;
+		}
+		#modalLayanan .form-cols .col-text { flex: 1 1 58%; display: flex; flex-direction: column; min-width: 260px; }
+		#modalLayanan .form-cols .col-image { flex: 1 1 38%; display: flex; flex-direction: column; min-width: 220px; }
+		#modalLayanan .form-cols .col-text .form-group:last-child { flex: 1; margin-bottom: 0; }
+		#modalLayanan .form-cols .col-text .form-group textarea { flex: 1; min-height: 240px; resize: none; }
+		#modalLayanan .uploader { min-height: 340px; }
+		#modalLayanan .uploader-preview img { height: 340px; }
+		/* Tombol Batal/Simpan tetap di bawah, tidak ikut ter-scroll */
+		#modalLayanan .modal-actions {
+			flex-shrink: 0;
+			margin: 16px -40px -28px -40px;
+			padding: 16px 40px;
+			border-top: 1px solid var(--grey);
+			background: var(--light);
+			border-radius: 0 0 16px 16px;
+		}
+		@media screen and (max-width: 768px) {
+			#modalLayanan { padding: 12px; }
+			#modalLayanan .modal-box { padding: 20px 16px; }
+			#modalLayanan .form-cols { grid-gap: 16px; }
+			#modalLayanan .modal-actions { margin: 14px -16px -20px -16px; padding: 14px 16px; }
 		}
 
 		/* MODAL KONFIRMASI & NOTIFIKASI */
@@ -1205,8 +1261,30 @@
 			imageZoomOverlay.classList.add('show');
 		});
 
+		// Overlay layar penuh (menutupi sidebar), kotak form dibatasi di area konten lewat padding overlay
+		function syncModalWithContentArea() {
+			const contentEl = document.getElementById('content');
+			if (!contentEl) return;
+			const rect = contentEl.getBoundingClientRect();
+			const vw = document.documentElement.clientWidth;
+			document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+				overlay.style.paddingLeft = '';
+				overlay.style.paddingRight = '';
+				const base = parseFloat(getComputedStyle(overlay).paddingRight) || 0;
+				overlay.style.paddingLeft = (rect.left + base) + 'px';
+				overlay.style.paddingRight = (Math.max(0, vw - rect.right) + base) + 'px';
+			});
+		}
+		window.addEventListener('resize', syncModalWithContentArea);
+		document.addEventListener('DOMContentLoaded', function () {
+			syncModalWithContentArea();
+			const contentEl = document.getElementById('content');
+			if (window.ResizeObserver && contentEl) new ResizeObserver(syncModalWithContentArea).observe(contentEl);
+		});
+
 		// Buka modal tambah
 		function openAddModal() {
+			syncModalWithContentArea();
 			modalLayananTitle.innerText = 'Tambah Layanan';
 			formLayanan.reset();
 			formLayanan.action = "{{ route('admin.kelola-layanan.store') }}";
@@ -1214,10 +1292,12 @@
 			hapusGambarFlag.value = '0';
 			resetUploader();
 			modalLayanan.classList.add('show');
+			document.body.classList.add('chb-modal-open');
 		}
 
 		// Buka modal edit
 		function openEditModal(id, title, description, image) {
+			syncModalWithContentArea();
 			modalLayananTitle.innerText = 'Edit Layanan';
 			formLayanan.action = '/admin/kelola-layanan/' + id;
 			document.getElementById('formMethod').value = 'PUT';
@@ -1232,10 +1312,12 @@
 			}
 
 			modalLayanan.classList.add('show');
+			document.body.classList.add('chb-modal-open');
 		}
 
 		function closeModalLayanan() {
 			modalLayanan.classList.remove('show');
+			document.body.classList.remove('chb-modal-open');
 		}
 
 		// Zoom gambar dari tabel

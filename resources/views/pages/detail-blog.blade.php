@@ -209,6 +209,59 @@
             text-decoration: underline;
         }
         .detail-body strong { color: var(--text); }
+
+        /* Video YouTube dari editor: selalu lebar penuh kolom, rasio 16:9, tampil sama seperti preview di editor */
+        .detail-body .chb-video {
+            position: relative !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 480px !important;
+            height: auto !important;
+            aspect-ratio: 16 / 9;
+            float: none !important;
+            margin: 1.6em auto !important;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: var(--shadow-soft);
+        }
+        .detail-body .chb-video iframe {
+            position: absolute !important;
+            top: 0; left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            border: 0;
+        }
+
+        /* Kartu video: thumbnail + tombol play. Video baru dimuat saat diklik. */
+        .detail-body .chb-video.yt-ready { cursor: pointer; }
+        /* Spesifisitas dinaikkan supaya tidak tertimpa aturan ".detail-body img" (margin & height:auto) -> penyebab thumbnail tampil dobel */
+        .detail-body .chb-video .yt-thumb {
+            position: absolute !important; top: 0; left: 0;
+            width: 100% !important; height: 100% !important;
+            margin: 0 !important; border-radius: 0 !important; max-width: none !important;
+            object-fit: cover; display: block;
+        }
+        .yt-play {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 68px; height: 48px; padding: 0; border: 0; border-radius: 14px;
+            background: #ef4444; color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .35); transition: transform .15s ease, filter .15s ease;
+        }
+        .yt-play svg { width: 26px; height: 26px; margin-left: 2px; }
+        .chb-video.yt-ready:hover .yt-play { transform: translate(-50%, -50%) scale(1.08); filter: brightness(.94); }
+        .yt-fallback {
+            position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; padding: 20px; text-align: center; color: #fff;
+            background: rgba(15, 23, 42, .72);
+        }
+        .yt-fallback p { margin: 0; font-size: .95rem; line-height: 1.5; color: #fff; }
+        .yt-fallback a {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px;
+            background: #fff; color: #0f172a !important; font-weight: 600; font-size: .9rem; text-decoration: none !important;
+        }
+        .yt-fallback a:hover { filter: brightness(.94); }
         .detail-body blockquote {
             margin: 1.6em 0;
             padding: 14px 20px;
@@ -220,7 +273,7 @@
             border-radius: 0 8px 8px 0;
         }
         .detail-body img {
-            max-width: 100%;
+            max-width: 100% !important;
             height: auto;
             border-radius: 12px;
             margin: 1.6em 0;
@@ -451,6 +504,105 @@
             </div>
         </div>
     </div>
+
+    <script>
+        /* ===== Kartu video YouTube di isi artikel =====
+           Tampil sebagai thumbnail + tombol play. Saat diklik, video diputar di tempat.
+           Jika pemilik video menonaktifkan embed (error 101/150), tampil tombol "Tonton di YouTube". */
+        (function () {
+            var ytApiPromise = null;
+            function loadYtApi() {
+                if (ytApiPromise) return ytApiPromise;
+                ytApiPromise = new Promise(function (resolve) {
+                    if (window.YT && window.YT.Player) { resolve(); return; }
+                    var prev = window.onYouTubeIframeAPIReady;
+                    window.onYouTubeIframeAPIReady = function () { if (prev) prev(); resolve(); };
+                    var s = document.createElement('script');
+                    s.src = 'https://www.youtube.com/iframe_api';
+                    document.head.appendChild(s);
+                });
+                return ytApiPromise;
+            }
+
+            function makeThumb(id) {
+                var img = document.createElement('img');
+                img.className = 'yt-thumb';
+                img.alt = 'Thumbnail video YouTube';
+                img.loading = 'lazy';
+                img.referrerPolicy = 'no-referrer';
+                img.src = 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg';
+                img.onload = function () {
+                    // maxresdefault yang tidak tersedia mengembalikan gambar kecil (120px): pakai hqdefault
+                    if (img.naturalWidth <= 120) img.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+                };
+                img.onerror = function () { img.onerror = null; img.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg'; };
+                return img;
+            }
+
+            function showFallback(box, id) {
+                box.innerHTML = '';
+                box.classList.remove('yt-ready');
+                box.style.cursor = 'default';
+                box.appendChild(makeThumb(id));
+                var fb = document.createElement('div');
+                fb.className = 'yt-fallback';
+                fb.innerHTML = '<p>Video ini tidak bisa diputar di halaman ini.</p>';
+                var a = document.createElement('a');
+                a.href = 'https://www.youtube.com/watch?v=' + id;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                a.textContent = 'Tonton di YouTube';
+                fb.appendChild(a);
+                box.appendChild(fb);
+            }
+
+            function play(box, id) {
+                box.classList.remove('yt-ready');
+                box.style.cursor = 'default';
+                box.innerHTML = '';
+                var holder = document.createElement('div');
+                holder.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+                box.appendChild(holder);
+                loadYtApi().then(function () {
+                    new YT.Player(holder, {
+                        videoId: id,
+                        width: '100%',
+                        height: '100%',
+                        playerVars: { autoplay: 1, rel: 0, playsinline: 1 },
+                        events: {
+                            onReady: function (e) { e.target.playVideo(); },
+                            onError: function () { showFallback(box, id); }
+                        }
+                    });
+                    // iframe hasil API harus memenuhi kartu
+                    setTimeout(function () {
+                        var f = box.querySelector('iframe');
+                        if (f) { f.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;'; }
+                    }, 0);
+                });
+            }
+
+            document.querySelectorAll('.detail-body .chb-video').forEach(function (box) {
+                var f = box.querySelector('iframe');
+                var m = f && (f.getAttribute('src') || '').match(/embed\/([\w-]{11})/);
+                if (!m) return;
+                var id = m[1];
+                box.innerHTML = '';
+                box.style.background = '#000'; // buang thumbnail latar bawaan agar tidak tampil dobel
+                box.classList.add('yt-ready');
+                box.appendChild(makeThumb(id));
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'yt-play';
+                btn.setAttribute('aria-label', 'Putar video');
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+                box.appendChild(btn);
+                box.addEventListener('click', function () {
+                    if (box.classList.contains('yt-ready')) play(box, id);
+                });
+            });
+        })();
+    </script>
 
     <script>
         document.getElementById('backButton').addEventListener('click', function () {

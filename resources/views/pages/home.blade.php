@@ -87,19 +87,12 @@ button, input, textarea, select {
 /* varian arah/gaya, opsional dipakai bareng .reveal */
 .reveal-scale { transform: translateY(24px) scale(0.94); }
 .reveal-scale.in-view { transform: translateY(0) scale(1); }
-.reveal-left { transform: translateX(-52px); }
-.reveal-left.in-view { transform: translateX(0); }
-.reveal-right { transform: translateX(52px); }
-.reveal-right.in-view { transform: translateX(0); }
 /* delay bertingkat supaya beberapa elemen tidak muncul serentak */
 .reveal-delay-1 { transition-delay: 0.08s; }
 .reveal-delay-2 { transition-delay: 0.16s; }
-.reveal-delay-3 { transition-delay: 0.24s; }
-.reveal-delay-4 { transition-delay: 0.32s; }
-.reveal-delay-5 { transition-delay: 0.4s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal-scale, .reveal-left, .reveal-right {
+  .reveal,.reveal-scale{
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
@@ -112,80 +105,6 @@ button, input, textarea, select {
   position: relative;
   padding: 22px;
   background: #FFFFFF;
-}
-
-/* logo di pojok kiri atas, menyatu dengan gambar lewat lengkungan cekung (teknik circle + box-shadow) */
-.brand-badge {
-  position: absolute;
-  z-index: 160;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: #FFFFFF;
-  color: #094356;
-  padding: 16px 22px 16px 16px;
-  border-radius: 26px 0 26px 0;
-}
-.brand-badge::before,
-.brand-badge::after {
-  content: "";
-  position: absolute;
-  width: 26px;
-  height: 26px;
-  background: transparent;
-  border-radius: 50%;
-}
-.brand-badge::before {
-  top: 0;
-  right: -26px;
-  box-shadow: -12px -12px 0 0 #FFFFFF;
-}
-.brand-badge::after {
-  bottom: -26px;
-  left: 0;
-  box-shadow: -12px -12px 0 0 #FFFFFF;
-}
-.brand-badge__icon {
-  flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: #094356;
-  color: #7C9BA6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.05rem;
-}
-.brand-badge__text {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 0.92rem;
-  line-height: 1.25;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: #094356;
-}
-
-/* tombol menu di pojok kanan atas, mengambang di atas warna frame */
-.menu-btn {
-  position: absolute;
-  z-index: 200;
-  top: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
-  border: none;
-  border-radius: 50%;
-  background: #094356;
-  color: #EDEDED;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  cursor: pointer;
 }
 
 /* kartu kepercayaan di pojok kanan bawah, menyatu dengan gambar lewat lengkungan cekung yang sama */
@@ -271,7 +190,6 @@ main {
 .mountain-9 { z-index: 5; position: absolute; width: 32.15%; top: calc(50% + 14.69%); left: calc(50% - 31.74%); }
 .mountain-8 { z-index: 6; position: absolute; width: 54.58%; top: calc(50% + 11.85%); left: calc(50% - 14.03%); }
 .fog-5 { z-index: 7; position: absolute; width: 31.18%; top: calc(50% + 21.11%); left: calc(50% + 2.01%); }
-.mountain-7 { z-index: 8; position: absolute; width: 31.18%; top: calc(50% + 21.11%); left: calc(50% + 2.01%); }
 
 .text {
   position: absolute;
@@ -286,16 +204,6 @@ main {
 }
 .text h2 { font-weight: 300; font-size: 6.5rem; line-height: 0.88; letter-spacing: 0.02em; }
 .text h1 { font-weight: 800; font-size: 8rem; line-height: 0.88; letter-spacing: -0.01em; }
-
-.mountain-6 { z-index: 10; position: absolute; width: 26.68%; top: calc(50% + 10.68%); left: calc(50% + 40.97%); }
-.fog-4 { z-index: 11; position: absolute; width: 37.71%; top: calc(50% + 29.88%); left: calc(50% - 4.44%); }
-.mountain-5 { z-index: 12; position: absolute; width: 37.36%; top: calc(50% + 33.09%); left: calc(50% + 9.03%); }
-.fog-3 { z-index: 13; position: absolute; width: 99.65%; top: calc(50% + 18.43%); left: calc(50% - 1.94%); }
-.mountain-4 { z-index: 14; position: absolute; width: 49.79%; top: calc(50% + 27.28%); left: calc(50% - 26.45%); }
-.mountain-3 { z-index: 15; position: absolute; top: 61.35%; left: 101.11%; width: 32.22%; }
-.fog-2 { z-index: 16; position: absolute; top: 68.14%; left: 48%; width: 108.33%; }
-.mountain-2 { z-index: 17; position: absolute; top: 69.01%; left: 78.61%; width: 47.91%; }
-.mountain-1 { position: absolute; z-index: 18; top: 52%; left: 8.27%; width: 37.15%; }
 .sun-rays { position: absolute; z-index: 19; top: 0; right: 0; width: 595px; pointer-events: none; }
 .black-shadow { position: absolute; z-index: 20; bottom: 0; right: 0; width: 100%; pointer-events: none; }
 .fog-1 { z-index: 21; position: absolute; top: 59.26%; left: 50.69%; width: 111.8%; }
@@ -323,27 +231,6 @@ main {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0.62) 100%);
 }
 
-/* tombol izin giroskop untuk iOS */
-.gyro-btn {
-  position: absolute;
-  z-index: 998;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(6px);
-  color: #FEFEFE;
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  display: none;
-}
-.gyro-btn.show { display: block; }
-
 .scroll-hint {
   position: absolute;
   z-index: 998;
@@ -362,120 +249,10 @@ main {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(6px); }
 }
-
-/* section penjelasan di bawah */
-.info {
-  position: relative;
-  z-index: 1;
-  background: #ededed;
-  color: #2b2b2b;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 5rem 1.5rem;
-}
-.info-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 3.5rem;
-  width: 100%;
-}
-.info-text {
-  flex: 1 1 55%;
-  min-width: 0;
-}
-.info-image {
-  flex: 1 1 40%;
-  align-self: stretch;
-}
-.info-image img {
-  width: 100%;
-  height: 100%;
-  min-height: 320px;
-  object-fit: cover;
-  border-radius: 20px;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
-  display: block;
-}
-@media (max-width: 900px) {
-  .info-inner { gap: 2rem; }
-  .info-image img { min-height: 260px; }
-}
-.info h3 {
-  font-family: var(--font-sans);
-  font-size: 2.2rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin-bottom: 1rem;
-  color: #094356;
-}
-.info .eyebrow {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #094356;
-  opacity: 0.85;
-  margin-bottom: 0.7rem;
-}
-.info p {
-  font-size: 1rem;
-  line-height: 1.75;
-  font-weight: 300;
-  color: rgba(9, 67, 86, 0.75);
-  margin-bottom: 1.3rem;
-  max-width: 68ch;
-}
-.info .reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.info .reveal.in-view {
-  opacity: 1;
-  transform: translateY(0);
-}
-.info .steps {
-  display: grid;
-  gap: 1.1rem;
-  margin-top: 2.2rem;
-}
-.info .step {
-  border-left: 2px solid #7C9BA6;
-  padding-left: 1rem;
-}
-.info .step b {
-  display: block;
-  font-family: var(--font-sans);
-  color: #094356;
-  font-weight: 600;
-  margin-bottom: 0.2rem;
-}
-.info .step span {
-  font-size: 0.9rem;
-  color: rgba(9, 67, 86, 0.65);
-  font-weight: 300;
-}
-
-/* section Layanan */
-.layanan {
-  position: relative;
-  z-index: 1;
-  background: #094356;
-  color: #EDEDED;
-  padding: 5rem 1.5rem 6rem;
-  border-top: 1px solid rgba(124, 155, 166, 0.08);
-}
-.layanan-inner,
 .project-inner {
   max-width: 1080px;
   margin: 0 auto;
 }
-.layanan h3,
 .project h3 {
   font-family: var(--font-sans);
   font-size: 2.2rem;
@@ -491,43 +268,6 @@ main {
   color: rgba(237, 237, 237, 0.7);
   max-width: 62ch;
   margin-bottom: 2.75rem;
-}
-.layanan-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.5rem;
-}
-.layanan-card {
-  background: rgba(124, 155, 166, 0.04);
-  border: 1px solid rgba(124, 155, 166, 0.14);
-  border-radius: 14px;
-  padding: 1.9rem 1.6rem;
-  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
-}
-.layanan-card:hover {
-  transform: translateY(-6px);
-  border-color: #7C9BA6;
-  background: rgba(124, 155, 166, 0.08);
-}
-.layanan-card i {
-  font-size: 1.5rem;
-  color: #7C9BA6;
-  margin-bottom: 1.1rem;
-  display: inline-block;
-}
-.layanan-card h4 {
-  font-family: var(--font-sans);
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #EDEDED;
-}
-.layanan-card p {
-  font-size: 0.88rem;
-  line-height: 1.65;
-  font-weight: 300;
-  color: rgba(237, 237, 237, 0.68);
-  margin: 0;
 }
 
 /* section FAQ (Pertanyaan Umum) */
@@ -764,13 +504,6 @@ main {
      Pakai aspect-ratio supaya bentuknya pasti landscape di semua ukuran
      layar HP, tidak lagi mengandalkan tinggi layar (100vh). */
   main { height: auto; aspect-ratio: 1 / 1; max-height: none; border-radius: 24px; }
-  .brand-badge { padding: 12px 16px 12px 12px; border-radius: 18px 0 18px 0; gap: 0.5rem; }
-  .brand-badge::before, .brand-badge::after { width: 18px; height: 18px; }
-  .brand-badge::before { right: -18px; box-shadow: -9px -9px 0 0 #FFFFFF; }
-  .brand-badge::after { bottom: -18px; box-shadow: -9px -9px 0 0 #FFFFFF; }
-  .brand-badge__icon { width: 34px; height: 34px; border-radius: 10px; font-size: 0.85rem; }
-  .brand-badge__text { font-size: 0.68rem; }
-  .menu-btn { top: 14px; right: 14px; width: 38px; height: 38px; font-size: 0.88rem; }
   .trust-badge { max-width: 220px; padding: 16px 18px; border-radius: 18px 0 18px 0; }
   .trust-badge::before, .trust-badge::after { width: 18px; height: 18px; }
   .trust-badge::before { top: -18px; box-shadow: 9px 9px 0 0 #FFFFFF; }
@@ -795,39 +528,10 @@ main {
   /* Gedung ke-1 / paling depan (mountain-8, z-index tertinggi di antara gedung) disembunyikan di mobile
      karena ukurannya terlalu besar & menutupi tampilan hero */
   .mountain-8 { display: none; }
-  .mountain-7 { width: initial; height: 49.888%; top: calc(50% + 13.11%); }
-  .mountain-6 { width: initial; height: 42.688%; top: calc(50% + 2.68%); }
-  .mountain-5 { width: initial; height: 59.776%; top: calc(50% + 25.09%); }
-  .mountain-4 { width: initial; height: 79.664%; top: calc(50% + 19.28%); }
-  .mountain-3 { width: initial; height: 51.552%; top: 53.35%; }
   .fog-5 { width: initial; height: 49.888%; top: calc(50% + 13.11%); }
-  .fog-4 { width: initial; height: 60.336%; top: calc(50% + 21.88%); }
-  .fog-3 { width: initial; height: 159.44%; top: calc(50% + 10.43%); }
-  .fog-2 { width: initial; height: 173.32%; top: 60.14%; }
-  .mountain-2 { width: initial; height: 76.656%; top: 61.01%; }
-  .mountain-1 { width: initial; height: 109.44%; top: 44%; }
   .fog-1 { width: initial; height: 178.88%; top: 51.26%; }
-
-  .info { padding: 3.5rem 1.25rem 4rem; min-height: auto; }
-  .info h3 { font-size: 1.7rem; }
-  .info-inner {
-    flex-direction: column;
-    gap: 1.75rem;
-  }
-  .info-text,
-  .info-image {
-    flex: 1 1 auto;
-    width: 100%;
-  }
-  .info-image {
-    order: -1;
-  }
-  .info-image img {
-    min-height: 220px;
-    max-height: 260px;
-  }
-  .layanan, .project { padding: 3.5rem 1.25rem 4rem; }
-  .layanan h3, .project h3 { font-size: 1.7rem; }
+  .project { padding: 3.5rem 1.25rem 4rem; }
+  .project h3 { font-size: 1.7rem; }
 }
 @media (max-width: 520px) {
   .text h1 { font-size: 3.3rem; }
@@ -1165,29 +869,10 @@ html #navHeader.scrolled {
     min-height: 0;
   }
 
-  .content-button__bg {
-    z-index: -1;
-    background-color: #094356;
-    border-radius: .25em;
-    position: absolute;
-    inset: 0%;
-  }
-
   .content-p {
     margin: 0;
     font-size: 1.25em;
     line-height: 1.4;
-  }
-
-  .tab-button__bg {
-    z-index: 0;
-    background-color: #1313130d;
-    border: 1px solid #1313131a;
-    border-radius: .25em;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    inset: 0%;
   }
 
   .tab-content-item {
@@ -1252,18 +937,6 @@ html #navHeader.scrolled {
     color: #094356;
   }
 
-  .tab-content__button {
-    color: #ffffff;
-    justify-content: center;
-    align-items: center;
-    height: 4em;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    text-decoration: none;
-    display: flex;
-    position: relative;
-  }
-
   @media (max-width: 991px) {
     .tentang-kami-cloneable {
       padding: 1.5em 1em;
@@ -1315,12 +988,6 @@ html #navHeader.scrolled {
     .content-p {
       font-size: 0.95em;
       line-height: 1.35;
-    }
-
-    .tab-content__button {
-      height: 3em;
-      width: 100%;
-      box-sizing: border-box;
     }
 
     .tab-visual-wrap {
@@ -1421,141 +1088,7 @@ if ('paintWorklet' in CSS) {
   }
 }
 </script>
-<script src='https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/CustomEase.min.js'></script>
-<script>
-(function () {
-  gsap.registerPlugin(CustomEase, Flip);
-
-  if (!CustomEase.get || !CustomEase.get("osmo-ease")) {
-    CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
-  }
-
-  gsap.defaults({
-    ease: "osmo-ease",
-    duration: 0.8,
-  });
-
-  function initFlipButtons() {
-    let wrappers = document.querySelectorAll('[data-flip-button="wrap"]');
-
-    wrappers.forEach((wrapper) => {
-      let buttons = wrapper.querySelectorAll('[data-flip-button="button"]');
-      let bg = wrapper.querySelector('[data-flip-button="bg"]');
-
-      buttons.forEach(function (button) {
-        button.addEventListener("mouseenter", function () {
-          const state = Flip.getState(bg);
-          this.appendChild(bg);
-          Flip.from(state, { duration: 0.4 });
-        });
-
-        button.addEventListener("focus", function () {
-          const state = Flip.getState(bg);
-          this.appendChild(bg);
-          Flip.from(state, { duration: 0.4 });
-        });
-
-        button.addEventListener("mouseleave", function () {
-          const state = Flip.getState(bg);
-          const activeLink = wrapper.querySelector(".active");
-          activeLink.appendChild(bg);
-          Flip.from(state, { duration: 0.4 });
-        });
-
-        button.addEventListener("blur", function () {
-          const state = Flip.getState(bg);
-          const activeLink = wrapper.querySelector(".active");
-          activeLink.appendChild(bg);
-          Flip.from(state, { duration: 0.4 });
-        });
-      });
-    });
-  }
-
-  function initTabSystem() {
-    let wrappers = document.querySelectorAll('[data-tabs="wrapper"]');
-
-    wrappers.forEach((wrapper) => {
-      let nav = wrapper.querySelector('[data-tabs="nav"]');
-      let buttons = nav ? nav.querySelectorAll('[data-tabs="button"]') : [];
-      let contentWrap = wrapper.querySelector('[data-tabs="content-wrap"]');
-      let contentItems = contentWrap.querySelectorAll('[data-tabs="content-item"]');
-      let visualWrap = wrapper.querySelector('[data-tabs="visual-wrap"]');
-      let visualItems = visualWrap.querySelectorAll('[data-tabs="visual-item"]');
-
-      // Tidak ada tombol navigasi (card/filter-bar sudah dihapus): cukup
-      // tampilkan konten & visual pertama tanpa sistem switch tab.
-      if (!buttons.length) {
-        contentItems.forEach((item) => item.classList.remove("active"));
-        visualItems.forEach((item) => item.classList.remove("active"));
-        contentItems[0] && contentItems[0].classList.add("active");
-        visualItems[0] && visualItems[0].classList.add("active");
-        return;
-      }
-
-      let activeButton = buttons[0];
-      let activeContent = contentItems[0];
-      let activeVisual = visualItems[0];
-      let isAnimating = false;
-
-      function switchTab(index, initial = false) {
-        if (!initial && (isAnimating || buttons[index] === activeButton)) return;
-        isAnimating = true;
-
-        const outgoingContent = activeContent;
-        const incomingContent = contentItems[index];
-        const outgoingVisual = activeVisual;
-        const incomingVisual = visualItems[index];
-
-        let outgoingLines = outgoingContent.querySelectorAll("[data-tabs-fade]") || [];
-        let incomingLines = incomingContent.querySelectorAll("[data-tabs-fade]");
-
-        const tl = gsap.timeline({
-          defaults: { ease: "power3.inOut" },
-          onComplete: () => {
-            if (!initial) {
-              outgoingContent && outgoingContent.classList.remove("active");
-              outgoingVisual && outgoingVisual.classList.remove("active");
-            }
-            activeContent = incomingContent;
-            activeVisual = incomingVisual;
-            isAnimating = false;
-          },
-        });
-
-        incomingContent.classList.add("active");
-        incomingVisual.classList.add("active");
-
-        tl
-          .to(outgoingLines, { y: "-2em", autoAlpha: 0 }, 0)
-          .to(outgoingVisual, { autoAlpha: 0, xPercent: 3 }, 0)
-          .fromTo(incomingLines, { y: "2em", autoAlpha: 0 }, { y: "0em", autoAlpha: 1, stagger: 0.075 }, 0.4)
-          .fromTo(incomingVisual, { autoAlpha: 0, xPercent: 3 }, { autoAlpha: 1, xPercent: 0 }, "<");
-
-        activeButton && activeButton.classList.remove("active");
-        buttons[index].classList.add("active");
-        activeButton = buttons[index];
-      }
-
-      switchTab(0, true);
-
-      buttons.forEach((button, i) => {
-        button.addEventListener("click", () => switchTab(i));
-      });
-
-      contentItems[0].classList.add("active");
-      visualItems[0].classList.add("active");
-      buttons[0].classList.add("active");
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    initTabSystem();
-    initFlipButtons();
-  });
-})();
-</script>
 @endpush
 
 @push('styles')
@@ -1800,22 +1333,8 @@ if ('paintWorklet' in CSS) {
     @media (min-width: 1200px) {
         .swiper-slide__block .main__title { margin-top: 100px; height: 90px; }
     }
-    .swiper-slide__block .main__subtitle {
-        margin: 2px 0;
-        font-weight: 700;
-        font-family: var(--font-sans);
-        font-size: 0.9em;
-        color: #f2f3f3;
-    }
-    .swiper-slide__block .main__subtitle span {
-        font-family: var(--font-sans);
-        font-style: normal;
-        color: #00a8af;
-        letter-spacing: 1px;
-    }
-    .swiper-slide__block .main__subtitle,
     .swiper-slide__block .main__title,
-    .swiper-slide__block .paragraphe {
+.swiper-slide__block .paragraphe{
         color: #21272b;
         z-index: 2;
         position: relative;
@@ -1853,20 +1372,6 @@ if ('paintWorklet' in CSS) {
     @media (min-width: 1200px) {
         .swiper-slide__block .number { margin-top: 100px; font-size: 15em; }
     }
-    .swiper-slide__block .link {
-        display: inline-block;
-        width: auto;
-        position: relative;
-        text-decoration: none;
-        font-family: var(--font-sans);
-        font-size: 0.7em;
-        font-weight: 400;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        color: #00a8af !important;
-        transition: all 0.3s ease-in-out;
-    }
-    .swiper-slide__block .link:hover { letter-spacing: 2px; }
 
     @media screen and (max-width: 900px) {
         .layanan-container { padding: 60px 3% 80px; }
@@ -2006,7 +1511,6 @@ if ('paintWorklet' in CSS) {
                 slidesPerView: 1,
                 nextButton: ".swiper-button-next",
                 prevButton: ".swiper-button-prev",
-                paginationClickable: true,
                 spaceBetween: 0,
                 autoplay: 2500,
                 autoplayDisableOnInteraction: false, // usap boleh mengontrol, tapi slider tetap jalan otomatis lagi setelahnya
@@ -2019,7 +1523,6 @@ if ('paintWorklet' in CSS) {
                 parallax: true,
                 nextButton: ".swiper-button-next",
                 prevButton: ".swiper-button-prev",
-                paginationClickable: true,
                 spaceBetween: 0,
                 speed: 1500,
                 autoplay: 2500,
@@ -2228,7 +1731,6 @@ if ('paintWorklet' in CSS) {
 (function () {
   const parallax_el = document.querySelectorAll(".parallax");
   const main = document.querySelector("main");
-  const gyroBtn = document.getElementById("gyroBtn");
 
   let xValue = 0,
       yValue = 0;
@@ -2249,8 +1751,9 @@ if ('paintWorklet' in CSS) {
 
   update(0);
 
+  // Efek parallax kursor/sentuh ditahan selama animasi intro belum mulai atau masih berjalan
   function isAnimating() {
-    return typeof timeline !== "undefined" && timeline.isActive();
+    return timeline.paused() || timeline.isActive();
   }
 
   // --- Desktop: mouse ---
@@ -2266,7 +1769,7 @@ if ('paintWorklet' in CSS) {
   let touchActive = false;
   const touchSensitivity = 2.2; // makin besar angka ini, makin sensitif efek parallax terhadap geseran jari
 
-  main.addEventListener("touchstart", (e) => {
+  main.addEventListener("touchstart", () => {
     touchActive = true;
   }, { passive: true });
 
@@ -2302,28 +1805,14 @@ if ('paintWorklet' in CSS) {
     update(cursorPos);
   }
 
-  function enableGyro() {
-    window.addEventListener("deviceorientation", handleOrientation);
-    gyroBtn.classList.remove("show");
-  }
-
+  // Giroskop hanya aktif di perangkat yang tidak butuh izin (mis. Android).
+  // (Tombol izin untuk iOS tidak ada di halaman ini, jadi cabang itu dihapus.)
   const supportsGyro = typeof DeviceOrientationEvent !== "undefined";
   const needsPermission = supportsGyro && typeof DeviceOrientationEvent.requestPermission === "function";
   const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-  if (isTouchDevice && supportsGyro) {
-    if (needsPermission) {
-      gyroBtn.classList.add("show");
-      gyroBtn.addEventListener("click", () => {
-        DeviceOrientationEvent.requestPermission()
-          .then(state => {
-            if (state === "granted") enableGyro();
-          })
-          .catch(() => {});
-      });
-    } else {
-      enableGyro();
-    }
+  if (isTouchDevice && supportsGyro && !needsPermission) {
+    window.addEventListener("deviceorientation", handleOrientation);
   }
 
   // --- Ukuran tinggi main sesuai lebar layar ---
@@ -2334,7 +1823,14 @@ if ('paintWorklet' in CSS) {
   }
 
   // --- Animasi masuk (GSAP) ---
-  window.timeline = gsap.timeline();
+  // Easing khusus (dulu diset lewat gsap.defaults di script tab yang sudah dihapus)
+  gsap.registerPlugin(CustomEase);
+  if (!CustomEase.get("osmo-ease")) CustomEase.create("osmo-ease", "0.625, 0.05, 0, 1");
+
+  // Timeline dibuat paused, lalu dijalankan setelah tirai transisi mulai terbuka
+  // (langsung jalan kalau halaman dibuka tanpa transisi).
+  const timeline = gsap.timeline({ paused: true });
+  window.timeline = timeline;
 
   Array.from(parallax_el).filter(el => !el.classList.contains("text")).forEach(el => {
     timeline.from(el, {
@@ -2347,16 +1843,23 @@ if ('paintWorklet' in CSS) {
   timeline.from(".text h1", {
     y: window.innerHeight - document.querySelector(".text h1").getBoundingClientRect().top + 200,
     duration: 2,
+    ease: "osmo-ease",
   }, "2.5")
   .from(".text h2", {
     y: -150,
     opacity: 0,
-    duration: 1.5
+    duration: 1.5,
+    ease: "osmo-ease"
   }, "3")
   .from(".hide", {
     opacity: 0,
-    duration: 1.5
+    duration: 1.5,
+    ease: "osmo-ease"
   }, "3");
+
+  const start = () => timeline.play();
+  (window.PageTransition && window.PageTransition.ready ? window.PageTransition.ready : Promise.resolve())
+    .then(start, start);
 })();
 </script>
 @endpush

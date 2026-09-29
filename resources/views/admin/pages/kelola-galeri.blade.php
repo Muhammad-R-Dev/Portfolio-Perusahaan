@@ -987,6 +987,76 @@
 			}
 		}
 
+
+		/* ============================================================
+		   FORM TAMBAH/EDIT GALERI DIPERBESAR (seperti Kelola Layanan)
+		   Overlay layar penuh (sidebar tertutup abu-abu transparan), kotak form memenuhi area konten
+		   ============================================================ */
+		body.chb-modal-open { overflow: hidden; }
+		#galleryModal {
+			padding: 32px;
+			align-items: stretch;
+			box-sizing: border-box;
+			z-index: 5000;
+		}
+		#galleryModal .modal-box {
+			max-width: none;
+			width: 100%;
+			height: 100%;
+			max-height: none;
+			padding: 28px 40px;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			box-sizing: border-box;
+		}
+		#galleryModal .modal-box h2,
+		#galleryModal #modalTitle { flex-shrink: 0; font-size: 22px; margin: 0 0 20px; }
+		#galleryModal .modal-box form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+		#galleryModal .gallery-form-layout {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
+			overflow-x: hidden;
+			overscroll-behavior: contain;
+			grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
+			gap: 32px;
+			margin-top: 0;
+			align-items: stretch;
+		}
+		#galleryModal .gallery-form-left .form-group input[type="text"],
+		#galleryModal .gallery-form-left .form-group select {
+			height: 50px;
+			line-height: 50px;
+			font-size: 15px;
+		}
+		#galleryModal .gallery-form-right { display: flex; flex-direction: column; }
+		#galleryModal .gallery-media-card { flex: 1; display: flex; flex-direction: column; }
+		#galleryModal .gallery-media-preview { flex: 1; min-height: 340px; }
+		#galleryModal .gallery-media-preview img {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+		}
+		/* Tombol Batal/Simpan tetap di bawah, tidak ikut ter-scroll */
+		#galleryModal .modal-actions {
+			flex-shrink: 0;
+			margin: 16px -40px -28px -40px;
+			padding: 16px 40px;
+			border-top: 1px solid var(--grey);
+			background: var(--light);
+			border-radius: 0 0 18px 18px;
+		}
+		@media screen and (max-width: 768px) {
+			#galleryModal { padding: 12px; }
+			#galleryModal .modal-box { max-width: none; padding: 20px 16px; }
+			#galleryModal .gallery-form-layout { grid-template-columns: 1fr; gap: 16px; }
+			#galleryModal .gallery-media-card { order: -1; flex: none; }
+			#galleryModal .gallery-media-preview { min-height: 240px; }
+			#galleryModal .modal-actions { margin: 14px -16px -20px -16px; padding: 14px 16px; }
+		}
+
 </style>
 @endpush
 
@@ -1648,12 +1718,36 @@
 				photoCategory.value = 'kegiatan';
 			}
 
+			syncModalWithContentArea();
 			galleryModal.classList.add('show');
+			document.body.classList.add('chb-modal-open');
 		}
 
 		function closeModal() {
 			galleryModal.classList.remove('show');
+			document.body.classList.remove('chb-modal-open');
 		}
+
+		// Overlay layar penuh (menutupi sidebar), kotak form dibatasi di area konten lewat padding overlay
+		function syncModalWithContentArea() {
+		    const contentEl = document.getElementById('content');
+		    if (!contentEl) return;
+		    const rect = contentEl.getBoundingClientRect();
+		    const vw = document.documentElement.clientWidth;
+		    document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+		        overlay.style.paddingLeft = '';
+		        overlay.style.paddingRight = '';
+		        const base = parseFloat(getComputedStyle(overlay).paddingRight) || 0;
+		        overlay.style.paddingLeft = (rect.left + base) + 'px';
+		        overlay.style.paddingRight = (Math.max(0, vw - rect.right) + base) + 'px';
+		    });
+		}
+		window.addEventListener('resize', syncModalWithContentArea);
+		document.addEventListener('DOMContentLoaded', function () {
+		    syncModalWithContentArea();
+		    const contentEl = document.getElementById('content');
+		    if (window.ResizeObserver && contentEl) new ResizeObserver(syncModalWithContentArea).observe(contentEl);
+		});
 
 		btnAddGallery.addEventListener('click', () => openModal('add'));
 		btnCancelModal.addEventListener('click', closeModal);

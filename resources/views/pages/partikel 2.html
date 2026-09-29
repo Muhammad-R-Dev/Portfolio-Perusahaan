@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Particle Card Braces</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --blue: #317cff;
+    --text: #111;
+    --muted: #707070;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #fff;
+    color: var(--text);
+
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   SECTION
+===================================================== */
+
+#who {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 40px;
+
+    padding: 80px 40px;
+
+    overflow: hidden;
+
+    background: #fff;
+}
+
+
+/* =====================================================
+   PARTICLE CANVAS
+===================================================== */
+
+#particleCanvas {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 0;
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   VERY SOFT BACKGROUND GLOW
+===================================================== */
+
+#who::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 750px;
+    height: 750px;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(49,124,255,.035),
+            transparent 68%
+        );
+
+    filter: blur(15px);
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.particle-card {
+
+    position: relative;
+
+    width: min(560px, 42vw);
+
+    min-height: 390px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    border-radius: 30px;
+
+    background:
+        rgba(255,255,255,.80);
+
+    backdrop-filter:
+        blur(7px);
+
+    -webkit-backdrop-filter:
+        blur(7px);
+
+    border:
+        1px solid
+        rgba(0,0,0,.07);
+
+    z-index: 2;
+
+    transition:
+        transform .6s cubic-bezier(.2,.8,.2,1),
+        border-color .4s ease,
+        box-shadow .5s ease;
+}
+
+
+.particle-card:hover,
+.particle-card.active {
+
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(49,124,255,.18);
+
+    box-shadow:
+        0 25px 80px
+        rgba(49,124,255,.06);
+}
+
+
+/* =====================================================
+   CARD CONTENT
+===================================================== */
+
+.card-content {
+
+    position: relative;
+
+    z-index: 5;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 26px;
+}
+
+
+.card-content h3 {
+
+    font-size: 2.45rem;
+
+    font-weight: 400;
+
+    line-height: 1.08;
+
+    letter-spacing: -.045em;
+}
+
+
+.card-content h3 span {
+
+    color: var(--muted);
+}
+
+
+/* =====================================================
+   LABEL
+===================================================== */
+
+.card-label {
+
+    position: absolute;
+
+    top: 24px;
+    left: 28px;
+
+    z-index: 5;
+
+    font-size: 10px;
+
+    letter-spacing: .15em;
+
+    text-transform: uppercase;
+
+    color:
+        rgba(0,0,0,.30);
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.card-content button {
+
+    border: none;
+
+    padding:
+        13px 25px;
+
+    border-radius: 999px;
+
+    background: #111;
+
+    color: #fff;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition:
+        transform .3s ease,
+        background .3s ease,
+        box-shadow .3s ease;
+}
+
+
+.card-content button:hover {
+
+    transform:
+        translateY(-3px);
+
+    background:
+        var(--blue);
+
+    box-shadow:
+        0 10px 30px
+        rgba(49,124,255,.20);
+}
+
+
+.card-content button.secondary {
+
+    background: transparent;
+
+    color: #111;
+
+    border:
+        1px solid
+        rgba(0,0,0,.14);
+}
+
+
+.card-content button.secondary:hover {
+
+    color: #fff;
+
+    background:
+        var(--blue);
+
+    border-color:
+        var(--blue);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 930px) {
+
+    #who {
+
+        flex-direction: column;
+
+        gap: 30px;
+
+        padding:
+            60px 20px;
+    }
+
+    .particle-card {
+
+        width:
+            min(600px, 94vw);
+
+        min-height:
+            350px;
+    }
+
+    .card-content h3 {
+
+        font-size:
+            2rem;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    #who {
+
+        padding:
+            40px 15px;
+    }
+
+    .particle-card {
+
+        width: 100%;
+
+        min-height:
+            320px;
+
+        border-radius:
+            24px;
+    }
+
+    .card-content h3 {
+
+        font-size:
+            1.65rem;
+    }
+
+    .card-label {
+
+        top: 18px;
+        left: 20px;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    #particleCanvas {
+        display: none;
+    }
+
+    .particle-card {
+        transition: none;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<section id="who">
+
+    <!--
+        PARTICLE BACKGROUND
+        ====================
+        Bukan di dalam card.
+        Canvas memenuhi seluruh section.
+    -->
+
+    <canvas id="particleCanvas"></canvas>
+
+
+    <!-- =================================================
+         DEVELOPERS CARD
+    ================================================= -->
+
+    <div
+        class="particle-card"
+        data-card="developers"
+    >
+
+        <span class="card-label">
+            Developers
+        </span>
+
+        <div class="card-content">
+
+            <h3>
+                For developers<br>
+                <span>
+                    Achieve new heights
+                </span>
+            </h3>
+
+            <button>
+                Download
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         ORGANIZATIONS CARD
+    ================================================= -->
+
+    <div
+        class="particle-card"
+        data-card="organizations"
+    >
+
+        <span class="card-label">
+            Organizations
+        </span>
+
+        <div class="card-content">
+
+            <h3>
+                For organizations<br>
+                <span>
+                    Level up your entire team
+                </span>
+            </h3>
+
+            <button class="secondary">
+                Notify me
+            </button>
+
+        </div>
+
+    </div>
+
+
+</section>
+
+
+
+<script>
+
+/* =====================================================
+   PARTICLE SYSTEM
+===================================================== */
+
+class ParticleSystem {
+
+    constructor() {
+
+        this.section =
+            document.querySelector("#who");
+
+        this.canvas =
+            document.querySelector("#particleCanvas");
+
+        this.ctx =
+            this.canvas.getContext("2d");
+
+        this.cards =
+            [...document.querySelectorAll(".particle-card")];
+
+
+        /* =================================================
+           SETTINGS
+        ================================================= */
+
+        this.PARTICLE_COUNT =
+            window.innerWidth < 700
+                ? 900
+                : 1500;
+
+
+        /*
+            Sangat kecil seperti titik pada
+            referensi Antigravity
+        */
+
+        this.MIN_SIZE =
+            0.35;
+
+        this.MAX_SIZE =
+            1.15;
+
+
+        this.particles = [];
+
+
+        /* =================================================
+           CANVAS
+        ================================================= */
+
+        this.width = 0;
+        this.height = 0;
+
+        this.dpr =
+            Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+
+        /* =================================================
+           ANIMATION
+        ================================================= */
+
+        this.activeCard =
+            null;
+
+        this.activation =
+            0;
+
+        this.targetActivation =
+            0;
+
+
+        this.mouse = {
+            x: 0,
+            y: 0
+        };
+
+
+        /* =================================================
+           START
+        ================================================= */
+
+        this.resize();
+
+        this.createParticles();
+
+        this.bindEvents();
+
+        window.addEventListener(
+            "resize",
+            () => {
+
+                this.resize();
+
+                this.createBraceTargets();
+
+            }
+        );
+
+
+        this.createBraceTargets();
+
+        this.animate();
+    }
+
+
+    /* =====================================================
+       RESIZE
+    ===================================================== */
+
+    resize() {
+
+        const rect =
+            this.section.getBoundingClientRect();
+
+        this.width =
+            rect.width;
+
+        this.height =
+            rect.height;
+
+
+        this.canvas.width =
+            this.width * this.dpr;
+
+        this.canvas.height =
+            this.height * this.dpr;
+
+
+        this.canvas.style.width =
+            this.width + "px";
+
+        this.canvas.style.height =
+            this.height + "px";
+
+
+        this.ctx.setTransform(
+            this.dpr,
+            0,
+            0,
+            this.dpr,
+            0,
+            0
+        );
+    }
+
+
+    /* =====================================================
+       PARTICLES
+    ===================================================== */
+
+    createParticles() {
+
+        this.particles = [];
+
+        for (
+            let i = 0;
+            i < this.PARTICLE_COUNT;
+            i++
+        ) {
+
+            const particle = {
+
+                /* Random background */
+
+                x:
+                    Math.random() *
+                    this.width,
+
+                y:
+                    Math.random() *
+                    this.height,
+
+
+                baseX:
+                    Math.random() *
+                    this.width,
+
+                baseY:
+                    Math.random() *
+                    this.height,
+
+
+                /* Tiny point */
+
+                size:
+                    this.MIN_SIZE +
+                    Math.random() *
+                    (
+                        this.MAX_SIZE -
+                        this.MIN_SIZE
+                    ),
+
+
+                /* Transparency */
+
+                alpha:
+                    .12 +
+                    Math.random() *
+                    .50,
+
+
+                /* Movement */
+
+                phase:
+                    Math.random() *
+                    Math.PI *
+                    2,
+
+                speed:
+                    .05 +
+                    Math.random() *
+                    .18,
+
+
+                /* Target positions */
+
+                braceLeft:
+                    {
+                        x: 0,
+                        y: 0
+                    },
+
+                braceRight:
+                    {
+                        x: 0,
+                        y: 0
+                    },
+
+
+                /* Depth */
+
+                depth:
+                    Math.random()
+
+            };
+
+
+            this.particles.push(
+                particle
+            );
+        }
+    }
+
+
+    /* =====================================================
+       CREATE BRACES AROUND CARD
+    ===================================================== */
+
+    createBraceTargets() {
+
+        this.cards.forEach(
+            (card, cardIndex) => {
+
+                const rect =
+                    card.getBoundingClientRect();
+
+
+                const sectionRect =
+                    this.section.getBoundingClientRect();
+
+
+                /*
+                    Card coordinates inside section
+                */
+
+                const left =
+                    rect.left -
+                    sectionRect.left;
+
+                const top =
+                    rect.top -
+                    sectionRect.top;
+
+                const width =
+                    rect.width;
+
+                const height =
+                    rect.height;
+
+
+                /*
+                    Padding around card.
+
+                    Semakin besar angka ini,
+                    semakin jauh {} dari card.
+                */
+
+                const padding =
+                    Math.min(
+                        110,
+                        Math.max(
+                            70,
+                            width * .14
+                        )
+                    );
+
+
+                const braceTop =
+                    top -
+                    padding * .30;
+
+
+                const braceBottom =
+                    top +
+                    height +
+                    padding * .30;
+
+
+                /*
+                    Kiri card
+                */
+
+                const leftX =
+                    left -
+                    padding;
+
+
+                /*
+                    Kanan card
+                */
+
+                const rightX =
+                    left +
+                    width +
+                    padding;
+
+
+                const centerY =
+                    top +
+                    height / 2;
+
+
+                /*
+                    Tinggi brace
+                */
+
+                const braceHeight =
+                    height +
+                    padding * .25;
+
+
+                const points =
+                    this.generateBracePair(
+                        leftX,
+                        rightX,
+                        centerY,
+                        braceHeight
+                    );
+
+
+                /*
+                    Assign points
+                */
+
+                const half =
+                    Math.floor(
+                        this.particles.length / 2
+                    );
+
+
+                for (
+                    let i = 0;
+                    i < this.particles.length;
+                    i++
+                ) {
+
+                    const p =
+                        this.particles[i];
+
+
+                    const index =
+                        i %
+                        points.length;
+
+
+                    const target =
+                        points[index];
+
+
+                    /*
+                        Simpan untuk masing-masing card.
+                    */
+
+                    if (
+                        cardIndex === 0
+                    ) {
+
+                        p.card0Left =
+                            target.left;
+
+                        p.card0Right =
+                            target.right;
+
+                    } else {
+
+                        p.card1Left =
+                            target.left;
+
+                        p.card1Right =
+                            target.right;
+                    }
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       GENERATE { }
+    ===================================================== */
+
+    generateBracePair(
+        leftX,
+        rightX,
+        centerY,
+        height
+    ) {
+
+        const result = [];
+
+
+        const count =
+            750;
+
+
+        for (
+            let i = 0;
+            i < count;
+            i++
+        ) {
+
+            const t =
+                i /
+                (count - 1);
+
+
+            /*
+                Vertikal dari atas ke bawah
+            */
+
+            const y =
+                centerY -
+                height / 2 +
+                t * height;
+
+
+            /*
+                Bentuk {
+
+                atas -> tengah -> bawah
+            */
+
+            const curve =
+                Math.abs(
+                    t - .5
+                ) * 2;
+
+
+            /*
+                Lebar lekukan
+            */
+
+            const bend =
+                Math.pow(
+                    curve,
+                    1.65
+                );
+
+
+            /*
+                LEFT BRACE {
+
+                semakin ke tengah,
+                semakin masuk
+            */
+
+            const leftBraceX =
+                leftX +
+                bend * 65;
+
+
+            /*
+                RIGHT BRACE }
+
+                mirror
+            */
+
+            const rightBraceX =
+                rightX -
+                bend * 65;
+
+
+            /*
+                Sedikit random supaya
+                bukan garis solid
+            */
+
+            const noiseX =
+                (
+                    Math.random() -
+                    .5
+                ) * 14;
+
+
+            const noiseY =
+                (
+                    Math.random() -
+                    .5
+                ) * 14;
+
+
+            result.push({
+
+                left: {
+
+                    x:
+                        leftBraceX +
+                        noiseX,
+
+                    y:
+                        y +
+                        noiseY
+                },
+
+                right: {
+
+                    x:
+                        rightBraceX +
+                        noiseX,
+
+                    y:
+                        y +
+                        noiseY
+                }
+
+            });
+        }
+
+
+        return result;
+    }
+
+
+    /* =====================================================
+       EVENTS
+    ===================================================== */
+
+    bindEvents() {
+
+        this.cards.forEach(
+            (card, index) => {
+
+
+                /*
+                    DESKTOP HOVER
+                */
+
+                card.addEventListener(
+                    "pointerenter",
+                    event => {
+
+                        this.activate(
+                            index,
+                            event
+                        );
+                    }
+                );
+
+
+                /*
+                    MOUSE POSITION
+                */
+
+                card.addEventListener(
+                    "pointermove",
+                    event => {
+
+                        const rect =
+                            this.section
+                                .getBoundingClientRect();
+
+
+                        this.mouse.x =
+                            event.clientX -
+                            rect.left;
+
+
+                        this.mouse.y =
+                            event.clientY -
+                            rect.top;
+                    }
+                );
+
+
+                /*
+                    DESKTOP LEAVE
+                */
+
+                card.addEventListener(
+                    "pointerleave",
+                    () => {
+
+                        if (
+                            eventIsTouch
+                        ) return;
+
+
+                        this.deactivate();
+                    }
+                );
+
+
+                /*
+                    TOUCH / MOBILE
+
+                    Tap untuk aktif
+                */
+
+                card.addEventListener(
+                    "pointerdown",
+                    event => {
+
+                        if (
+                            event.pointerType ===
+                            "touch"
+                        ) {
+
+                            if (
+                                this.activeCard ===
+                                index
+                            ) {
+
+                                this.deactivate();
+
+                            } else {
+
+                                this.activate(
+                                    index,
+                                    event
+                                );
+                            }
+                        }
+
+                    }
+                );
+            }
+        );
+
+
+        /*
+            Global move
+
+            Supaya titik background
+            tetap mengikuti pointer.
+        */
+
+        this.section.addEventListener(
+            "pointermove",
+            event => {
+
+                const rect =
+                    this.section
+                        .getBoundingClientRect();
+
+
+                this.mouse.x =
+                    event.clientX -
+                    rect.left;
+
+
+                this.mouse.y =
+                    event.clientY -
+                    rect.top;
+            }
+        );
+    }
+
+
+    /* =====================================================
+       ACTIVATE
+    ===================================================== */
+
+    activate(
+        index,
+        event
+    ) {
+
+        this.activeCard =
+            index;
+
+        this.targetActivation =
+            1;
+
+
+        this.cards.forEach(
+            (card, i) => {
+
+                card.classList.toggle(
+                    "active",
+                    i === index
+                );
+            }
+        );
+
+
+        /*
+            sedikit refresh target
+        */
+
+        this.createBraceTargets();
+    }
+
+
+    /* =====================================================
+       DEACTIVATE
+    ===================================================== */
+
+    deactivate() {
+
+        this.targetActivation =
+            0;
+
+        this.activeCard =
+            null;
+
+
+        this.cards.forEach(
+            card => {
+
+                card.classList.remove(
+                    "active"
+                );
+            }
+        );
+    }
+
+
+    /* =====================================================
+       GET TARGET
+    ===================================================== */
+
+    getTarget(
+        particle,
+        index
+    ) {
+
+        if (
+            this.activeCard ===
+            null
+        ) {
+
+            return {
+                x:
+                    particle.baseX,
+
+                y:
+                    particle.baseY
+            };
+        }
+
+
+        let leftTarget;
+        let rightTarget;
+
+
+        if (
+            this.activeCard === 0
+        ) {
+
+            leftTarget =
+                particle.card0Left;
+
+            rightTarget =
+                particle.card0Right;
+
+        } else {
+
+            leftTarget =
+                particle.card1Left;
+
+            rightTarget =
+                particle.card1Right;
+        }
+
+
+        /*
+            Setengah partikel ke {
+            setengah ke }
+        */
+
+        if (
+            index <
+            this.particles.length / 2
+        ) {
+
+            return leftTarget;
+
+        } else {
+
+            return rightTarget;
+        }
+    }
+
+
+    /* =====================================================
+       ANIMATE
+    ===================================================== */
+
+    animate() {
+
+        requestAnimationFrame(
+            () => this.animate()
+        );
+
+
+        /*
+            Smooth activation
+        */
+
+        this.activation +=
+            (
+                this.targetActivation -
+                this.activation
+            ) * .045;
+
+
+        /*
+            Clear
+        */
+
+        this.ctx.clearRect(
+            0,
+            0,
+            this.width,
+            this.height
+        );
+
+
+        const time =
+            performance.now() *
+            .001;
+
+
+        /*
+            DRAW PARTICLES
+        */
+
+        this.particles.forEach(
+            (particle, index) => {
+
+
+                /* =========================================
+                   FLOATING BACKGROUND
+                ========================================= */
+
+                const floatX =
+                    Math.sin(
+                        time *
+                        particle.speed +
+                        particle.phase
+                    ) * 7;
+
+
+                const floatY =
+                    Math.cos(
+                        time *
+                        particle.speed *
+                        .7 +
+                        particle.phase
+                    ) * 7;
+
+
+                const startX =
+                    particle.baseX +
+                    floatX;
+
+
+                const startY =
+                    particle.baseY +
+                    floatY;
+
+
+                /* =========================================
+                   TARGET
+                ========================================= */
+
+                const target =
+                    this.getTarget(
+                        particle,
+                        index
+                    );
+
+
+                /*
+                    Random spread ketika
+                    sedang transisi.
+                */
+
+                const x =
+                    startX +
+                    (
+                        target.x -
+                        startX
+                    ) *
+                    this.activation;
+
+
+                const y =
+                    startY +
+                    (
+                        target.y -
+                        startY
+                    ) *
+                    this.activation;
+
+
+                /* =========================================
+                   POINTER INFLUENCE
+                ========================================= */
+
+                let finalX =
+                    x;
+
+                let finalY =
+                    y;
+
+
+                if (
+                    this.activation >
+                    .2
+                ) {
+
+                    const dx =
+                        x -
+                        this.mouse.x;
+
+
+                    const dy =
+                        y -
+                        this.mouse.y;
+
+
+                    const distance =
+                        Math.sqrt(
+                            dx * dx +
+                            dy * dy
+                        );
+
+
+                    const radius =
+                        130;
+
+
+                    if (
+                        distance <
+                        radius
+                    ) {
+
+                        const force =
+                            (
+                                1 -
+                                distance /
+                                radius
+                            ) * 12;
+
+
+                        finalX +=
+                            (
+                                dx /
+                                (
+                                    distance ||
+                                    1
+                                )
+                            ) *
+                            force;
+
+
+                        finalY +=
+                            (
+                                dy /
+                                (
+                                    distance ||
+                                    1
+                                )
+                            ) *
+                            force;
+                    }
+                }
+
+
+                /* =========================================
+                   OPACITY
+
+                   Ketika inactive:
+                   titik sangat halus.
+
+                   Ketika aktif:
+                   sedikit lebih terlihat.
+                ========================================= */
+
+                const alpha =
+                    particle.alpha *
+                    (
+                        .42 +
+                        this.activation *
+                        .58
+                    );
+
+
+                /* =========================================
+                   SIZE
+
+                   Tetap kecil.
+                ========================================= */
+
+                const size =
+                    particle.size *
+                    (
+                        0.85 +
+                        this.activation *
+                        .20
+                    );
+
+
+                /* =========================================
+                   DRAW
+                ========================================= */
+
+                this.ctx.beginPath();
+
+                this.ctx.arc(
+                    finalX,
+                    finalY,
+                    size,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                this.ctx.fillStyle =
+                    `rgba(
+                        49,
+                        124,
+                        255,
+                        ${alpha}
+                    )`;
+
+
+                this.ctx.fill();
+            }
+        );
+    }
+}
+
+
+/* =====================================================
+   TOUCH HELPER
+===================================================== */
+
+let eventIsTouch = false;
+
+document.addEventListener(
+    "pointerdown",
+    event => {
+
+        eventIsTouch =
+            event.pointerType ===
+            "touch";
+    }
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+new ParticleSystem();
+
+</script>
+
+</body>
+</html>

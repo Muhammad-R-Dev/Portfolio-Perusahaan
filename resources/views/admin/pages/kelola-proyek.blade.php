@@ -206,11 +206,16 @@
 
     /* ---------- MODAL FULLSCREEN ---------- */
     .chb-modal-overlay.overlay-full {
-        left: var(--chb-sidebar-w, 0px);
-        padding: 28px 32px;
+        /* Overlay blur menutupi seluruh layar termasuk sidebar (sidebar tidak bisa diklik);
+           form tetap diposisikan di area konten lewat padding-left sebesar lebar sidebar. */
+        left: 0;
+        padding: 28px 32px 28px calc(var(--chb-sidebar-w, 0px) + 32px);
         align-items: stretch; justify-content: stretch;
-        z-index: 1200;
-        transition: left 0.3s ease;
+        z-index: 3000;
+        /* Tanpa blur: hanya lapisan gelap transparan tipis, isi halaman di belakang masih terbaca */
+        background: rgba(15, 23, 42, 0.25);
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+        transition: opacity 0.3s ease, padding-left 0.3s ease;
     }
     .chb-modal.modal-full {
         max-width: none; width: 100%; height: 100%; max-height: 100%;
@@ -227,6 +232,23 @@
     .form-col-left { display: flex; flex-direction: column; gap: 18px; }
     .form-col-right { display: flex; flex-direction: column; height: 100%; min-height: 420px; }
     .form-col-right .form-group { flex: 1; min-height: 0; }
+
+    /* ========== MODE ZOOM DESKRIPSI: editor membesar penuh, input lain disembunyikan ========== */
+    .modal-full-header .btn-back {
+        display: none; align-items: center; gap: 6px; padding: 8px 18px; border: none; cursor: pointer;
+        border-radius: 36px; background: var(--blue, #3b82f6); color: #fff; font-size: 14px; font-weight: 500;
+        font-family: var(--poppins), sans-serif; transition: 0.2s;
+    }
+    .modal-full-header .btn-back:hover { filter: brightness(0.92); }
+    .chb-modal.modal-full.focus-mode { animation: chbFocusExpand .2s ease; }
+    .chb-modal.modal-full.focus-mode .btn-back { display: inline-flex; }
+    .chb-modal.modal-full.focus-mode .modal-title-wrap { display: none; }
+    .chb-modal.modal-full.focus-mode .modal-full-body { overflow: hidden; }
+    .chb-modal.modal-full.focus-mode .form-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 100%; min-height: 0; }
+    .chb-modal.modal-full.focus-mode .form-col-left { display: none; }
+    .chb-modal.modal-full.focus-mode .form-col-right { height: 100%; min-height: 0; }
+    .chb-modal.modal-full.focus-mode .editor-content { font-size: 16px; padding: 32px; }
+    @keyframes chbFocusExpand { from { opacity: .7; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
     .field-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px; background: #fff; }
     .chb-modal .form-group { display: flex; flex-direction: column; }
     .chb-modal .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #1e293b; }
@@ -247,8 +269,16 @@
     .editor-toolbar select { padding: 4px 8px; font-size: 13px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; outline: none; color: #334155; font-family: var(--poppins), sans-serif; }
     .editor-btn { background: transparent; border: none; padding: 4px; font-size: 16px; cursor: pointer; border-radius: 6px; color: #475569; width: 30px; height: 30px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
     .editor-btn:hover { background: #e2e8f0; color: #0f172a; }
-    .editor-btn.is-image { color: #2563eb; }
-    .editor-divider { width: 1px; height: 18px; background: #cbd5e1; margin: 0 4px; }
+    /* Toolbar ringkas: dropdown Normal & Ukuran berbentuk card kecil di samping ikon Bold */
+    .editor-toolbar { gap: 4px; padding: 6px 10px; }
+    .chb-modal .form-group .editor-toolbar select {
+        width: auto; height: 26px; padding: 0 8px; font-size: 12px; font-weight: 500; border-radius: 8px;
+        border: 1px solid #cbd5e1; background-color: #fff; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); cursor: pointer;
+    }
+    .chb-modal .form-group .editor-toolbar select:hover { border-color: #94a3b8; }
+    .chb-modal .form-group .editor-toolbar select:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15); }
+    .editor-btn { width: 26px; height: 26px; font-size: 14px; padding: 2px; border-radius: 5px; }
+    .editor-divider { width: 1px; height: 14px; background: #cbd5e1; margin: 0 2px; }
     .editor-canvas { position: relative; flex: 1; min-height: 0; display: flex; }
     .editor-content { flex: 1; min-height: 220px; overflow-y: auto; padding: 18px 20px; font-size: 14px; line-height: 1.7; outline: none; color: #1e293b; }
     .editor-content:empty:before { content: attr(data-placeholder); color: #94a3b8; }
@@ -301,6 +331,12 @@
         z-index: 5000; justify-content: center; align-items: center; padding: 16px;
     }
     .modal-overlay.show { display: flex; }
+    /* Form Import (unggah & hasil): menutupi seluruh layar termasuk sidebar, tanpa blur, transparan tipis agar isi halaman masih terbaca */
+    #importModal, #importResultModal {
+        position: fixed; inset: 0;
+        background: rgba(15, 23, 42, 0.25);
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+    }
     .modal-box {
         background: var(--light); border-radius: 16px; padding: 40px; width: 100%; max-width: 900px;
         max-height: 92vh; overflow-y: auto; font-family: var(--poppins), sans-serif;
@@ -650,6 +686,13 @@
         color: #fff !important;
     }
 
+    /* Tombol "Kembali" (zoom mode deskripsi) tetap biru, tulisan putih */
+    body.dark .modal-full-header .btn-back,
+    body.dark .modal-full-header .btn-back:hover {
+        background: var(--blue) !important;
+        color: #fff !important;
+    }
+
     /* Tombol "Batal" di modal (form tambah/edit, konfirmasi, dll) tetap merah, tulisan putih */
     body.dark .modal-box .btn-cancel,
     body.dark .modal-box .btn-cancel:hover {
@@ -823,10 +866,11 @@
     <div class="chb-modal-overlay overlay-full" id="chbFormModalOverlay">
         <div class="chb-modal modal-full">
             <div class="modal-full-header">
-                <div>
+                <div class="modal-title-wrap">
                     <h3 id="chbFormModalTitle">Tambah Data Client</h3>
                     <div class="modal-subtitle">Lengkapi data pokok di kiri, tulis deskripsi project di kanan.</div>
                 </div>
+                <button type="button" class="btn-back" id="chbBtnEditorBack"><i class='bx bx-arrow-back'></i> Kembali</button>
             </div>
 
             <form id="chbClientForm" onsubmit="chbProcessFormSubmit(event)">
@@ -874,7 +918,6 @@
                                             <option value="5">Besar</option>
                                             <option value="6">Sangat Besar</option>
                                         </select>
-                                        <div class="editor-divider"></div>
                                         <button type="button" class="editor-btn" onclick="formatDoc('bold')" title="Bold"><i class='bx bx-bold'></i></button>
                                         <button type="button" class="editor-btn" onclick="formatDoc('italic')" title="Italic"><i class='bx bx-italic'></i></button>
                                         <button type="button" class="editor-btn" onclick="formatDoc('underline')" title="Underline"><i class='bx bx-underline'></i></button>
@@ -887,8 +930,6 @@
                                         <button type="button" class="editor-btn" onclick="formatDoc('insertUnorderedList')" title="Bullet List"><i class='bx bx-list-ul'></i></button>
                                         <button type="button" class="editor-btn" onclick="formatDoc('insertOrderedList')" title="Numbering"><i class='bx bx-list-ol'></i></button>
                                         <div class="editor-divider"></div>
-                                        <button type="button" class="editor-btn" onclick="addLink()" title="Link"><i class='bx bx-link'></i></button>
-                                        <button type="button" class="editor-btn is-image" onclick="triggerEditorImage()" title="Sisipkan Gambar"><i class='bx bx-image-add'></i></button>
                                         <button type="button" class="editor-btn" onclick="formatDoc('removeFormat')" title="Hapus Format"><i class='bx bx-eraser'></i></button>
                                         <button type="button" class="editor-btn" onclick="formatDoc('undo')" title="Undo"><i class='bx bx-undo'></i></button>
                                         <button type="button" class="editor-btn" onclick="formatDoc('redo')" title="Redo"><i class='bx bx-redo'></i></button>
@@ -896,7 +937,7 @@
 
                                     <div class="editor-canvas" id="chbEditorCanvas">
                                         <div class="editor-content" id="chbDeskripsiEditor" contenteditable="true"
-                                             data-placeholder="Tulis deskripsi / catatan detail project di sini... (gambar bisa disisipkan lewat tombol gambar atau paste langsung)"></div>
+                                             data-placeholder="Tulis deskripsi / catatan detail project di sini..."></div>
 
                                         {{-- Frame resize gambar --}}
                                         <div class="img-frame" id="chbImgFrame">
@@ -927,7 +968,6 @@
                                         <div class="img-size-badge" id="chbImgSizeBadge">0 px</div>
                                     </div>
                                 </div>
-                                <input type="file" id="chbEditorImageInput" accept="image/*" multiple style="display:none" onchange="handleEditorImage(event)">
                             </div>
                         </div>
                     </div>
@@ -1092,9 +1132,7 @@
             function closeImportResultModal() {
                 document.getElementById('importResultModal').classList.remove('show');
             }
-            document.getElementById('importResultModal').addEventListener('click', function (e) {
-                if (e.target === this) closeImportResultModal();
-            });
+            // Klik di luar kotak TIDAK menutup; tutup hanya lewat tombol OK.
         </script>
     @endif
 
@@ -1264,10 +1302,6 @@
         else document.execCommand(cmd, false, null);
         saveRange();
     }
-    function addLink() {
-        const url = prompt('Masukkan Link/URL:');
-        if (url) formatDoc('createLink', url);
-    }
     function saveRange() {
         const sel = window.getSelection();
         if (sel && sel.rangeCount > 0) {
@@ -1284,45 +1318,15 @@
         sel.addRange(chbSavedRange);
     }
 
-    function triggerEditorImage() {
-        saveRange();
-        document.getElementById('chbEditorImageInput').click();
-    }
-    function handleEditorImage(e) {
-        const files = Array.from(e.target.files || []);
-        files.forEach(file => {
-            if (!file.type.startsWith('image/')) return;
-            if (file.size > 3 * 1024 * 1024) {
-                alert(`Gambar "${file.name}" melebihi 3MB dan dilewati.`); return;
-            }
-            const reader = new FileReader();
-            reader.onload = ev => insertImageToEditor(ev.target.result);
-            reader.readAsDataURL(file);
-        });
-        e.target.value = '';
-    }
-    function insertImageToEditor(dataUrl) {
-        const editor = document.getElementById('chbDeskripsiEditor');
-        editor.focus();
-        restoreRange();
-        const html = `<img src="${dataUrl}" class="chb-img" style="width:60%;height:auto;display:block;margin:10px 0;border-radius:6px;"><p><br></p>`;
-        document.execCommand('insertHTML', false, html);
-        saveRange();
-    }
     function initEditorImageEvents() {
         const editor = document.getElementById('chbDeskripsiEditor');
         const canvas = document.getElementById('chbEditorCanvas');
         const frame = document.getElementById('chbImgFrame');
         editor.addEventListener('paste', function (e) {
+            // Sisipkan gambar sudah dihapus: paste gambar diblokir (paste teks tetap normal)
             const items = (e.clipboardData || window.clipboardData).items;
             for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') !== -1) {
-                    e.preventDefault();
-                    const file = items[i].getAsFile();
-                    const reader = new FileReader();
-                    reader.onload = ev => insertImageToEditor(ev.target.result);
-                    reader.readAsDataURL(file);
-                }
+                if (items[i].type.indexOf('image') !== -1) { e.preventDefault(); return; }
             }
         });
         editor.addEventListener('click', function (e) {
@@ -1427,7 +1431,7 @@
             th.innerHTML = `<input type="checkbox" id="chbSelectAll" title="Pilih semua di halaman ini" onclick="chbToggleSelectAllOnPage(this.checked)"><span class="chb-select-label">Pilih</span>`;
             th.classList.add('select-mode-header');
             toggleBtn.classList.add('active');
-            toggleBtnText.textContent = 'Batal Pilih';
+            toggleBtnText.textContent = 'Batal';
             bulkGroup.classList.add('show');
         } else {
             th.textContent = 'Aksi';
@@ -1655,6 +1659,7 @@
         document.getElementById('chbDeskripsiEditor').innerHTML = '';
         deselectEditorImage();
         chbSavedRange = null;
+        chbResetFocusMode();
         chbSyncSidebarOffset();
         document.getElementById('chbFormModalOverlay').classList.add('show');
         setTimeout(() => document.getElementById('chbNamaClient').focus(), 150);
@@ -1672,14 +1677,69 @@
         document.getElementById('chbDeadline').value = client.deadline;
         deselectEditorImage();
         chbSavedRange = null;
+        chbResetFocusMode();
         chbSyncSidebarOffset();
         document.getElementById('chbFormModalOverlay').classList.add('show');
     }
 
     function chbCloseFormModal() { 
         deselectEditorImage(); 
+        chbResetFocusMode();
         document.getElementById('chbFormModalOverlay').classList.remove('show'); 
     }
+
+    /* ============================================================
+       MODE ZOOM DESKRIPSI LENGKAP
+       Klik/ketik di editor -> editor membesar penuh. Tombol Kembali / Esc -> normal.
+       Input lain hanya disembunyikan lewat CSS (tidak dihapus), jadi semua data tetap ikut tersimpan.
+       ============================================================ */
+    let chbFocusMode = false;
+    let chbFocusLock = false;
+
+    function chbFormModal() { return document.querySelector('#chbFormModalOverlay .chb-modal'); }
+
+    function chbEnterFocusMode() {
+        if (chbFocusMode || chbFocusLock || !document.getElementById('chbFormModalOverlay').classList.contains('show')) return;
+        chbFormModal().classList.add('focus-mode');
+        chbFocusMode = true;
+        deselectEditorImage();
+    }
+
+    function chbExitFocusMode() {
+        if (!chbFocusMode) return;
+        saveRange();
+        chbFormModal().classList.remove('focus-mode');
+        chbFocusMode = false;
+        deselectEditorImage();
+        chbFocusLock = true; // cegah langsung membesar lagi karena fokus editor
+        document.getElementById('chbDeskripsiEditor').blur();
+        setTimeout(() => { chbFocusLock = false; }, 400);
+    }
+
+    function chbResetFocusMode() {
+        chbFormModal().classList.remove('focus-mode');
+        chbFocusMode = false;
+        chbFocusLock = false;
+    }
+
+    (function chbInitFocusMode() {
+        const editor = document.getElementById('chbDeskripsiEditor');
+        editor.addEventListener('focus', chbEnterFocusMode);
+        editor.addEventListener('click', chbEnterFocusMode);
+        editor.addEventListener('input', chbEnterFocusMode);
+        document.getElementById('chbBtnEditorBack').addEventListener('click', chbExitFocusMode);
+
+        // Saat Simpan ditekan, kembalikan tampilan dulu supaya validasi input (Nama, Project, Tanggal) bisa berjalan
+        document.querySelector('#chbClientForm .btn-save').addEventListener('click', chbExitFocusMode);
+
+        // Esc keluar dari zoom mode (fase capture: berjalan sebelum Esc pembatal pilihan gambar)
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape' || !chbFocusMode || chbSelectedImg) return;
+            if (document.getElementById('dbLightbox').classList.contains('show')) return;
+            if (document.getElementById('saveConfirmModal').classList.contains('show')) return;
+            chbExitFocusMode();
+        }, true);
+    })();
 
     /* ============================================================
        MODAL KONFIRMASI SIMPAN / EDIT & SUCCESS
@@ -1971,8 +2031,33 @@
             btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> Mengimpor...";
         });
 
-        modal.addEventListener('click', e => { if (e.target === modal) closeImportModal(); });
+        // Klik di luar kotak TIDAK menutup modal import; tutup hanya lewat tombol Batal.
     }
+
+    /* ============================================================
+       KUNCI FORM IMPORT: klik di luar kotak / Esc TIDAK menutup.
+       Tutup hanya lewat tombol Batal (atau OK pada modal hasil).
+       Listener capture di window menghentikan event sebelum sampai ke handler lain
+       (termasuk handler global dari layout) bila yang diklik adalah area overlay-nya.
+       ============================================================ */
+    (function chbLockImportModals() {
+        const ids = ['importModal', 'importResultModal'];
+        ['click', 'mousedown', 'mouseup', 'pointerdown', 'pointerup', 'touchstart', 'touchend'].forEach(type => {
+            window.addEventListener(type, function (e) {
+                if (ids.some(id => e.target === document.getElementById(id))) {
+                    e.stopImmediatePropagation();
+                }
+            }, true);
+        });
+        window.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            const open = ids.some(id => {
+                const el = document.getElementById(id);
+                return el && el.classList.contains('show');
+            });
+            if (open) e.stopImmediatePropagation();
+        }, true);
+    })();
 
     /* ============================================================
        DETAIL

@@ -18,6 +18,8 @@
 			font-weight: 500;
 			border: none;
 			cursor: pointer;
+			font-family: var(--poppins);
+			font-size: 14px;
 		}
 
 		#content main .box-info {
@@ -356,17 +358,13 @@
 		.modal-overlay {
 			display: none;
 			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
+			inset: 0;
 			background: rgba(0, 0, 0, 0.5);
 			z-index: 5000;
 			justify-content: center;
 			align-items: center;
 			padding: 20px;
 			box-sizing: border-box;
-			transition: left .2s ease, width .2s ease;
 		}
 		.modal-overlay.show {
 			display: flex;
@@ -430,6 +428,36 @@
 				height: auto;
 			}
 		}
+		/* FORM TAMBAH/EDIT BLOG: besar memenuhi area konten dengan jarak di setiap sisi */
+		#blogModal {
+			padding: 32px;
+			align-items: stretch;
+		}
+		#blogModal .modal-box {
+			width: 100%;
+			max-width: none;
+			height: 100%;
+			max-height: none;
+			border-radius: 16px;
+			padding: 28px 40px;
+		}
+		#blogModal .modal-box form { flex: 1; min-height: 0; }
+		#blogModal .modal-box .form-grid { flex: 1; min-height: 0; }
+		#blogModal .modal-box .form-col-right { height: auto; min-height: 0; }
+		#blogModal .modal-box .editor-box { height: 100%; }
+		#blogModal .modal-box .editor-content { min-height: 320px; }
+		#blogModal .modal-actions {
+			bottom: -28px;
+			margin: 24px -40px -28px -40px;
+			padding: 16px 40px;
+			border-radius: 0 0 16px 16px;
+		}
+		@media screen and (max-width: 768px) {
+			#blogModal { padding: 12px; }
+			#blogModal .modal-box { max-width: none; padding: 20px 16px; }
+			#blogModal .modal-actions { bottom: -20px; margin: 20px -16px -20px -16px; padding: 14px 16px; }
+		}
+
 		.modal-box h2 {
 			font-size: 20px;
 			margin-bottom: 20px;
@@ -617,6 +645,179 @@
 		}
 		.img-size-badge.active { display: block; }
 
+		/* ============================================================
+		   MODE FOKUS MENULIS: form membesar penuh, input lain disembunyikan
+		   ============================================================ */
+		.modal-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 20px;
+		}
+		.modal-head h2 { margin-bottom: 0; }
+		.modal-box .btn-back {
+			display: none;
+			align-items: center;
+			gap: 6px;
+			padding: 8px 18px;
+			background: var(--blue);
+			color: #fff;
+		}
+		.editor-toolbar .editor-toggle {
+			margin-left: auto;
+			width: auto;
+			height: 30px;
+			padding: 0 12px;
+			gap: 6px;
+			border-radius: 20px;
+			background: var(--blue);
+			color: #fff;
+			font-family: var(--poppins), sans-serif;
+			font-size: 12px;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+		.editor-toolbar .editor-toggle:hover { background: var(--blue); color: #fff; filter: brightness(.92); }
+
+		#blogModal .modal-box.focus-mode {
+			max-width: none;
+			width: 100%;
+			height: 100%;
+			max-height: 100%;
+			overflow: hidden;
+			animation: focusExpand .2s ease;
+		}
+		#blogModal .modal-box.focus-mode .btn-back { display: inline-flex; }
+		#blogModal .modal-box.focus-mode .modal-head { justify-content: flex-start; }
+		#blogModal .modal-box.focus-mode .modal-head h2 { display: none; }
+		#blogModal .modal-box.focus-mode .form-grid {
+			flex: 1;
+			min-height: 0;
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-rows: minmax(0, 1fr);
+		}
+		#blogModal .modal-box.focus-mode .form-col-left { display: none; }
+		#blogModal .modal-box.focus-mode .form-col-right { height: auto; min-height: 0; }
+		#blogModal .modal-box.focus-mode .editor-content {
+			font-size: 16px;
+			padding: 32px 32px;
+		}
+		@keyframes focusExpand {
+			from { opacity: .7; transform: scale(.985); }
+			to   { opacity: 1;  transform: scale(1); }
+		}
+
+		/* ============================================================
+		   FITUR EDITOR: warna teks, shape, crop, video YouTube
+		   ============================================================ */
+		.editor-pop { position: relative; display: inline-flex; }
+		.editor-pop .editor-btn { position: relative; }
+		.editor-btn .icon-shape { display: block; pointer-events: none; }
+		.editor-btn .color-a { font-weight: 700; font-size: 15px; line-height: 1; margin-top: -3px; }
+		.editor-btn .color-bar { position: absolute; left: 7px; right: 7px; bottom: 4px; height: 3px; border-radius: 2px; background: #ef4444; }
+		.editor-popover {
+			display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 50;
+			background: var(--light, #fff); border: 1px solid #cbd5e1; border-radius: 10px;
+			padding: 10px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+		}
+		.editor-popover.show { display: block; }
+		.swatch-grid { display: grid; grid-template-columns: repeat(10, 20px); gap: 6px; }
+		.swatch-grid button {
+			width: 20px; height: 20px; border-radius: 50%; padding: 0; cursor: pointer;
+			border: 1px solid rgba(0, 0, 0, 0.18); transition: transform .12s;
+		}
+		.swatch-grid button:hover { transform: scale(1.18); }
+		.editor-popover .pop-more {
+			margin-top: 10px; width: 100%; padding: 6px 8px; border-radius: 6px; cursor: pointer;
+			border: 1px solid #cbd5e1; background: transparent; color: var(--dark, #334155);
+			font-size: 12px; font-weight: 600; font-family: var(--poppins), sans-serif;
+			display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+		}
+		.editor-popover .pop-more:hover { background: var(--grey, #e2e8f0); }
+		#chbColorCustom { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; border: 0; padding: 0; }
+		.shape-grid { display: grid; grid-template-columns: repeat(4, 46px); gap: 6px; }
+		.shape-grid button {
+			width: 46px; height: 46px; border-radius: 8px; cursor: pointer; background: transparent;
+			border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;
+		}
+		.shape-grid button:hover { background: var(--grey, #f1f5f9); border-color: #3b82f6; }
+
+		.editor-content .chb-shape, .editor-content .chb-video { cursor: pointer; max-width: 100%; box-sizing: border-box; }
+		.editor-content img { max-width: 100%; }
+		.editor-content .chb-video.is-selected { outline: 2px solid #3b82f6; outline-offset: 2px; }
+		/* Pelindung klik: video hanya dipilih (bukan diputar) saat mengedit. Tidak ikut tersimpan. */
+		.editor-content .chb-video:not(.chb-playing)::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 2; }
+
+		/* Video YouTube: ukuran TETAP (lebar penuh, rasio 16:9) sama seperti di halaman blog -> tidak bisa diubah */
+		.img-toolbar[data-type="video"] [data-hide-video] { display: none; }
+		/* Kartu video di editor: thumbnail + tombol play (seperti di halaman blog). Video baru tampil saat tombol "Putar" ditekan. */
+		.editor-content .chb-video:not(.chb-playing) iframe { visibility: hidden; }
+		.editor-content .chb-video:not(.chb-playing)::before {
+			content: ''; position: absolute; top: 50%; left: 50%; width: 68px; height: 48px; transform: translate(-50%, -50%);
+			background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect width='68' height='48' rx='14' fill='%23ef4444'/%3E%3Cpath d='M27 14l20 10-20 10z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
+			filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35)); z-index: 1; pointer-events: none;
+		}
+		.img-frame.no-resize .handle { display: none; }
+		.editor-content .chb-video { width: 100%; max-width: 480px; margin-left: auto; margin-right: auto; }
+		.editor-content img { max-width: 100%; }
+		.img-toolbar [data-only] { display: none; }
+		.img-toolbar[data-type="img"] [data-only="img"],
+		.img-toolbar[data-type="shape"] [data-only="shape"],
+		.img-toolbar[data-type="video"] [data-only="video"] { display: inline-flex; }
+		.img-toolbar .tb-color {
+			display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px;
+			cursor: pointer; color: #e2e8f0; font-size: 14px;
+		}
+		.img-toolbar .tb-color:hover { background: rgba(255, 255, 255, 0.14); }
+		.img-toolbar .tb-color input { width: 24px; height: 20px; border: none; padding: 0; background: none; cursor: pointer; }
+
+		/* Dialog crop & YouTube */
+		.chb-dialog-overlay { z-index: 5500; }
+		.modal-box.chb-dialog { max-width: 560px; }
+		.modal-box.chb-dialog.chb-dialog-wide { max-width: 860px; }
+		.chb-crop-ratios { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+		.chb-crop-ratios button {
+			border: 1px solid var(--grey); background: var(--grey); color: var(--dark); padding: 6px 16px;
+			border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--poppins), sans-serif;
+		}
+		.chb-crop-ratios button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+		.chb-crop-wrap { display: flex; justify-content: center; background: var(--grey); border-radius: 10px; padding: 14px; overflow: hidden; }
+		.chb-crop-stage { position: relative; display: inline-block; line-height: 0; user-select: none; -webkit-user-select: none; touch-action: none; }
+		.chb-crop-stage img { display: block; max-width: 100%; max-height: 56vh; }
+		.chb-crop-box {
+			position: absolute; box-sizing: border-box; border: 2px solid #fff; cursor: move;
+			box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+			background-image: linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)),
+				linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4)), linear-gradient(rgba(255,255,255,.4), rgba(255,255,255,.4));
+			background-size: 1px 100%, 1px 100%, 100% 1px, 100% 1px;
+			background-position: 33.33% 0, 66.66% 0, 0 33.33%, 0 66.66%;
+			background-repeat: no-repeat;
+		}
+		.chb-crop-box .ch { position: absolute; width: 14px; height: 14px; background: #fff; border: 2px solid var(--blue); border-radius: 3px; box-sizing: border-box; }
+		.chb-crop-box .ch.nw { left: -8px; top: -8px; cursor: nwse-resize; }
+		.chb-crop-box .ch.ne { right: -8px; top: -8px; cursor: nesw-resize; }
+		.chb-crop-box .ch.sw { left: -8px; bottom: -8px; cursor: nesw-resize; }
+		.chb-crop-box .ch.se { right: -8px; bottom: -8px; cursor: nwse-resize; }
+		.chb-crop-box .ch.n { left: 50%; top: -8px; margin-left: -7px; cursor: ns-resize; }
+		.chb-crop-box .ch.s { left: 50%; bottom: -8px; margin-left: -7px; cursor: ns-resize; }
+		.chb-crop-box .ch.w { left: -8px; top: 50%; margin-top: -7px; cursor: ew-resize; }
+		.chb-crop-box .ch.e { right: -8px; top: 50%; margin-top: -7px; cursor: ew-resize; }
+		.chb-crop-stage.ratio-locked .ch.n, .chb-crop-stage.ratio-locked .ch.s,
+		.chb-crop-stage.ratio-locked .ch.w, .chb-crop-stage.ratio-locked .ch.e { display: none; }
+		.chb-yt-hint { display: block; margin-top: 6px; font-size: 12px; color: var(--dark-grey); }
+		.chb-yt-hint.error { color: var(--red); }
+		.chb-yt-preview {
+			position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--grey); border-radius: 10px; overflow: hidden;
+			display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+			color: var(--dark-grey); font-size: 13px; margin-top: 4px;
+		}
+		.chb-yt-preview > i { font-size: 46px; color: #ef4444; }
+		.chb-yt-preview iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+		.chb-dialog .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+		body.dark .chb-dialog .btn-save, body.dark .chb-dialog .btn-save:hover { background: var(--blue) !important; color: #fff !important; }
+		body.dark .chb-dialog .btn-cancel, body.dark .chb-dialog .btn-cancel:hover { background: var(--red) !important; color: #fff !important; }
+
 		/* FILE UPLOADER */
 		.modal-box .uploader {
 			position: relative;
@@ -741,6 +942,62 @@
 			filter: brightness(.9);
 		}
 
+		/* ============================================================
+		   PERBAIKAN: scroll zoom, toolbar/tombol tetap, teks di shape, preview YouTube, sidebar
+		   ============================================================ */
+		/* Saat form terbuka: halaman di belakang tidak ikut scroll */
+		body.chb-modal-open { overflow: hidden; }
+
+		/* Kotak form tidak scroll sendiri -> Kembali & Batal/Simpan selalu tetap di tempatnya.
+		   Yang scroll hanya isi form (form-grid). */
+		#blogModal .modal-box { overflow: hidden; }
+		#blogModal .modal-head { flex-shrink: 0; }
+		#blogModal .modal-box .form-grid { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+		#blogModal .modal-box .editor-box { min-height: 420px; overflow: hidden; overflow: clip; }
+		/* Toolbar WYSIWYG selalu menempel di atas editor walau di-scroll */
+		#blogModal .editor-toolbar { position: sticky; top: 0; z-index: 25; }
+		#blogModal .modal-actions {
+			position: static;
+			flex-shrink: 0;
+			margin: 16px -40px -28px -40px;
+			padding: 16px 40px;
+		}
+		@media screen and (max-width: 768px) {
+			#blogModal .modal-actions { margin: 14px -16px -20px -16px; padding: 14px 16px; }
+		}
+
+		/* Zoom gambar: gambar tinggi bisa digeser ke atas/bawah */
+		.image-zoom-overlay {
+			overflow-y: auto;
+			overflow-x: hidden;
+			align-items: flex-start;
+			padding: 48px 0;
+			box-sizing: border-box;
+			overscroll-behavior: contain;
+		}
+		.image-zoom-overlay .image-zoom-stage { margin: auto; max-width: 90%; max-height: none; }
+		/* Ukuran maksimum zoom: lebar maks 640px (atau 90% layar di HP); gambar tinggi tetap bisa digeser */
+		.image-zoom-overlay img { max-width: min(90vw, 640px); width: auto; max-height: none; }
+		.image-zoom-overlay .image-zoom-close { position: absolute; top: -12px; right: -12px; z-index: 2; }
+		@media screen and (max-width: 700px) {
+			/* Di HP gambar hampir selebar layar, jadi tombol X masuk sedikit ke dalam sudut gambar */
+			.image-zoom-overlay .image-zoom-close { top: 8px; right: 8px; }
+		}
+
+		/* Teks di dalam shape */
+		.editor-content .chb-shape-text { cursor: text; }
+		.editor-content .chb-shape-text:empty:before { content: 'Ketik teks...'; opacity: .55; pointer-events: none; }
+
+		/* Preview YouTube (thumbnail + tombol play) */
+		.chb-yt-preview .chb-yt-thumb { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+		.chb-yt-preview .chb-yt-play {
+			position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+			width: 68px; height: 48px; border: none; border-radius: 14px; background: #ef4444; color: #fff;
+			font-size: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, .35); padding: 0;
+		}
+		.chb-yt-preview .chb-yt-play:hover { filter: brightness(.92); }
+
 		/* MODAL KONFIRMASI & NOTIFIKASI */
 		.modal-box.modal-confirm {
 			max-width: 380px;
@@ -857,6 +1114,15 @@
 		body.dark #blogModal .modal-actions {
 			background: var(--light) !important;
 			border-top-color: var(--grey) !important;
+		}
+
+		/* Tombol Kembali & Minimize editor tetap biru di dark mode */
+		body.dark #blogModal .editor-toggle,
+		body.dark #blogModal .editor-toggle:hover,
+		body.dark #blogModal .btn-back,
+		body.dark #blogModal .btn-back:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
 		}
 
 		/* Tombol Batal tambah/update tetap merah */
@@ -1040,7 +1306,10 @@
 			<!-- Modal Tambah/Edit Blog -->
 			<div class="modal-overlay" id="blogModal">
 				<div class="modal-box">
-					<h2 id="modalTitle">Tambah Blog</h2>
+					<div class="modal-head">
+						<h2 id="modalTitle">Tambah Blog</h2>
+						<button type="button" class="btn btn-back" id="btnEditorBack"><i class='bx bx-arrow-back'></i> Kembali</button>
+					</div>
 
 					@if($errors->any())
 						<div class="alert-box" style="background: var(--light-orange); color: var(--red); margin-top: 0; margin-bottom: 16px;">
@@ -1126,6 +1395,14 @@
 											<button type="button" class="editor-btn" onclick="formatDoc('italic')" title="Italic"><i class='bx bx-italic'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('underline')" title="Underline"><i class='bx bx-underline'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('strikeThrough')" title="Coret"><i class='bx bx-strikethrough'></i></button>
+											<div class="editor-pop" id="chbColorWrap">
+												<button type="button" class="editor-btn" onmousedown="event.preventDefault()" onclick="toggleEditorPop('chbColorPop')" title="Warna Teks"><span class="color-a">A</span><span class="color-bar" id="chbColorBar"></span></button>
+												<div class="editor-popover" id="chbColorPop" onmousedown="event.preventDefault()">
+													<div class="swatch-grid" id="chbColorGrid"></div>
+													<button type="button" class="pop-more" onclick="document.getElementById('chbColorCustom').click()"><i class='bx bx-palette'></i> Warna lainnya</button>
+													<input type="color" id="chbColorCustom" value="#2563eb" tabindex="-1" aria-hidden="true">
+												</div>
+											</div>
 											<div class="editor-divider"></div>
 											<button type="button" class="editor-btn" onclick="formatDoc('justifyLeft')" title="Rata Kiri"><i class='bx bx-align-left'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('justifyCenter')" title="Rata Tengah"><i class='bx bx-align-middle'></i></button>
@@ -1136,6 +1413,13 @@
 											<div class="editor-divider"></div>
 											<button type="button" class="editor-btn" onclick="addLink()" title="Link"><i class='bx bx-link'></i></button>
 											<button type="button" class="editor-btn" onclick="triggerEditorImage()" title="Sisipkan Gambar"><i class='bx bx-image-add'></i></button>
+											<div class="editor-pop" id="chbShapeWrap">
+												<button type="button" class="editor-btn" onmousedown="event.preventDefault()" onclick="toggleEditorPop('chbShapePop')" title="Sisipkan Shape"><svg class="icon-shape" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3" y="12" width="9" height="9" rx="1.5"></rect><circle cx="16.5" cy="7.5" r="4.5"></circle><path d="M14 21l3.5-6.5L21 21z"></path></svg></button>
+												<div class="editor-popover" id="chbShapePop" onmousedown="event.preventDefault()">
+													<div class="shape-grid" id="chbShapeGrid"></div>
+												</div>
+											</div>
+											<button type="button" class="editor-btn" onmousedown="event.preventDefault()" onclick="openYoutubeDialog()" title="Sisipkan Video YouTube"><i class='bx bxl-youtube' style="color:#ef4444"></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('removeFormat')" title="Hapus Format"><i class='bx bx-eraser'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('undo')" title="Undo"><i class='bx bx-undo'></i></button>
 											<button type="button" class="editor-btn" onclick="formatDoc('redo')" title="Redo"><i class='bx bx-redo'></i></button>
@@ -1157,17 +1441,22 @@
 											</div>
 
 											{{-- Toolbar melayang untuk gambar terpilih --}}
-											<div class="img-toolbar" id="chbImgToolbar">
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgWidth('25%')">25%</button>
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgWidth('50%')">50%</button>
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgWidth('75%')">75%</button>
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgWidth('100%')">100%</button>
+											<div class="img-toolbar" id="chbImgToolbar" data-type="img">
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgWidth('25%')">25%</button>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgWidth('50%')">50%</button>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgWidth('75%')">75%</button>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgWidth('100%')">100%</button>
+												<div class="tb-divider" data-hide-video></div>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgAlign('left')" title="Rata kiri (teks membungkus)"><i class='bx bx-align-left'></i></button>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgAlign('center')" title="Rata tengah"><i class='bx bx-align-middle'></i></button>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="setImgAlign('right')" title="Rata kanan (teks membungkus)"><i class='bx bx-align-right'></i></button>
+												<div class="tb-divider" data-hide-video></div>
+												<button type="button" data-only="img" onmousedown="event.preventDefault()" onclick="openCropDialog()" title="Crop gambar"><i class='bx bx-crop'></i> Crop</button>
+												<label class="tb-color" data-only="shape" title="Warna shape"><i class='bx bx-palette'></i><input type="color" id="chbShapeColor" oninput="setShapeColor(this.value)"></label>
+										<label class="tb-color" data-only="shape" title="Warna teks di dalam shape"><i class='bx bx-font-color'></i><input type="color" id="chbShapeTextColor" oninput="setShapeTextColor(this.value)"></label>
+												<button type="button" data-only="video" onmousedown="event.preventDefault()" onclick="toggleVideoPlay()" title="Putar / hentikan preview video"><i class='bx bx-play-circle'></i> Putar</button>
 												<div class="tb-divider"></div>
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgAlign('left')" title="Rata kiri (teks membungkus)"><i class='bx bx-align-left'></i></button>
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgAlign('center')" title="Rata tengah"><i class='bx bx-align-middle'></i></button>
-												<button type="button" onmousedown="event.preventDefault()" onclick="setImgAlign('right')" title="Rata kanan (teks membungkus)"><i class='bx bx-align-right'></i></button>
-												<div class="tb-divider"></div>
-												<button type="button" onmousedown="event.preventDefault()" onclick="resetImgSize()" title="Ukuran asli"><i class='bx bx-reset'></i></button>
+												<button type="button" data-hide-video onmousedown="event.preventDefault()" onclick="resetImgSize()" title="Ukuran asli"><i class='bx bx-reset'></i></button>
 												<button type="button" class="danger" onmousedown="event.preventDefault()" onclick="deleteSelectedImg()" title="Hapus gambar"><i class='bx bx-trash'></i> Hapus</button>
 											</div>
 
@@ -1221,6 +1510,53 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Dialog Crop Gambar -->
+			<div class="modal-overlay chb-dialog-overlay" id="chbCropOverlay">
+				<div class="modal-box chb-dialog chb-dialog-wide">
+					<h2>Crop Gambar</h2>
+					<div class="chb-crop-ratios" id="chbCropRatios">
+						<button type="button" data-ratio="free" class="active">Bebas</button>
+						<button type="button" data-ratio="1">1:1</button>
+						<button type="button" data-ratio="1.3333333">4:3</button>
+						<button type="button" data-ratio="1.7777778">16:9</button>
+					</div>
+					<div class="chb-crop-wrap">
+						<div class="chb-crop-stage" id="chbCropStage">
+							<img id="chbCropImg" alt="Crop gambar" draggable="false">
+							<div class="chb-crop-box" id="chbCropBox">
+								<span class="ch nw" data-dir="nw"></span><span class="ch n" data-dir="n"></span><span class="ch ne" data-dir="ne"></span>
+								<span class="ch e" data-dir="e"></span><span class="ch se" data-dir="se"></span><span class="ch s" data-dir="s"></span>
+								<span class="ch sw" data-dir="sw"></span><span class="ch w" data-dir="w"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-cancel" id="btnCropCancel">Batal</button>
+						<button type="button" class="btn btn-save" id="btnCropApply">Terapkan</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Dialog Video YouTube -->
+			<div class="modal-overlay chb-dialog-overlay" id="chbYtOverlay">
+				<div class="modal-box chb-dialog">
+					<h2>Sisipkan Video YouTube</h2>
+					<div class="form-group">
+						<label for="chbYtInput">Link YouTube</label>
+						<input type="text" id="chbYtInput" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+						<small id="chbYtHint" class="chb-yt-hint">Tempel link video (youtube.com, youtu.be, atau Shorts). Ukuran video tetap (lebar penuh, 16:9) dan sama seperti di halaman blog.</small>
+					</div>
+					<div class="chb-yt-preview" id="chbYtPreview">
+						<i class='bx bxl-youtube'></i>
+						<span>Preview video akan tampil di sini</span>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-cancel" id="btnYtCancel">Batal</button>
+						<button type="button" class="btn btn-save" id="btnYtInsert" disabled>Sisipkan</button>
+					</div>
+				</div>
+			</div>
 @endsection
 
 @push('scripts')
@@ -1234,20 +1570,29 @@
 		let currentPage = 1;
 
 		// ===== Sinkronkan lebar modal dengan area konten =====
+		// Overlay tetap layar penuh (lapisan abu-abu menutupi sidebar sehingga tidak bisa diklik),
+		// sedangkan kotak form dibatasi di area konten lewat padding overlay -> ukuran form sama seperti sebelumnya.
 		function syncModalWithContentArea() {
 			const contentEl = document.getElementById('content');
 			if (!contentEl) return;
 			const rect = contentEl.getBoundingClientRect();
+			const vw = document.documentElement.clientWidth;
 			document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
-				overlay.style.left = rect.left + 'px';
-				overlay.style.width = rect.width + 'px';
+				overlay.style.paddingLeft = '';
+				overlay.style.paddingRight = '';
+				const base = parseFloat(getComputedStyle(overlay).paddingRight) || 0;
+				overlay.style.paddingLeft = (rect.left + base) + 'px';
+				overlay.style.paddingRight = (Math.max(0, vw - rect.right) + base) + 'px';
 			});
 		}
-		
+
 		window.addEventListener('resize', syncModalWithContentArea);
 		document.addEventListener('DOMContentLoaded', function () {
 			syncModalWithContentArea();
-			initEditorImageEvents(); 
+			const contentEl = document.getElementById('content');
+			if (window.ResizeObserver && contentEl) new ResizeObserver(syncModalWithContentArea).observe(contentEl);
+			initEditorImageEvents();
+			initEditorExtras();
 			applyBlogFilters(); // Jalankan paginasi & filter pertama kali
 		});
 
@@ -1597,7 +1942,7 @@
 			const editor = document.getElementById('inputKontenEditor');
 			editor.focus();
 			restoreRange();
-			const html = `<img src="${dataUrl}" class="chb-img" style="width:60%;height:auto;display:block;margin:10px 0;border-radius:6px;"><p><br></p>`;
+			const html = `<img src="${dataUrl}" class="chb-img" style="width:60%;max-width:100%;height:auto;display:block;margin:10px 0;border-radius:6px;"><p><br></p>`;
 			document.execCommand('insertHTML', false, html);
 			saveRange();
 		}
@@ -1621,8 +1966,10 @@
 			});
 
 			editor.addEventListener('click', function (e) {
-				if (e.target.tagName === 'IMG') {
-					selectEditorImage(e.target);
+				const mediaEl = e.target.closest ? e.target.closest('img, .chb-shape, .chb-video') : null;
+				if (mediaEl && editor.contains(mediaEl)) {
+					selectEditorImage(mediaEl);
+					if (e.target.closest && e.target.closest('.chb-shape-text')) saveRange();
 				} else {
 					deselectEditorImage();
 					saveRange();
@@ -1634,10 +1981,14 @@
 			editor.addEventListener('scroll', () => { if (chbSelectedImg) positionImgUI(); });
 			editor.addEventListener('input', () => {
 				if (chbSelectedImg && !editor.contains(chbSelectedImg)) deselectEditorImage();
+				else if (chbSelectedImg) positionImgUI();
 			});
 
 			document.addEventListener('keydown', function (e) {
 				if (!chbSelectedImg) return;
+				if (['INPUT', 'TEXTAREA', 'SELECT'].indexOf(e.target.tagName) !== -1) return;
+				// Sedang mengetik di dalam teks shape: Backspace/Delete jangan menghapus shape-nya
+				if (e.key !== 'Escape' && e.target.closest && e.target.closest('.chb-shape-text')) return;
 				if (e.key === 'Delete' || e.key === 'Backspace') {
 					e.preventDefault();
 					deleteSelectedImg();
@@ -1664,12 +2015,21 @@
 			if (chbSelectedImg && chbSelectedImg !== img) chbSelectedImg.classList.remove('is-selected');
 			chbSelectedImg = img;
 			img.classList.add('is-selected');
+			const tb = document.getElementById('chbImgToolbar');
+			tb.dataset.type = img.tagName === 'IMG' ? 'img' : (img.classList.contains('chb-video') ? 'video' : 'shape');
+			if (tb.dataset.type === 'shape') {
+				document.getElementById('chbShapeColor').value = rgbToHex(getComputedStyle(img).backgroundColor);
+				const st = img.querySelector('.chb-shape-text');
+				if (st) document.getElementById('chbShapeTextColor').value = rgbToHex(getComputedStyle(st).color);
+			}
+			document.getElementById('chbImgFrame').classList.toggle('no-resize', tb.dataset.type === 'video');
 			document.getElementById('chbImgFrame').classList.add('active');
 			document.getElementById('chbImgToolbar').classList.add('active');
 			positionImgUI();
 		}
 
 		function deselectEditorImage() {
+			if (chbSelectedImg && chbSelectedImg.classList.contains('chb-playing')) stopVideoPreview(chbSelectedImg);
 			if (chbSelectedImg) chbSelectedImg.classList.remove('is-selected');
 			chbSelectedImg = null;
 			document.getElementById('chbImgFrame').classList.remove('active');
@@ -1710,23 +2070,65 @@
 			toolbar.style.visibility = visible ? 'visible' : 'hidden';
 		}
 
+		// Batas ukuran maksimum gambar = lebar penuh area konten (sama dengan lebar banner/gambar utama di halaman blog).
+		const CHB_VIDEO_MAX_W = 480;  // ukuran kartu YouTube (tetap)
+		function chbImgMaxCss() { return '100%'; }
+
+		// Semua gambar/shape/video diberi batas lebar maksimum 100% supaya di layar kecil (mobile)
+		// otomatis mengecil sesuai lebar halaman, sementara di desktop tetap memakai ukuran yang dipilih.
+		// Tinggi mengikuti proporsi (height:auto / aspect-ratio), jadi tidak gepeng.
+		function chbMakeResponsive(el) {
+			if (!el || !el.style) return;
+			if (el.classList && el.classList.contains('chb-video')) {
+				// Ukuran video dikunci: lebar penuh kolom, proporsi 16:9 (sama dengan tampilan front end)
+				el.style.width = '100%';
+				el.style.maxWidth = CHB_VIDEO_MAX_W + 'px';
+				el.style.height = 'auto';
+				el.style.aspectRatio = '16/9';
+				el.style.float = 'none';
+				el.style.display = 'block';
+				el.style.margin = '1.6em auto';
+				el.dataset.defw = '100%';
+				return;
+			}
+			el.style.maxWidth = el.tagName === 'IMG' ? chbImgMaxCss() : '100%';
+			if (el.tagName === 'IMG') {
+				el.style.height = 'auto';
+			} else {
+				el.style.height = 'auto';
+				if (!el.style.aspectRatio) el.style.aspectRatio = el.classList.contains('chb-video') ? '16/9' : (({ rect: '16/9', rounded: '16/9', arrow: '2/1', line: '100/1' })[el.dataset.shape] || '1/1');
+			}
+		}
+
+		function chbNormalizeMedia(root) {
+			(root || document.getElementById('inputKontenEditor')).querySelectorAll('img, .chb-shape, .chb-video').forEach(chbMakeResponsive);
+		}
+
 		function setImgWidth(w) {
-			if (!chbSelectedImg) return;
+			if (!chbSelectedImg || chbSelectedImg.classList.contains('chb-video')) return;
 			chbSelectedImg.style.width = w;
 			chbSelectedImg.style.height = 'auto';
+			chbMakeResponsive(chbSelectedImg);
 			setTimeout(positionImgUI, 30);
 		}
 
 		function resetImgSize() {
-			if (!chbSelectedImg) return;
+			if (!chbSelectedImg || chbSelectedImg.classList.contains('chb-video')) return;
+			if (chbSelectedImg.tagName !== 'IMG') {
+				chbSelectedImg.style.width = chbSelectedImg.dataset.defw || '60%';
+				chbSelectedImg.style.height = '';
+				chbMakeResponsive(chbSelectedImg);
+				setTimeout(positionImgUI, 30);
+				return;
+			}
 			chbSelectedImg.style.width = '';
 			chbSelectedImg.style.height = '';
-			chbSelectedImg.style.maxWidth = '100%';
+			chbSelectedImg.style.maxWidth = chbImgMaxCss();
 			setTimeout(positionImgUI, 30);
 		}
 
 		function setImgAlign(pos) {
-			if (!chbSelectedImg) return;
+			if (!chbSelectedImg || chbSelectedImg.classList.contains('chb-video')) return;
 			const img = chbSelectedImg;
 			img.style.float = 'none';
 			img.style.display = 'block';
@@ -1754,7 +2156,7 @@
 		}
 
 		function startResize(e) {
-			if (!chbSelectedImg) return;
+			if (!chbSelectedImg || chbSelectedImg.classList.contains('chb-video')) return;
 			e.preventDefault();
 			e.stopPropagation();
 			const rect = chbSelectedImg.getBoundingClientRect();
@@ -1774,12 +2176,13 @@
 			const grow = (chbResizeState.dir === 'tl' || chbResizeState.dir === 'bl' || chbResizeState.dir === 'ml') ? -1 : 1;
 			let newW = chbResizeState.startW + (dx * grow);
 
-			const maxW = document.getElementById('inputKontenEditor').clientWidth - 40;
+			let maxW = document.getElementById('inputKontenEditor').clientWidth - 40;
 			if (newW < 60) newW = 60;
 			if (newW > maxW) newW = maxW;
 
 			chbSelectedImg.style.width = Math.round(newW) + 'px';
 			chbSelectedImg.style.height = 'auto';
+			chbMakeResponsive(chbSelectedImg);
 
 			const badge = document.getElementById('chbImgSizeBadge');
 			badge.textContent = `${Math.round(newW)} × ${Math.round(newW * chbResizeState.ratio)} px`;
@@ -1800,6 +2203,527 @@
 			positionImgUI();
 		}
 
+
+		/* ============================================================
+		   FITUR TAMBAHAN EDITOR: warna teks, shape, crop gambar, video YouTube
+		============================================================ */
+		const CHB_COLORS = [
+			'#0f172a', '#475569', '#94a3b8', '#ffffff', '#ef4444', '#f97316', '#f59e0b', '#eab308', '#22c55e', '#14b8a6',
+			'#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#b91c1c', '#166534', '#1e40af', '#7e22ce'
+		];
+
+		// Shape dibuat dari <div> + CSS inline (bukan SVG) supaya aman dipakai di halaman blog.
+		const CHB_SHAPES = {
+			rect:     { label: 'Persegi panjang', ar: '16/9', w: '240px', thumb: [28, 18], style: '' },
+			rounded:  { label: 'Persegi tumpul',  ar: '16/9', w: '240px', thumb: [28, 18], style: 'border-radius:18px;' },
+			circle:   { label: 'Lingkaran',       ar: '1/1',  w: '160px', thumb: [26, 26], style: 'border-radius:50%;' },
+			triangle: { label: 'Segitiga',        ar: '1/1',  w: '160px', thumb: [26, 26], style: 'clip-path:polygon(50% 0,100% 100%,0 100%);' },
+			diamond:  { label: 'Belah ketupat',   ar: '1/1',  w: '160px', thumb: [26, 26], style: 'clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);' },
+			star:     { label: 'Bintang',         ar: '1/1',  w: '160px', thumb: [26, 26], style: 'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);' },
+			arrow:    { label: 'Panah',           ar: '2/1',  w: '200px', thumb: [30, 15], style: 'clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%);' },
+			line:     { label: 'Garis pemisah',   ar: '100/1', w: '100%', thumb: [30, 3],  style: 'border-radius:4px;' }
+		};
+
+		function rgbToHex(rgb) {
+			const m = (rgb || '').match(/\d+/g);
+			if (!m || m.length < 3) return '#3b82f6';
+			return '#' + m.slice(0, 3).map(function (n) { return (+n).toString(16).padStart(2, '0'); }).join('');
+		}
+
+		function chbDialogOpen() {
+			return ['chbCropOverlay', 'chbYtOverlay'].some(function (id) {
+				return document.getElementById(id).classList.contains('show');
+			});
+		}
+
+		// ---------- Popover toolbar (warna teks & shape) ----------
+		function closeEditorPops() {
+			document.querySelectorAll('.editor-popover.show').forEach(function (p) { p.classList.remove('show'); });
+		}
+
+		function toggleEditorPop(id) {
+			saveRange();
+			const pop = document.getElementById(id);
+			const willShow = !pop.classList.contains('show');
+			closeEditorPops();
+			if (!willShow) return;
+			pop.style.left = '0';
+			pop.style.right = 'auto';
+			pop.classList.add('show');
+			const box = document.getElementById('chbEditorBox').getBoundingClientRect();
+			if (pop.getBoundingClientRect().right > box.right - 6) {
+				pop.style.left = 'auto';
+				pop.style.right = '0';
+			}
+		}
+
+		// ---------- Warna teks ----------
+		function applyTextColor(color) {
+			const editor = document.getElementById('inputKontenEditor');
+			editor.focus();
+			restoreRange();
+			document.execCommand('styleWithCSS', false, true);
+			document.execCommand('foreColor', false, color);
+			document.execCommand('styleWithCSS', false, false);
+			saveRange();
+			document.getElementById('chbColorBar').style.background = color;
+		}
+
+		// ---------- Sisipkan blok (shape / video) di posisi kursor ----------
+		function insertBlockAtCaret(node) {
+			const editor = document.getElementById('inputKontenEditor');
+			editor.focus();
+			restoreRange();
+			const sel = window.getSelection();
+			let range = null;
+			if (sel.rangeCount && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) range = sel.getRangeAt(0);
+
+			if (!range || range.startContainer === editor) {
+				const ref = range ? editor.childNodes[range.startOffset] : null;
+				editor.insertBefore(node, ref || null);
+			} else {
+				let anchor = range.startContainer;
+				while (anchor && anchor.parentNode !== editor) anchor = anchor.parentNode;
+				if (!anchor) {
+					editor.appendChild(node);
+				} else if (anchor.nodeType === 1 && /^(P|DIV)$/.test(anchor.tagName) && anchor.textContent.trim() === '' && !anchor.querySelector('img, iframe, .chb-shape')) {
+					anchor.replaceWith(node);
+				} else {
+					anchor.after(node);
+				}
+			}
+			const p = document.createElement('p');
+			p.innerHTML = '<br>';
+			node.after(p);
+			const r = document.createRange();
+			r.setStart(p, 0);
+			r.collapse(true);
+			sel.removeAllRanges();
+			sel.addRange(r);
+			saveRange();
+		}
+
+		// ---------- Shape ----------
+		// Padding area teks per bentuk supaya teks tetap berada di dalam bentuknya
+		const CHB_TEXT_PAD = {
+			circle: '14%', triangle: '48% 22% 6%', diamond: '22%', star: '28%', arrow: '4% 30% 4% 8%'
+		};
+
+		function insertShape(key) {
+			const s = CHB_SHAPES[key];
+			if (!s) return;
+			const el = document.createElement('div');
+			el.className = 'chb-shape';
+			el.setAttribute('contenteditable', 'false');
+			el.dataset.shape = key;
+			el.dataset.defw = s.w;
+			el.style.cssText = 'position:relative;width:' + s.w + ';max-width:100%;height:auto;aspect-ratio:' + s.ar + ';container-type:inline-size;background:#3b82f6;display:block;margin:10px 0;' + s.style;
+			if (key !== 'line') {
+				// Area teks: style inline supaya tampil sama di halaman blog
+				const t = document.createElement('div');
+				t.className = 'chb-shape-text';
+				t.setAttribute('contenteditable', 'true');
+				t.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;padding:' + (CHB_TEXT_PAD[key] || '8px 14%') + ';color:#ffffff;font-weight:600;font-size:16px;font-size:clamp(10px,7cqw,26px);line-height:1.3;outline:none;overflow:hidden;word-break:break-word;';
+				el.appendChild(t);
+			}
+			insertBlockAtCaret(el);
+			closeEditorPops();
+			setTimeout(function () { selectEditorImage(el); }, 260);
+		}
+
+		function setShapeTextColor(color) {
+			if (!chbSelectedImg || !chbSelectedImg.classList.contains('chb-shape')) return;
+			const t = chbSelectedImg.querySelector('.chb-shape-text');
+			if (t) t.style.color = color;
+		}
+
+		// Shape yang dimuat ulang dari database: aktifkan lagi area teksnya
+		function chbReviveShapes() {
+			document.querySelectorAll('#inputKontenEditor .chb-shape-text').forEach(function (n) { n.setAttribute('contenteditable', 'true'); });
+		}
+
+		function setShapeColor(color) {
+			if (chbSelectedImg && chbSelectedImg.classList.contains('chb-shape')) chbSelectedImg.style.background = color;
+		}
+
+		// ---------- Video YouTube ----------
+		let chbYtId = null;
+
+		function parseYoutubeId(input) {
+			input = (input || '').trim();
+			if (!input) return null;
+			if (/^[\w-]{11}$/.test(input)) return input;
+			let u;
+			try { u = new URL(/^https?:\/\//i.test(input) ? input : 'https://' + input); } catch (err) { return null; }
+			const host = u.hostname.replace(/^(www\.|m\.)/, '');
+			let id = null;
+			if (host === 'youtu.be') {
+				id = u.pathname.split('/')[1];
+			} else if (host === 'youtube.com' || host === 'youtube-nocookie.com' || host === 'music.youtube.com') {
+				if (u.pathname === '/watch') {
+					id = u.searchParams.get('v');
+				} else {
+					const m = u.pathname.match(/^\/(embed|shorts|live|v)\/([\w-]{11})/);
+					if (m) id = m[2];
+				}
+			}
+			return id && /^[\w-]{11}$/.test(id) ? id : null;
+		}
+
+		function chbMakeYtIframe(id, autoplay) {
+			const f = document.createElement('iframe');
+			f.src = 'https://www.youtube.com/embed/' + id + '?rel=0&playsinline=1' + (autoplay ? '&autoplay=1' : '');
+			f.setAttribute('title', 'Video YouTube');
+			f.setAttribute('frameborder', '0');
+			// YouTube menolak embed tanpa referrer (error 153), jadi referrer harus dikirim
+			f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+			f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+			f.setAttribute('allowfullscreen', '');
+			f.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+			return f;
+		}
+
+		// Preview: thumbnail langsung tampil, video dimuat saat tombol play ditekan
+		function chbBuildYoutubePreview(preview, id) {
+			const img = document.createElement('img');
+			img.className = 'chb-yt-thumb';
+			img.alt = 'Thumbnail video YouTube';
+			img.referrerPolicy = 'no-referrer';
+			img.src = 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg';
+			img.onerror = function () { img.onerror = null; img.src = 'https://img.youtube.com/vi/' + id + '/0.jpg'; };
+			const btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'chb-yt-play';
+			btn.title = 'Putar preview';
+			btn.innerHTML = "<i class='bx bx-play'></i>";
+			btn.addEventListener('click', function () {
+				preview.innerHTML = '';
+				preview.appendChild(chbMakeYtIframe(id, true));
+			});
+			preview.appendChild(img);
+			preview.appendChild(btn);
+		}
+
+		function updateYoutubePreview() {
+			const input = document.getElementById('chbYtInput');
+			const hint = document.getElementById('chbYtHint');
+			const preview = document.getElementById('chbYtPreview');
+			const btn = document.getElementById('btnYtInsert');
+			const id = parseYoutubeId(input.value);
+			if (id === chbYtId && id) return;
+			chbYtId = id;
+			preview.innerHTML = '';
+			hint.classList.remove('error');
+			if (id) {
+				chbBuildYoutubePreview(preview, id);
+				hint.textContent = 'Link valid. Video akan tampil lebar penuh (16:9) seperti di halaman blog. Tekan play untuk mencoba.';
+				btn.disabled = false;
+			} else {
+				preview.innerHTML = "<i class='bx bxl-youtube'></i><span>Preview video akan tampil di sini</span>";
+				btn.disabled = true;
+				if (input.value.trim()) {
+					hint.textContent = 'Link YouTube belum valid.';
+					hint.classList.add('error');
+				} else {
+					hint.textContent = 'Tempel link video (youtube.com, youtu.be, atau Shorts). Ukuran video tetap (lebar penuh, 16:9) dan sama seperti di halaman blog.';
+				}
+			}
+		}
+
+		function openYoutubeDialog() {
+			saveRange();
+			deselectEditorImage();
+			closeEditorPops();
+			syncModalWithContentArea();
+			document.getElementById('chbYtInput').value = '';
+			chbYtId = null;
+			updateYoutubePreview();
+			document.getElementById('chbYtOverlay').classList.add('show');
+			setTimeout(function () { document.getElementById('chbYtInput').focus(); }, 50);
+		}
+
+		function closeYoutubeDialog() {
+			document.getElementById('chbYtOverlay').classList.remove('show');
+			document.getElementById('chbYtPreview').innerHTML = '';
+			chbYtId = null;
+		}
+
+		function insertYoutubeVideo() {
+			if (!chbYtId) return;
+			const id = chbYtId;
+			closeYoutubeDialog();
+			const wrap = document.createElement('div');
+			wrap.className = 'chb-video';
+			wrap.setAttribute('contenteditable', 'false');
+			wrap.dataset.defw = '100%';
+			wrap.style.cssText = 'position:relative;width:100%;max-width:480px;height:auto;aspect-ratio:16/9;display:block;margin:1.6em auto;background:#000 url(https://i.ytimg.com/vi/' + id + '/hqdefault.jpg) center/cover no-repeat;border-radius:10px;overflow:hidden;';
+			const f = chbMakeYtIframe(id, false);
+			wrap.appendChild(f);
+			insertBlockAtCaret(wrap);
+			setTimeout(function () { selectEditorImage(wrap); }, 260);
+		}
+
+		function toggleVideoPlay() {
+			if (!chbSelectedImg || !chbSelectedImg.classList.contains('chb-video')) return;
+			if (chbSelectedImg.classList.contains('chb-playing')) stopVideoPreview(chbSelectedImg);
+			else chbSelectedImg.classList.add('chb-playing');
+		}
+
+		function stopVideoPreview(el) {
+			el.classList.remove('chb-playing');
+			const f = el.querySelector('iframe');
+			if (f) f.src = f.src; // muat ulang supaya video berhenti
+		}
+
+		// ---------- Crop gambar ----------
+		let chbCrop = null;
+
+		function openCropDialog() {
+			const img = chbSelectedImg;
+			if (!img || img.tagName !== 'IMG') return;
+			const cropImg = document.getElementById('chbCropImg');
+			chbCrop = { target: img, ratio: null, rect: null, dw: 0, dh: 0, drag: null };
+			deselectEditorImage();
+			syncModalWithContentArea();
+			setCropRatioButton('free');
+			document.getElementById('chbCropStage').classList.remove('ratio-locked');
+			document.getElementById('chbCropOverlay').classList.add('show');
+			cropImg.onload = initCropBox;
+			cropImg.src = img.src;
+			if (cropImg.complete && cropImg.naturalWidth) initCropBox();
+		}
+
+		function closeCropDialog() {
+			document.getElementById('chbCropOverlay').classList.remove('show');
+			document.getElementById('chbCropImg').onload = null;
+			chbCrop = null;
+		}
+
+		function initCropBox() {
+			if (!chbCrop) return;
+			const img = document.getElementById('chbCropImg');
+			chbCrop.dw = img.clientWidth;
+			chbCrop.dh = img.clientHeight;
+			const dw = chbCrop.dw, dh = chbCrop.dh;
+			chbCrop.ratio = null;
+			chbCrop.rect = { x: dw * 0.1, y: dh * 0.1, w: dw * 0.8, h: dh * 0.8 };
+			renderCropBox();
+		}
+
+		function renderCropBox() {
+			if (!chbCrop || !chbCrop.rect) return;
+			const b = document.getElementById('chbCropBox');
+			const r = chbCrop.rect;
+			b.style.left = r.x + 'px';
+			b.style.top = r.y + 'px';
+			b.style.width = r.w + 'px';
+			b.style.height = r.h + 'px';
+		}
+
+		function setCropRatioButton(key) {
+			document.querySelectorAll('#chbCropRatios button').forEach(function (b) {
+				b.classList.toggle('active', b.dataset.ratio === key);
+			});
+		}
+
+		function setCropRatio(key) {
+			if (!chbCrop || !chbCrop.rect) return;
+			const r = key === 'free' ? null : parseFloat(key);
+			chbCrop.ratio = r;
+			setCropRatioButton(key);
+			document.getElementById('chbCropStage').classList.toggle('ratio-locked', !!r);
+			if (r) {
+				const dw = chbCrop.dw, dh = chbCrop.dh;
+				const w = Math.min(dw * 0.8, dh * 0.8 * r);
+				const h = w / r;
+				chbCrop.rect = { x: (dw - w) / 2, y: (dh - h) / 2, w: w, h: h };
+			}
+			renderCropBox();
+		}
+
+		function cropDrag(dir, dx, dy, s) {
+			const dw = chbCrop.dw, dh = chbCrop.dh, ratio = chbCrop.ratio, min = 24;
+			const clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
+			if (dir === 'move') {
+				return { x: clamp(s.x + dx, 0, dw - s.w), y: clamp(s.y + dy, 0, dh - s.h), w: s.w, h: s.h };
+			}
+			let x1 = s.x, y1 = s.y, x2 = s.x + s.w, y2 = s.y + s.h;
+			if (dir.indexOf('w') !== -1) x1 = clamp(s.x + dx, 0, x2 - min);
+			if (dir.indexOf('e') !== -1) x2 = clamp(s.x + s.w + dx, x1 + min, dw);
+			if (dir.indexOf('n') !== -1) y1 = clamp(s.y + dy, 0, y2 - min);
+			if (dir.indexOf('s') !== -1) y2 = clamp(s.y + s.h + dy, y1 + min, dh);
+			if (ratio && dir.length === 2) {
+				const west = dir.indexOf('w') !== -1, north = dir.indexOf('n') !== -1;
+				const ax = west ? s.x + s.w : s.x;
+				const ay = north ? s.y + s.h : s.y;
+				const maxW = west ? ax : dw - ax;
+				const maxH = north ? ay : dh - ay;
+				let nw = Math.min(x2 - x1, maxW, maxH * ratio);
+				nw = Math.max(nw, min);
+				const nh = nw / ratio;
+				x1 = west ? ax - nw : ax;
+				y1 = north ? ay - nh : ay;
+				x2 = x1 + nw;
+				y2 = y1 + nh;
+			}
+			return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+		}
+
+		function applyCrop() {
+			const c = chbCrop;
+			if (!c || !c.rect) return;
+			const src = document.getElementById('chbCropImg');
+			const sx = src.naturalWidth / c.dw, sy = src.naturalHeight / c.dh;
+			const cw = Math.max(1, Math.round(c.rect.w * sx)), ch = Math.max(1, Math.round(c.rect.h * sy));
+			const canvas = document.createElement('canvas');
+			canvas.width = cw;
+			canvas.height = ch;
+			canvas.getContext('2d').drawImage(src, c.rect.x * sx, c.rect.y * sy, c.rect.w * sx, c.rect.h * sy, 0, 0, cw, ch);
+			const isJpg = /^data:image\/jpe?g/i.test(c.target.src) || /\.jpe?g(\?|$)/i.test(c.target.src);
+			let out;
+			try {
+				out = canvas.toDataURL(isJpg ? 'image/jpeg' : 'image/png', 0.92);
+			} catch (err) {
+				alert('Gambar ini tidak bisa di-crop karena berasal dari sumber lain.');
+				return;
+			}
+			const target = c.target;
+			closeCropDialog();
+			target.addEventListener('load', function () { selectEditorImage(target); }, { once: true });
+			target.src = out;
+		}
+
+		function initEditorExtras() {
+			// Palet warna teks
+			const grid = document.getElementById('chbColorGrid');
+			CHB_COLORS.forEach(function (c) {
+				const b = document.createElement('button');
+				b.type = 'button';
+				b.title = c;
+				b.style.background = c;
+				b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+				b.addEventListener('click', function () { applyTextColor(c); closeEditorPops(); });
+				grid.appendChild(b);
+			});
+			document.getElementById('chbColorCustom').addEventListener('input', function () { applyTextColor(this.value); });
+
+			// Grid shape
+			const sg = document.getElementById('chbShapeGrid');
+			Object.keys(CHB_SHAPES).forEach(function (key) {
+				const s = CHB_SHAPES[key];
+				const b = document.createElement('button');
+				b.type = 'button';
+				b.title = s.label;
+				const t = document.createElement('span');
+				t.style.cssText = 'display:block;background:#3b82f6;width:' + s.thumb[0] + 'px;height:' + s.thumb[1] + 'px;' + s.style.replace('border-radius:18px;', 'border-radius:5px;');
+				b.appendChild(t);
+				b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+				b.addEventListener('click', function () { insertShape(key); });
+				sg.appendChild(b);
+			});
+
+			// Tutup popover saat klik di luar
+			document.addEventListener('mousedown', function (e) {
+				if (!e.target.closest || !e.target.closest('.editor-pop')) closeEditorPops();
+			});
+
+			// Crop
+			document.querySelectorAll('#chbCropRatios button').forEach(function (b) {
+				b.addEventListener('click', function () { setCropRatio(b.dataset.ratio); });
+			});
+			document.getElementById('btnCropCancel').addEventListener('click', closeCropDialog);
+			document.getElementById('btnCropApply').addEventListener('click', applyCrop);
+			const box = document.getElementById('chbCropBox');
+			box.addEventListener('pointerdown', function (e) {
+				if (!chbCrop || !chbCrop.rect) return;
+				e.preventDefault();
+				box.setPointerCapture(e.pointerId);
+				chbCrop.drag = { dir: e.target.dataset.dir || 'move', sx: e.clientX, sy: e.clientY, start: Object.assign({}, chbCrop.rect) };
+			});
+			box.addEventListener('pointermove', function (e) {
+				if (!chbCrop || !chbCrop.drag) return;
+				chbCrop.rect = cropDrag(chbCrop.drag.dir, e.clientX - chbCrop.drag.sx, e.clientY - chbCrop.drag.sy, chbCrop.drag.start);
+				renderCropBox();
+			});
+			['pointerup', 'pointercancel'].forEach(function (t) {
+				box.addEventListener(t, function () { if (chbCrop) chbCrop.drag = null; });
+			});
+
+			// YouTube
+			const yt = document.getElementById('chbYtInput');
+			yt.addEventListener('input', updateYoutubePreview);
+			yt.addEventListener('paste', function () { setTimeout(updateYoutubePreview, 0); });
+			yt.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') { e.preventDefault(); insertYoutubeVideo(); }
+			});
+			document.getElementById('btnYtCancel').addEventListener('click', closeYoutubeDialog);
+			document.getElementById('btnYtInsert').addEventListener('click', insertYoutubeVideo);
+			document.getElementById('chbYtOverlay').addEventListener('click', function (e) {
+				if (e.target === this) closeYoutubeDialog();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				if (document.getElementById('chbCropOverlay').classList.contains('show')) closeCropDialog();
+				else if (document.getElementById('chbYtOverlay').classList.contains('show')) closeYoutubeDialog();
+				else closeEditorPops();
+			});
+		}
+
+		// ===== Mode Fokus Menulis: ketik/klik editor -> form penuh, tombol Kembali -> normal =====
+		// Input lain hanya disembunyikan (CSS), tidak dihapus, jadi semua data tetap tersimpan.
+		let chbFocusMode = false;
+		let chbFocusLock = false;
+
+		function updateFocusToggle() {
+			// Tombol Perbesar sudah dihapus; tombol Kembali ada di pojok kiri atas (header) saat mode fokus.
+		}
+
+		function enterFocusMode() {
+			if (chbFocusMode || chbFocusLock || !blogModal.classList.contains('show')) return;
+			blogModal.querySelector('.modal-box').classList.add('focus-mode');
+			chbFocusMode = true;
+			deselectEditorImage();
+			updateFocusToggle();
+		}
+
+		function exitFocusMode() {
+			if (!chbFocusMode) return;
+			saveRange();
+			blogModal.querySelector('.modal-box').classList.remove('focus-mode');
+			chbFocusMode = false;
+			deselectEditorImage();
+			updateFocusToggle();
+			chbFocusLock = true; // cegah langsung membesar lagi karena fokus editor
+			document.getElementById('inputKontenEditor').blur();
+			setTimeout(function () { chbFocusLock = false; }, 400);
+		}
+
+		function toggleFocusMode() {
+			if (chbFocusMode) {
+				exitFocusMode();
+			} else {
+				enterFocusMode();
+				document.getElementById('inputKontenEditor').focus();
+			}
+		}
+
+		(function initFocusMode() {
+			const editor = document.getElementById('inputKontenEditor');
+			editor.addEventListener('focus', enterFocusMode);
+			editor.addEventListener('click', enterFocusMode);
+			editor.addEventListener('input', enterFocusMode);
+			document.getElementById('btnEditorBack').addEventListener('click', exitFocusMode);
+
+			// Saat Simpan ditekan, kembalikan tampilan dulu supaya validasi input (Judul, Kategori) bisa berjalan
+			document.querySelector('#blogForm .btn-save').addEventListener('click', exitFocusMode);
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && chbFocusMode && !chbSelectedImg && !chbDialogOpen() && !imageZoomOverlay.classList.contains('show')) {
+					exitFocusMode();
+				}
+			});
+		})();
 
 		// ===== Uploader helpers =====
 		function resetUploader() {
@@ -1866,7 +2790,7 @@
 		btnZoomImage.addEventListener('click', function (e) {
 			e.stopPropagation();
 			zoomedImage.src = previewImage.src;
-			imageZoomOverlay.classList.add('show');
+			imageZoomOverlay.classList.add('show'); imageZoomOverlay.scrollTop = 0;
 		});
 		btnCloseZoom.addEventListener('click', function () {
 			imageZoomOverlay.classList.remove('show');
@@ -1883,7 +2807,7 @@
 		// Zoom gambar dari daftar/tabel blog
 		function openListImageZoom(src) {
 			zoomedImage.src = src;
-			imageZoomOverlay.classList.add('show');
+			imageZoomOverlay.classList.add('show'); imageZoomOverlay.scrollTop = 0;
 		}
 
 		// ===== Modal open/close =====
@@ -1905,6 +2829,7 @@
 			gambarHint.textContent = '';
 
 			blogModal.classList.add('show');
+			document.body.classList.add('chb-modal-open');
 		}
 
 		function openEditModal(el) {
@@ -1929,6 +2854,8 @@
 			document.getElementById('inputKategori').value = data.kategori;
 
 			document.getElementById('inputKontenEditor').innerHTML = data.konten || '';
+			chbReviveShapes();
+			chbNormalizeMedia();
 			document.getElementById('inputKonten').value = data.konten || '';
 			deselectEditorImage();
 			chbSavedRange = null;
@@ -1945,11 +2872,14 @@
 			}
 
 			blogModal.classList.add('show');
+			document.body.classList.add('chb-modal-open');
 		}
 
 		function closeModal() {
+			exitFocusMode();
 			deselectEditorImage();
 			blogModal.classList.remove('show');
+			document.body.classList.remove('chb-modal-open');
 		}
 
 		function openBlogDeleteConfirm(title, text) {
@@ -2062,11 +2992,17 @@
 
 		// ===== Validasi sebelum submit =====
 		blogForm.addEventListener('submit', function (e) {
-			const editorHtml = document.getElementById('inputKontenEditor').innerHTML;
+			// Salin isi editor tanpa class sementara (terpilih / preview video sedang diputar)
+			const editorClone = document.getElementById('inputKontenEditor').cloneNode(true);
+			editorClone.querySelectorAll('.is-selected, .chb-playing').forEach(function (n) { n.classList.remove('is-selected', 'chb-playing'); });
+			chbNormalizeMedia(editorClone);
+			editorClone.querySelectorAll('.chb-shape-text').forEach(function (n) { n.removeAttribute('contenteditable'); });
+			editorClone.querySelectorAll('[class=""]').forEach(function (n) { n.removeAttribute('class'); });
+			const editorHtml = editorClone.innerHTML;
 			document.getElementById('inputKonten').value = editorHtml;
 
 			const editorText = document.getElementById('inputKontenEditor').textContent.trim();
-			if (editorText.length === 0 && editorHtml.indexOf('<img') === -1) {
+			if (editorText.length === 0 && !/<(img|iframe)\b|chb-shape/.test(editorHtml)) {
 				e.preventDefault();
 				alert('Isi konten tidak boleh kosong.');
 				return;
@@ -2089,6 +3025,8 @@
 		@if($errors->any())
 			openAddModal();
 			document.getElementById('inputKontenEditor').innerHTML = @json(old('konten', ''));
+			chbReviveShapes();
+			chbNormalizeMedia();
 			document.getElementById('inputKonten').value = @json(old('konten', ''));
 		@endif
 </script>

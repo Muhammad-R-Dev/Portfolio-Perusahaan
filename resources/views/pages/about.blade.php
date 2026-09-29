@@ -4,27 +4,64 @@
 
 @section('content')
 <div class="page-wrapper">
-    <div class="about-header reveal">
-        <span class="eyebrow">Tentang Perusahaan</span>
-        <h1>PT Astabrata Teknologi</h1>
-        <p class="subtitle">Membangun inovasi masa depan melalui solusi teknologi yang andal, estetis, dan berdampak nyata bagi pertumbuhan bisnis Anda.</p>
-    </div>
+<section class="hero" id="home" aria-label="Hero">
+      <div class="hero__wrapper">
+        <div class="hero__row">
 
-    <section class="about-section reveal">
-        <div class="about-content">
-            <div class="about-container">
-                <div class="about-text">
-                    <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi untuk mentransformasi ide menjadi solusi digital tingkat tinggi. Kami percaya bahwa setiap masalah bisnis memiliki jawaban teknologi yang tepat. Dengan perpaduan keahlian rekayasa perangkat lunak dan desain UI/UX yang modern, kami hadir sebagai mitra strategis untuk akselerasi digital Anda.</p>
-                    <p>Filosofi "Astabrata" yang melambangkan 8 sifat alam semesta menjadi pedoman kami dalam berkarya: adaptif seperti air, kokoh seperti bumi, dan menerangi seperti matahari. Kami berkomitmen memberikan layanan terbaik dengan standar profesionalisme tertinggi.</p>
+          <div class="hero__stage">
+            <!-- Video background utama -->
+            <video id="next-video" class="hero__next-video" loop muted playsinline preload="auto"></video>
+            <video id="bg-video" class="hero__bg" autoplay muted playsinline loop preload="auto"></video>
+          </div>
 
-                    <div class="about-social">
-                        <a href="#" title="Facebook" aria-label="Facebook" target="_blank" rel="noopener"><i class="bx bxl-facebook"></i></a>
-                        <a href="#" title="Instagram" aria-label="Instagram" target="_blank" rel="noopener"><i class="bx bxl-instagram"></i></a>
-                        <a href="#" title="Twitter" aria-label="Twitter" target="_blank" rel="noopener"><i class="bx bxl-twitter"></i></a>
-                        <a href="#" title="YouTube" aria-label="YouTube" target="_blank" rel="noopener"><i class="bx bxl-youtube"></i></a>
-                    </div>
-                </div>
-                <div class="about-image" role="img" aria-label="Tentang Astabrata" style="background-image: url('{{ asset('image/kantor.jpeg') }}');"></div>
+          <!-- Preview video di tengah, tetap dipertahankan -->
+          <div class="hero__mini">
+            <div class="hero__mini-inner" id="mini-click" title="Watch next">
+              <video id="current-video" class="hero__mini-video" loop muted playsinline preload="auto"></video>
+            </div>
+          </div>
+
+          <div class="hero__container">
+            <div class="hero__content" id="video-frame">
+              <div class="hero__copy">
+            <h2 class="hero__label hero__label--top">Astabrata</h2>
+            <p class="hero__tech">TEKNOLOGI</p>
+          </div>
+        </div>
+          </div><!-- /.hero__container -->
+        </div><!-- /.hero__row -->
+
+        <!-- Layer ke-2 (hitam): di luar .hero__row supaya tidak ikut terpotong,
+             jadi kelihatan di area yang ter-crop saat scroll -->
+        <h2 class="hero__label hero__label--inside">Astabrata</h2>
+        <p class="hero__tech hero__tech--inside">TEKNOLOGI</p>
+      </div><!-- /.hero__wrapper -->
+    </section>
+
+    <section class="zn-about" id="about-content">
+        <div class="zn-about__container">
+            <p class="zn-about__eyebrow">Tentang Kami</p>
+            <h3 class="zn-about__title">PT Astabrata Teknologi</h3>
+
+            <div class="zn-about__subtext">
+                <p>Membangun inovasi masa depan melalui solusi teknologi</p>
+                <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi 
+                <br>untuk mentransformasi ide menjadi solusi digital tingkat tinggi. 
+                <br>Kami percaya bahwa setiap masalah bisnis memiliki jawaban teknologi yang tepat.</p>
+            </div>
+        </div>
+
+        <div class="zn-about__viewport" id="znClip" aria-label="Zentry shared adventure artwork">
+            <div class="zn-about__image" id="znMask">
+                <img class="zn-about__img" src="{{ asset('image/kantor.jpeg') }}" alt="Background">
+            </div>
+
+            <!-- Muncul saat gambar sudah membesar penuh (scroll sampai paling bawah) -->
+            <div class="zn-about__shade" id="znShade" aria-hidden="true"></div>
+            <div class="zn-about__caption" id="znCaption">
+                <p class="zn-about__caption-eyebrow">Kantor Kami</p>
+                <h3 class="zn-about__caption-title">Ruang Kerja untuk Berkarya</h3>
+                <p class="zn-about__caption-text">Kantor PT Astabrata Teknologi dirancang sebagai ruang kerja yang nyaman dan kolaboratif, tempat tim kami bertukar ide, berdiskusi, dan mengembangkan solusi teknologi terbaik untuk setiap klien.</p>
             </div>
         </div>
     </section>
@@ -177,6 +214,377 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 <style>
+/* ===== HERO REDEFINE (dipindahkan dari hero HTML) ===== */
+.hero,.hero__row,.hero__wrapper{position:relative}
+.hero{min-height:100dvh}
+.hero__wrapper{
+  left:50%;
+  margin-left:-50vw;
+  margin-right:-50vw;
+  width:100vw;
+}
+.hero__row{
+  border-radius:0 0 40% 10%;
+  height:100dvh;
+  isolation:isolate;
+  left:50%;
+  margin-left:-50vw;
+  margin-right:-50vw;
+  max-width:none;
+  overflow:clip;
+  right:50%;
+  width:100vw;
+  z-index:10;
+  background-image:
+    linear-gradient(180deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,.15) 35%,rgba(0,0,0,.65) 100%),
+    url("https://images.unsplash.com/photo-1718220216044-006f43e3a9b1?fm=jpg&q=80&w=2400&auto=format&fit=crop");
+  background-size:cover;
+  background-position:center;
+}
+.hero__stage{
+  height:100%;
+  left:50%;
+  position:absolute;
+  top:0;
+  transform:translateX(-50%);
+  width:100vw;
+  z-index:0;
+}
+.hero__bg,.hero__next-video{
+  height:100%;
+  left:0;
+  object-fit:cover;
+  position:absolute;
+  top:0;
+  width:100%;
+}
+.hero__next-video{opacity:0}
+.hero__container{
+  height:100dvh;
+  position:relative;
+}
+.hero__content{
+  align-items:start;
+  background:transparent;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
+  height:100%;
+  position:static;
+  row-gap:20px;
+}
+.hero__copy{
+  align-items:start;
+  display:flex;
+  flex-direction:column;
+  grid-column:span 2;
+  justify-content:flex-end;
+  padding:0 24px 30px;
+  row-gap:15px;
+  z-index:3;
+}
+.hero__label{
+  color:#fff;
+  font-family:zentry,Impact,Arial Black,sans-serif;
+  font-weight:900;
+  font-size:clamp(34px,6.5vw,96px);
+  line-height:.85;
+  margin:0;
+  text-transform:uppercase;
+  letter-spacing:-.02em;
+}
+.hero__subtitle{
+  color:#fff;
+  font-family:robert,Arial,sans-serif;
+  font-size:clamp(11px,1vw,14px);
+  line-height:1.3;
+  max-width:220px;
+  margin:0;
+  position:absolute;
+  left:50%;
+  top:68%;
+  transform:translateX(-50%);
+  text-align:center;
+}
+.hero__tech{
+  position:absolute;
+  right:24px;
+  bottom:7%;
+  margin:0;
+  color:#fff;
+  font-family:"Poppins","Roboto",ui-sans-serif,sans-serif;
+  font-size:clamp(11px,1.1vw,15px);
+  font-weight:300;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  text-align:right;
+  z-index:3;
+  pointer-events:none;
+}
+.hero__tech--inside{
+  color:#094356 !important;
+  z-index:0;
+}
+.hero__label--top,
+.hero__label--inside{
+  bottom:11%;
+  display:block;
+  pointer-events:none;
+  position:absolute;
+  right:24px;
+  margin:0;
+}
+.hero__label--top{
+  color:#fff !important;
+  z-index:3;
+}
+.hero__label--inside{
+  color:#094356 !important;
+  z-index:0;
+}
+.hero__btn{
+  align-items:center;
+  background:#edff66;
+  border-radius:30px;
+  color:#fff;
+  display:inline-flex;
+  justify-content:center;
+  padding:12px 25px;
+  text-transform:uppercase;
+  transition:transform .3s cubic-bezier(.22,.61,.36,1);
+  will-change:transform;
+}
+.hero__btn:hover{transform:scale(1.04)}
+.hero__btn .btn__label{
+  align-items:center;
+  display:inline-grid;
+  justify-items:center;
+  line-height:1;
+  overflow:hidden;
+}
+.hero__btn .btn__alt,
+.hero__btn .btn__main{
+  grid-area:1/1;
+  transition:transform .45s cubic-bezier(.22,.61,.36,1);
+  white-space:nowrap;
+  will-change:transform;
+}
+.hero__btn .btn__main{transform:translateY(0)}
+.hero__btn .btn__alt{transform:translateY(120%)}
+.hero__btn:hover .btn__main{transform:translateY(-120%)}
+.hero__btn:hover .btn__alt{transform:translateY(0)}
+.hero__mini{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:10;
+}
+.hero__mini-inner{
+  transform:scale(.5);
+  transition:transform .5s ease;
+}
+.hero__mini-video{
+  aspect-ratio:1;
+  border-radius:16px;
+  cursor:pointer;
+  height:100%;
+  max-height:256px;
+  max-width:256px;
+  object-fit:cover;
+  overflow:hidden;
+  transform:scale(1.5);
+  width:100%;
+}
+.hero__mini:hover .hero__mini-inner{transform:scale(.56)}
+@media (max-width: 991px) {
+  .hero__mini { display: none; }
+  .hero__copy { padding-top: 90px; }
+  .hero__label { font-size: clamp(32px,8vw,60px); }
+}
+@media (max-width: 600px) {
+  .hero { min-height: 52dvh; }
+  .hero__row {
+    height: 52dvh;
+    min-height: 340px;
+    border-radius: 0 0 25% 7%;
+    background-position: center 100%;
+  }
+  .hero__stage,
+  .hero__container { height: 52dvh; min-height: 340px; }
+  .hero__bg,
+  .hero__next-video { object-position: center 92%; }
+  .hero__copy { padding: 72px 18px 22px; }
+  .hero__label { font-size: clamp(28px, 8vw, 46px); }
+  .hero__label--top,
+  .hero__label--inside {
+    right: 18px;
+    bottom: 13%;
+  }
+  .hero__tech { right: 18px; bottom: 8%; }
+  .hero__subtitle { max-width: 200px; top: 62%; }
+}
+
+/* ===== DESKTOP: TEKNOLOGI lebih besar & Astabrata Teknologi digeser ke atas =====
+   (mobile tidak diubah). Layer putih & hitam harus selalu sama persis. */
+@media (min-width: 992px) {
+  /* Bagian bawah hero di-crop (100dvh -> 86dvh) supaya tepi bawah gambar/video
+     mendekati tulisan Astabrata Teknologi. Yang terpotong hanya bagian bawah. */
+  .hero { min-height: 86dvh; }
+  .hero__row {
+    height: 86dvh;
+    background-position: center top;
+  }
+  .hero__container { height: 100%; }
+  .hero__bg,
+  .hero__next-video { object-position: center top; }
+
+  /* Jarak antara "Astabrata" dan "TEKNOLOGI": bottom label = posisi tech + tinggi tech + gap.
+     Ubah --tech-gap untuk memperlebar / mempersempit jarak (berlaku ke layer putih & hitam). */
+  .hero {
+    --tech-size: clamp(16px, 1.6vw, 24px);
+    --tech-gap: 20px;
+  }
+  .hero__label--top,
+  .hero__label--inside { bottom: calc(5% + var(--tech-size) + var(--tech-gap)); }
+  .hero__tech {
+    bottom: 5%;
+    font-size: var(--tech-size);
+    line-height: 1;
+  }
+}
+
+/* ===== ZENTRY ABOUT (mengikuti banner.html) ===== */
+.zn-about{
+  position:relative;
+  z-index:5;
+  width:calc(100% + 10vw);
+  margin-left:-5vw;
+  margin-right:-5vw;
+  background:#fff;
+  color:#094356;
+  padding-top:80px;
+}
+.zn-about__container{
+  align-items:center;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  text-align:center;
+  padding:0 20px 30px;
+  gap:20px;
+}
+.zn-about__eyebrow{
+  font-family:robert,Arial,sans-serif;
+  font-size:16px;
+  letter-spacing:.08em;
+  margin:0;
+  opacity:.8;
+  text-transform:uppercase;
+}
+.zn-about__title{
+  color:#094356;
+  font-family:zentry,Impact,Arial Black,sans-serif;
+  font-weight:900;
+  font-size:clamp(42px,7vw,100px);
+  line-height:1;
+  margin:0;
+  max-width:1100px;
+  text-transform:uppercase;
+}
+.zn-about__subtext{
+  color:#094356;
+  display:grid;
+  font-family:robert,Arial,sans-serif;
+  font-weight:700;
+  gap:6px;
+  line-height:1.25;
+  opacity:.9;
+  text-align:center;
+  margin:0;
+}
+.zn-about__subtext p{margin:0}
+.zn-about__viewport{
+  height:100dvh;
+  overflow:hidden;
+  position:relative;
+}
+.zn-about__image{
+  border-radius:24px;
+  left:50%;
+  overflow:hidden;
+  pointer-events:none;
+  position:absolute;
+  top:0;
+  transform:translateX(-50%);
+  will-change:width,height,border-radius;
+  height:600px;
+  width:520px;
+}
+.zn-about__img{
+  height:100%;
+  inset:0;
+  object-fit:cover;
+  position:absolute;
+  width:100%;
+}
+/* Deskripsi kantor: muncul di atas gambar yang sudah penuh layar */
+.zn-about__shade{
+  background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,0) 75%);
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+  position:absolute;
+  visibility:hidden;
+  z-index:1;
+}
+.zn-about__caption{
+  bottom:0;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  left:0;
+  max-width:760px;
+  padding:0 6vw 9vh;
+  pointer-events:none;
+  position:absolute;
+  z-index:2;
+}
+.zn-about__caption > *{margin:0;opacity:0;visibility:hidden}
+.zn-about__caption-eyebrow{
+  font-family:robert,Arial,sans-serif;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.85;
+}
+.zn-about__caption-title{
+  color:#fff;
+  font-family:zentry,Impact,Arial Black,sans-serif;
+  font-weight:900;
+  font-size:clamp(30px,4.5vw,64px);
+  line-height:1;
+  text-transform:uppercase;
+}
+.zn-about__caption-text{
+  font-family:robert,Arial,sans-serif;
+  font-size:clamp(14px,1.4vw,18px);
+  font-weight:700;
+  line-height:1.4;
+}
+@media (max-width:600px){
+  .zn-about__caption{padding:0 20px 8vh;gap:10px}
+  .zn-about__caption-eyebrow{font-size:11px}
+}
+@media (max-width:600px){
+  .zn-about{padding-top:50px}
+  .zn-about__title{font-size:42px}
+  .zn-about__eyebrow{font-size:12px}
+  .zn-about__image{height:400px;width:290px}
+}
+
     /* RESET PENTING UNTUK MENCEGAH MENGGESER KE KANAN */
     html, body {
         width: 100% !important;
@@ -205,12 +613,18 @@
         position: relative;
         z-index: 5;
     }
+
+    /* DESKTOP: hero digeser ke atas, mendekati navbar (tinggi navbar saat discroll = 64px).
+       Harus setelah aturan .page-wrapper di atas supaya tidak tertimpa. Mobile tidak diubah. */
+    @media (min-width: 992px) {
+        .page-wrapper { padding-top: 64px; }
+    }
     
     .about-header {
         text-align: center;
         margin-bottom: 60px;
     }
-    .eyebrow {
+    .about-header .eyebrow {
         font-family: 'Poppins', sans-serif;
         color: #094356;
         font-weight: 600;
@@ -237,14 +651,22 @@
     .section-heading {
         margin-bottom: 50px;
     }
+    /* Judul section (Tim Kami & Galeri Kegiatan): font sama dengan judul "PT Astabrata Teknologi" (.zn-about__title), warna hitam */
     .section-heading h2 {
-        font-family: 'Sora', sans-serif;
+        font-family: zentry, Impact, 'Arial Black', sans-serif;
+        font-weight: 900;
         font-size: 2.5rem;
+        line-height: 1;
+        text-transform: uppercase;
         color: #094356;
         margin-bottom: 10px;
     }
+    /* Teks deskripsi: font sama dengan "Membangun inovasi masa depan melalui solusi teknologi" (.zn-about__subtext), warna hitam */
     .section-heading p {
-        color: #57676D;
+        font-family: robert, Arial, sans-serif;
+        font-weight: 700;
+        line-height: 1.25;
+        color: #094356;
         font-size: 1.1rem;
     }
     .text-center { text-align: center; }
@@ -335,7 +757,7 @@
     }
 
     .about-text::before {
-        content: 'TENTANG KAMI';
+        content: 'Welcome to Zentry';
         display: block;
         font-family: var(--about-font);
         font-size: 0.85rem;
@@ -790,7 +1212,7 @@
     .th-expand-close svg {
         width: 18px;
         height: 18px;
-        stroke: #0a0a0a;
+        stroke: #094356;
     }
 
     .th-expand-close:hover svg {
@@ -844,7 +1266,7 @@
         isolation: isolate; /* lapisan partikel tidak "bocor" ke bagian lain halaman */
     }
     .gallery-section .section-heading p {
-        color: #3f5359;
+        color: #094356;
     }
     .gallery-inner {
         position: relative;
@@ -925,10 +1347,10 @@
         position: relative;
         flex: 0 0 auto;
         padding: 8px 2px 14px;
-        font-family: 'Poppins', sans-serif;
+        font-family: robert, Arial, sans-serif;
         font-size: 0.95rem;
-        font-weight: 500;
-        line-height: 1.4;
+        font-weight: 700;
+        line-height: 1.25;
         white-space: nowrap;
         color: var(--gf-text);
         background: none;
@@ -1360,6 +1782,234 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
+(() => {
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  const bgVideo = document.querySelector("#bg-video");
+  const currentVideo = document.querySelector("#current-video");
+  const nextVideo = document.querySelector("#next-video");
+  const miniClick = document.querySelector("#mini-click");
+  const heroRow = document.querySelector(".hero__row");
+  const clip = document.querySelector("#clip");
+  const mask = document.querySelector(".mask-clip-path");
+
+  // Sumber video sama seperti file asli.
+  const videos = [
+    @json(asset('files/hero-1.mp4')),
+    @json(asset('files/hero-2.mp4')),
+    @json(asset('files/hero-3.mp4')),
+    @json(asset('files/hero-4.mp4'))
+  ];
+
+  let currentIndex = 0;
+  let isAnimating = false;
+
+  const setVideo = (el, src) => {
+    if (!el) return;
+    if (el.src !== new URL(src, window.location.href).href) {
+      el.src = src;
+      el.load();
+    }
+    el.muted = true;
+    el.defaultMuted = true;
+    el.autoplay = true;
+    el.playsInline = true;
+    el.setAttribute("muted", "");
+    el.setAttribute("playsinline", "");
+    el.setAttribute("autoplay", "");
+    el.preload = "auto";
+  };
+
+  const playVideo = (el) => {
+    if (!el) return;
+    const run = () => el.play().catch(() => {});
+    run();
+    el.addEventListener("loadeddata", run, {once:true});
+    el.addEventListener("canplay", run, {once:true});
+  };
+
+  setVideo(bgVideo, videos[0]);
+  setVideo(currentVideo, videos[1]);
+  setVideo(nextVideo, videos[0]);
+
+  playVideo(bgVideo);
+  playVideo(currentVideo);
+
+  // Preview video berpindah ke background seperti implementasi asli.
+  miniClick?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (isAnimating || window.matchMedia("(pointer: coarse)").matches) return;
+
+    isAnimating = true;
+    const nextIndex = (currentIndex + 1) % videos.length;
+    const previewSrc = videos[nextIndex];
+
+    setVideo(nextVideo, previewSrc);
+    playVideo(nextVideo);
+
+    gsap.timeline({
+      defaults: {ease:"power1.inOut"},
+      onComplete: () => {
+        currentIndex = nextIndex;
+
+        setVideo(currentVideo, videos[(currentIndex + 1) % videos.length]);
+        setVideo(bgVideo, videos[currentIndex]);
+        playVideo(currentVideo);
+        playVideo(bgVideo);
+
+        gsap.set(nextVideo, {
+          clearProps:"all",
+          opacity:0
+        });
+
+        isAnimating = false;
+      }
+    })
+    .set(nextVideo, {
+      opacity:1,
+      position:"absolute",
+      left:"50%",
+      top:"50%",
+      width:"16rem",
+      height:"16rem",
+      xPercent:-50,
+      yPercent:-50,
+      zIndex:2
+    })
+    .to(nextVideo, {
+      width:"100%",
+      height:"100%",
+      left:0,
+      top:0,
+      xPercent:0,
+      yPercent:0,
+      duration:1
+    })
+    .from(currentVideo, {
+      transformOrigin:"center center",
+      scale:0,
+      duration:1.2
+    }, 0);
+  });
+
+  // Kondisi awal hero harus benar-benar full.
+  // Di mobile, efek crop baru dimulai setelah user mulai scroll.
+  if (heroRow) {
+    gsap.set(heroRow, {
+      clipPath:"polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      borderRadius:"0 0 0 0"
+    });
+
+    const isMobile = window.matchMedia("(max-width: 600px)");
+
+    gsap.to(heroRow, {
+      clipPath:"polygon(14% 0%, 72% 0%, 90% 90%, 0% 100%)",
+      borderRadius:"0 0 40% 10%",
+      ease:"power1.inOut",
+      scrollTrigger:{
+        trigger:heroRow,
+        start: () => isMobile.matches ? "top top" : "center center",
+        end: () => isMobile.matches ? "bottom 20%" : "bottom center",
+        scrub:true,
+        invalidateOnRefresh:true
+      }
+    });
+  }
+
+  // Efek crop utama yang membuka gambar saat discroll ke bawah.
+  if (clip && mask) {
+    gsap.timeline({
+      scrollTrigger:{
+        trigger:"#clip",
+        start:"top top",
+        scrub:0.5,
+        pin:true,
+        pinSpacing:true
+      }
+    }).to(mask, {
+      width:"100vw",
+      height:"100vh",
+      borderRadius:0,
+      ease:"none"
+    });
+  }
+
+  // Animasi masuk teks hero.
+  gsap.set(".hero__label", {
+    y:60,
+    opacity:0,
+    scale:.98
+  });
+  gsap.set(".hero__btn", {
+    y:18,
+    opacity:0,
+    scale:0
+  });
+
+  const heroIntro = gsap.timeline({
+    defaults:{ease:"power2.out"},
+    scrollTrigger:{
+      trigger:".hero",
+      start:"top 85%",
+      once:true
+    }
+  });
+
+  heroIntro
+    .to(".hero__label", {
+      y:0,
+      opacity:1,
+      scale:1,
+      duration:.45,
+      stagger:.09
+    }, 0)
+    .to(".hero__btn", {
+      y:0,
+      opacity:1,
+      scale:1,
+      duration:.38,
+      ease:"back.out(1.5)"
+    }, ">-0.13");
+
+  // Efek crop: gambar Zentry membesar saat discroll.
+  const znClip = document.querySelector("#znClip");
+  const znMask = document.querySelector("#znMask");
+  const znShade = document.querySelector("#znShade");
+  const znCaptionItems = document.querySelectorAll("#znCaption > *");
+  if (znClip && znMask) {
+    const znTl = gsap.timeline({
+      scrollTrigger:{
+        trigger:znClip,
+        start:"top top",
+        end:"+=150%",
+        scrub:0.5,
+        pin:true,
+        pinSpacing:true
+      }
+    });
+
+    // Tahap 1: gambar membesar sampai penuh layar
+    znTl.to(znMask, {
+      width:"100vw",
+      height:"100vh",
+      borderRadius:0,
+      ease:"none",
+      duration:2
+    });
+
+    // Tahap 2: setelah penuh (scroll paling bawah), teks deskripsi kantor muncul.
+    // Kalau di-scroll balik ke atas, teks otomatis menghilang lagi (scrub).
+    if (znShade) znTl.fromTo(znShade, { autoAlpha:0 }, { autoAlpha:1, ease:"none", duration:1 });
+    if (znCaptionItems.length) znTl.fromTo(znCaptionItems,
+      { autoAlpha:0, y:40 },
+      { autoAlpha:1, y:0, ease:"power2.out", duration:0.7, stagger:0.25 },
+      "<"
+    );
+  }
+})();
+</script>
+<script>
     /* ===== Animasi Scroll (GSAP + ScrollTrigger) ===== */
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof gsap === 'undefined') return;
@@ -1477,15 +2127,32 @@
                 .fromTo(galHeading, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.12 })
                 .fromTo(filterBtns, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.05 }, '-=0.35');
 
-            gsap.set(galCards, { autoAlpha: 0, y: 42, scale: 0.92 });
-            ScrollTrigger.batch(galCards, {
-                start: 'top 92%',
-                end: 'bottom 8%',
-                onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'power3.out', overwrite: true }),
-                onEnterBack: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'power3.out', overwrite: true }),
-                onLeave: (batch) => gsap.to(batch, { autoAlpha: 0, y: -35, scale: 0.94, duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true }),
-                onLeaveBack: (batch) => gsap.to(batch, { autoAlpha: 0, y: 35, scale: 0.94, duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
-            });
+            // Dibuat sebagai fungsi supaya bisa dipanggil ulang setiap kali filter kategori diganti.
+            // Tanpa ini, posisi trigger lama (dan kartu yang tadinya display:none) membuat foto
+            // hasil filter tetap tersembunyi / nyangkut di posisi y yang salah.
+            let galBatch = [];
+            window.__galleryReveal = function () {
+                galBatch.forEach((t) => t.kill());
+                galBatch = [];
+
+                const allCards = Array.from(gallerySection.querySelectorAll('.gallery-card'));
+                const visibleCards = allCards.filter((c) => !c.classList.contains('is-hidden'));
+
+                gsap.killTweensOf(allCards);
+                gsap.set(allCards, { clearProps: 'opacity,visibility,transform' });
+                gsap.set(visibleCards, { autoAlpha: 0, y: 42, scale: 0.92 });
+
+                galBatch = ScrollTrigger.batch(visibleCards, {
+                    start: 'top 92%',
+                    end: 'bottom 8%',
+                    onEnter: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'power3.out', overwrite: true }),
+                    onEnterBack: (batch) => gsap.to(batch, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'power3.out', overwrite: true }),
+                    onLeave: (batch) => gsap.to(batch, { autoAlpha: 0, y: -35, scale: 0.94, duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true }),
+                    onLeaveBack: (batch) => gsap.to(batch, { autoAlpha: 0, y: 35, scale: 0.94, duration: 0.4, stagger: 0.04, ease: 'power2.in', overwrite: true })
+                });
+                ScrollTrigger.refresh();
+            };
+            window.__galleryReveal();
         }
 
         // Refresh setelah semua gambar termuat agar posisi trigger akurat
@@ -2003,7 +2670,7 @@
                 card.classList.remove('is-entering');
 
                 if (ok) {
-                    if (animate) {
+                    if (animate && !window.__galleryReveal) {
                         void card.offsetWidth; // restart animasi
                         card.style.animationDelay = Math.min(shown, 12) * 35 + 'ms';
                         card.classList.add('is-entering');
@@ -2014,6 +2681,11 @@
 
             if (emptyEl) emptyEl.hidden = shown !== 0;
             layout();
+
+            // Setelah filter diganti: reset & pasang ulang animasi reveal untuk foto yang tampil
+            if (animate && window.__galleryReveal) {
+                requestAnimationFrame(window.__galleryReveal);
+            }
         }
 
         // Rasio & orientasi foto diambil setelah foto termuat
@@ -2055,7 +2727,17 @@
                     b.setAttribute('aria-pressed', on ? 'true' : 'false');
                 });
 
-                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                // Geser hanya baris tombol filter secara horizontal (jangan scrollIntoView,
+                // karena itu bisa ikut menggeser halaman secara vertikal).
+                const track = btn.parentElement;
+                if (track) {
+                    const bR = btn.getBoundingClientRect();
+                    const tR = track.getBoundingClientRect();
+                    track.scrollTo({
+                        left: track.scrollLeft + (bR.left - tR.left) - (track.clientWidth - btn.offsetWidth) / 2,
+                        behavior: 'smooth'
+                    });
+                }
                 applyFilter(true);
             });
         });

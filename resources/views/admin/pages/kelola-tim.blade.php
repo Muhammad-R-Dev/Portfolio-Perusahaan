@@ -796,6 +796,73 @@
         .zoom-overlay .zoom-close:hover {
             background: var(--red);
         }
+
+        /* ============================================================
+           FORM TAMBAH/EDIT TIM DIPERBESAR (seperti Kelola Layanan)
+           Overlay layar penuh (sidebar tertutup abu-abu transparan), kotak form memenuhi area konten
+           ============================================================ */
+        body.chb-modal-open { overflow: hidden; }
+        #timModal {
+            padding: 32px;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+        #timModal .modal-box {
+            max-width: none;
+            width: 100%;
+            height: 100%;
+            max-height: none;
+            padding: 28px 40px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        #timModal .modal-box h2 { flex-shrink: 0; font-size: 22px; }
+        #timModal .modal-box form { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+        #timModal .tim-form-grid {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
+            gap: 32px;
+            align-items: stretch;
+        }
+        #timModal .modal-box input[type="text"],
+        #timModal .modal-box input[type="url"],
+        #timModal .modal-box select {
+            padding: 12px 14px;
+            font-size: 15px;
+            border-radius: 8px;
+        }
+        #timModal .tim-media-card { display: flex; flex-direction: column; }
+        #timModal .tim-media-preview { flex: 1; min-height: 340px; }
+        #timModal .tim-media-preview img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        /* Tombol Batal/Simpan tetap di bawah, tidak ikut ter-scroll */
+        #timModal .modal-actions {
+            flex-shrink: 0;
+            margin: 16px -40px -28px -40px;
+            padding: 16px 40px;
+            border-top: 1px solid var(--grey);
+            background: var(--light);
+            border-radius: 0 0 16px 16px;
+        }
+        @media screen and (max-width: 768px) {
+            #timModal { padding: 12px; }
+            #timModal .modal-box { padding: 20px 16px; }
+            #timModal .tim-form-grid { grid-template-columns: 1fr; gap: 16px; }
+            #timModal .tim-media-card { order: -1; }
+            #timModal .tim-media-preview { min-height: 240px; }
+            #timModal .modal-actions { margin: 14px -16px -20px -16px; padding: 14px 16px; }
+        }
+
 </style>
 @endpush
 
@@ -1393,12 +1460,36 @@
                 selectDivisi.value = '';
             }
 
+            syncModalWithContentArea();
             timModal.classList.add('show');
+            document.body.classList.add('chb-modal-open');
         }
 
         function closeModal() {
             timModal.classList.remove('show');
+            document.body.classList.remove('chb-modal-open');
         }
+
+        // Overlay layar penuh (menutupi sidebar), kotak form dibatasi di area konten lewat padding overlay
+        function syncModalWithContentArea() {
+            const contentEl = document.getElementById('content');
+            if (!contentEl) return;
+            const rect = contentEl.getBoundingClientRect();
+            const vw = document.documentElement.clientWidth;
+            document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+                overlay.style.paddingLeft = '';
+                overlay.style.paddingRight = '';
+                const base = parseFloat(getComputedStyle(overlay).paddingRight) || 0;
+                overlay.style.paddingLeft = (rect.left + base) + 'px';
+                overlay.style.paddingRight = (Math.max(0, vw - rect.right) + base) + 'px';
+            });
+        }
+        window.addEventListener('resize', syncModalWithContentArea);
+        document.addEventListener('DOMContentLoaded', function () {
+            syncModalWithContentArea();
+            const contentEl = document.getElementById('content');
+            if (window.ResizeObserver && contentEl) new ResizeObserver(syncModalWithContentArea).observe(contentEl);
+        });
 
         const deleteConfirmModal = document.getElementById('deleteConfirmModal');
         const btnCancelDelete    = document.getElementById('btnCancelDelete');
