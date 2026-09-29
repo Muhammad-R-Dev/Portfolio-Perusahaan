@@ -911,7 +911,12 @@
                                     <p class="desc-kategori">{{ Str::limit($service->description, 50) }}</p>
                                 </td>
                                 <td class="aksi action-cell">
-                                    <button type="button" class="btn-edit-text" onclick="openEditModal({{ $service->id }}, '{{ addslashes($service->title) }}', '{{ addslashes($service->description) }}', '{{ $service->image ? $service->image_url : '' }}')">
+                                    <button type="button" class="btn-edit-text"
+                                        data-id="{{ $service->id }}"
+                                        data-title="{{ $service->title }}"
+                                        data-description="{{ $service->description }}"
+                                        data-image="{{ $service->image ? $service->image_url : '' }}"
+                                        onclick="openEditModalFromButton(this)">
                                         Edit
                                     </button>
                                 </td>
@@ -965,7 +970,7 @@
                                         <i class='bx bx-cloud-upload'></i>
                                         <p>Klik atau seret gambar ke sini</p>
                                         <!-- Update keterangan format file -->
-                                        <span>PNG, JPG, JPEG, JFIF, HEIC (maks. 2MB)</span>
+                                        <span>JPG, JPEG, JFIF, PNG, WEBP, GIF, BMP, AVIF, HEIC (maks. 5MB)</span>
                                     </div>
                                     <div class="uploader-preview" id="uploaderPreview" style="display:none;">
                                         <img src="" alt="Preview" id="imgPreview">
@@ -978,11 +983,11 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <!-- Update atribut accept untuk mendukung JFIF dan HEIC -->
-                                    <input type="file" id="image" name="image" accept="image/png, image/jpeg, image/jpg, image/jfif, image/heic, .heic, .jfif" hidden>
+                                    <!-- accept memakai image/* + ekstensi eksplisit agar JFIF, WEBP, HEIC, dll. bisa dipilih -->
+                                    <input type="file" id="image" name="image" accept="image/*,.jpg,.jpeg,.jfif,.pjpeg,.pjp,.png,.webp,.gif,.bmp,.avif,.heic,.heif" hidden>
                                 </div>
                                 <input type="hidden" name="hapus_gambar" id="hapusGambarFlag" value="0">
-                                <small style="color: var(--dark-grey); font-size: 12px; margin-top: 4px; display: block;">Kosongkan jika tidak ingin mengganti gambar.</small>
+                                <small id="uploaderNote" style="color: var(--dark-grey); font-size: 12px; margin-top: 4px; display: block;">Kosongkan jika tidak ingin mengganti gambar.</small>
                             </div>
                         </div>
                     </div>
@@ -1024,6 +1029,18 @@
                 <p id="successMessage"></p>
                 <div class="modal-actions">
                     <button type="button" class="btn-save" id="btnCloseSuccess">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Notifikasi Error -->
+        <div class="modal-overlay" id="errorModal">
+            <div class="modal-box modal-confirm">
+                <div class="confirm-icon"><i class='bx bx-error-circle'></i></div>
+                <h2>Gagal!</h2>
+                <p id="errorMessage" style="white-space:pre-line;"></p>
+                <div class="modal-actions">
+                    <button type="button" class="btn-save" id="btnCloseError">OK</button>
                 </div>
             </div>
         </div>
@@ -1197,14 +1214,52 @@
             uploaderEmpty.style.display = 'block';
         }
 
+        // Format gambar yang diizinkan (samakan dengan validasi di Controller)
+        const ALLOWED_IMAGE_EXT = ['jpg','jpeg','jfif','pjpeg','pjp','png','webp','gif','bmp','avif','heic','heif'];
+        const MAX_IMAGE_MB = 5;
+        const uploaderNote = document.getElementById('uploaderNote');
+        const uploaderNoteDefault = uploaderNote ? uploaderNote.textContent : '';
+
+        function setUploaderNote(text, isError) {
+            if (!uploaderNote) return;
+            uploaderNote.textContent = text || uploaderNoteDefault;
+            uploaderNote.style.color = isError ? '#e74c3c' : 'var(--dark-grey)';
+        }
+
+        // Cek ekstensi (bukan MIME, karena browser sering memberi MIME kosong untuk .jfif/.heic)
+        function validateImageFile(file) {
+            const ext = (file.name.split('.').pop() || '').toLowerCase();
+            const isImageMime = file.type && file.type.indexOf('image/') === 0;
+            if (!ALLOWED_IMAGE_EXT.includes(ext) && !isImageMime) {
+                return 'Format .' + ext + ' tidak didukung. Gunakan: ' + ALLOWED_IMAGE_EXT.join(', ').toUpperCase() + '.';
+            }
+            if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+                return 'Ukuran gambar maksimal ' + MAX_IMAGE_MB + 'MB.';
+            }
+            return null;
+        }
+
         function showImagePreview(file) {
+            const err = validateImageFile(file);
+            if (err) {
+                inputImage.value = '';
+                setUploaderNote(err, true);
+                return false;
+            }
+            setUploaderNote('', false);
             const reader = new FileReader();
             reader.onload = function (e) {
+                imgPreview.onerror = function () {
+                    // Browser tidak bisa menampilkan format ini (mis. HEIC), file tetap dikirim ke server
+                    imgPreview.removeAttribute('src');
+                    setUploaderNote('Pratinjau tidak tersedia untuk format ini, tetapi file "' + file.name + '" tetap akan diunggah.', false);
+                };
                 imgPreview.src = e.target.result;
                 uploaderEmpty.style.display = 'none';
                 uploaderPreview.style.display = 'block';
             };
             reader.readAsDataURL(file);
+            return true;
         }
 
         function setImagePreviewUrl(url) {
@@ -1220,8 +1275,7 @@
 
         inputImage.addEventListener('change', function () {
             const file = this.files[0];
-            if (file) {
-                showImagePreview(file);
+            if (file && showImagePreview(file)) {
                 hapusGambarFlag.value = '0';
             }
         });
@@ -1243,8 +1297,9 @@
             const file = e.dataTransfer.files[0];
             if (file) {
                 inputImage.files = e.dataTransfer.files;
-                showImagePreview(file);
-                hapusGambarFlag.value = '0';
+                if (showImagePreview(file)) {
+                    hapusGambarFlag.value = '0';
+                }
             }
         });
 
@@ -1252,6 +1307,7 @@
             e.stopPropagation();
             inputImage.value = '';
             resetUploader();
+            setUploaderNote('', false);
             hapusGambarFlag.value = '1';
         });
 
@@ -1292,13 +1348,20 @@
             document.getElementById('formMethod').value = 'POST';
             hapusGambarFlag.value = '0';
             resetUploader();
+            setUploaderNote('', false);
             modalLayanan.classList.add('show');
             document.body.classList.add('chb-modal-open');
         }
 
         // Buka modal edit
+        function openEditModalFromButton(btn) {
+            openEditModal(btn.dataset.id, btn.dataset.title || '', btn.dataset.description || '', btn.dataset.image || '');
+        }
+
         function openEditModal(id, title, description, image) {
             syncModalWithContentArea();
+            inputImage.value = '';
+            setUploaderNote('', false);
             modalLayananTitle.innerText = 'Edit Layanan';
             formLayanan.action = '/admin/kelola-layanan/' + id;
             document.getElementById('formMethod').value = 'PUT';
@@ -1554,6 +1617,29 @@
             if (e.target === successModal) successModal.classList.remove('show');
         });
 
+        // ===== Modal Notifikasi Error =====
+        const errorModal    = document.getElementById('errorModal');
+        const errorMessage  = document.getElementById('errorMessage');
+        const btnCloseError = document.getElementById('btnCloseError');
+
+        function showErrorPopup(message) {
+            errorMessage.textContent = message;
+            errorModal.classList.add('show');
+        }
+        btnCloseError.addEventListener('click', function () { errorModal.classList.remove('show'); });
+        errorModal.addEventListener('click', function (e) {
+            if (e.target === errorModal) errorModal.classList.remove('show');
+        });
+
+        // Cegah submit jika file yang dipilih tidak valid
+        formLayanan.addEventListener('submit', function (e) {
+            const f = inputImage.files[0];
+            if (f) {
+                const err = validateImageFile(f);
+                if (err) { e.preventDefault(); showErrorPopup(err); }
+            }
+        });
+
         const layananBulkDeleteMessage = sessionStorage.getItem('layananBulkDeleteMessage');
         if (layananBulkDeleteMessage) {
             sessionStorage.removeItem('layananBulkDeleteMessage');
@@ -1564,5 +1650,8 @@
                 showSuccessPopup(@json(session('success')));
             }
         @endif
+        @if($errors->any())
+            showErrorPopup(@json(implode("\n", $errors->all())));
+        @endif
 </script>
-@endpush
+@endpush 	

@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminServiceController extends Controller
 {
+    // Ekstensi gambar yang diizinkan (samakan dengan ALLOWED_IMAGE_EXT di blade)
+    private const ALLOWED_IMAGE_EXT = [
+        'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp',
+        'png', 'webp', 'gif', 'bmp', 'avif', 'heic', 'heif',
+    ];
+
     public function index()
     {
         $services = Service::all();
@@ -24,21 +30,19 @@ class AdminServiceController extends Controller
         $validated = $request->validate([
             'title'       => 'required',
             'description' => 'required',
-            // Kita hapus 'mimes' bawaan laravel, dan naikin kapasitas jadi 10MB (10240 KB)
+            // 10MB (10240 KB). Tanpa 'mimes' karena deteksi MIME Laravel
+            // sering gagal untuk jfif/heic/avif; ekstensi dicek manual di bawah.
             'image'       => 'nullable|file|max:10240',
         ]);
 
+        // Jangan biarkan 'image' => null ikut tersimpan
+        unset($validated['image']);
+
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $ext = strtolower($file->getClientOriginalExtension());
-            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'jfif', 'heic'];
-            
-            // Validasi ekstensi manual (Bypass kelemahan deteksi MIME Laravel)
-            if (!in_array($ext, $allowed)) {
-                return back()->withErrors(['image' => 'Format file gagal diupload. Pastikan formatnya jpg, jpeg, png, jfif, atau heic.']);
+            if ($error = $this->cekFormatGambar($request->file('image'))) {
+                return back()->withInput()->withErrors(['image' => $error]);
             }
-            
-            $validated['image'] = $file->store('services', 'public');
+            $validated['image'] = $request->file('image')->store('services', 'public');
         }
 
         Service::create($validated);
@@ -59,25 +63,25 @@ class AdminServiceController extends Controller
         $validated = $request->validate([
             'title'       => 'required',
             'description' => 'required',
-            // Kapasitas 10MB
             'image'       => 'nullable|file|max:10240',
         ]);
 
         $service = Service::findOrFail($id);
 
+        // PENTING: buang 'image' dari data validasi supaya gambar lama
+        // tidak tertimpa null ketika user tidak memilih file baru.
+        unset($validated['image']);
+
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $ext = strtolower($file->getClientOriginalExtension());
-            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'jfif', 'heic'];
-            
-            if (!in_array($ext, $allowed)) {
-                return back()->withErrors(['image' => 'Format file gagal diupload. Pastikan formatnya jpg, jpeg, png, jfif, atau heic.']);
+            if ($error = $this->cekFormatGambar($request->file('image'))) {
+                return back()->withInput()->withErrors(['image' => $error]);
             }
 
-            // Ganti gambar: hapus file lama, simpan yang baru
+            // Ganti gambar: simpan yang baru dulu, baru hapus yang lama
+            $pathBaru = $request->file('image')->store('services', 'public');
             $this->hapusGambarLama($service->image);
-            $validated['image'] = $file->store('services', 'public');
-            
+            $validated['image'] = $pathBaru;
+
         } elseif ($request->boolean('hapus_gambar')) {
             // User menekan "hapus gambar" tanpa upload gambar baru
             $this->hapusGambarLama($service->image);
@@ -96,6 +100,21 @@ class AdminServiceController extends Controller
         $service->delete();
 
         return redirect()->route('admin.kelola-layanan.index')->with('success', 'Layanan berhasil dihapus.');
+    }
+
+    /**
+     * Validasi ekstensi manual. Return pesan error, atau null jika valid.
+     */
+    private function cekFormatGambar($file): ?string
+    {
+        $ext = strtolower($file->getClientOriginalExtension());
+
+        if (!in_array($ext, self::ALLOWED_IMAGE_EXT, true)) {
+            return 'Format file tidak didukung. Gunakan: '
+                . strtoupper(implode(', ', self::ALLOWED_IMAGE_EXT)) . '.';
+        }
+
+        return null;
     }
 
     private function hapusGambarLama(?string $path): void
