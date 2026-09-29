@@ -1929,6 +1929,39 @@ if ('paintWorklet' in CSS) {
     .swiper-slide__block .main__title {
         transition: font-size 0.2s ease;
     }
+
+    /* ===== Perbaikan: slide berikutnya tidak boleh terlihat menyembul (mobile & tablet) ===== */
+    .section__slider,
+    .section__slider .container__center,
+    .swiper-container {
+        overflow: hidden;
+    }
+    @media screen and (max-width: 1199px) {
+        .swiper-slide {
+            width: 100%;
+            flex-shrink: 0;
+            /* Slide yang belum gilirannya disembunyikan; muncul halus hanya saat aktif */
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        .swiper-slide-active {
+            opacity: 1;
+        }
+        /* Gambar dipotong (crop) rapi mengisi kotak, tidak ada yang meluber */
+        .swiper-slide__block .swiper-slide__block__img {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            -webkit-mask-image: -webkit-radial-gradient(white, black); /* paksa radius ikut memotong gambar (Safari) */
+        }
+        .swiper-slide__block .swiper-slide__block__img img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+    }
 </style>
 @endpush
 
@@ -2010,7 +2043,10 @@ if ('paintWorklet' in CSS) {
                 spaceBetween: 0,
                 autoplay: 2500,
                 autoplayDisableOnInteraction: false, // usap boleh mengontrol, tapi slider tetap jalan otomatis lagi setelahnya
-                loop: true
+                loop: true,
+                observer: true,        // hitung ulang ukuran bila layout berubah (mis. animasi reveal)
+                observeParents: true,
+                updateOnImagesReady: true
             });
         } else {
             layananSwiper = new Swiper(".swiper-container", {
@@ -2076,10 +2112,18 @@ if ('paintWorklet' in CSS) {
 
         autoFitLayananTitles();
 
+        // Pastikan Swiper menghitung ulang lebar slide setelah semua gambar/font selesai dimuat
+        window.addEventListener('load', function () {
+            if (layananSwiper && layananSwiper.update) layananSwiper.update(true);
+        });
+
         var resizeTimer;
         window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(autoFitLayananTitles, 150);
+            resizeTimer = setTimeout(function () {
+                autoFitLayananTitles();
+                if (layananSwiper && layananSwiper.update) layananSwiper.update(true);
+            }, 150);
         });
     });
 </script>
