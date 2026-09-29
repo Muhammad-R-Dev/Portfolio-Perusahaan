@@ -45,9 +45,7 @@
 
             <div class="zn-about__subtext">
                 <p>Membangun inovasi masa depan melalui solusi teknologi</p>
-                <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi 
-                <br>untuk mentransformasi ide menjadi solusi digital tingkat tinggi. 
-                <br>Kami percaya bahwa setiap masalah bisnis memiliki jawaban teknologi yang tepat.</p>
+                <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi </p>
             </div>
         </div>
 
@@ -61,7 +59,7 @@
             <div class="zn-about__caption" id="znCaption">
                 <p class="zn-about__caption-eyebrow">Kantor Kami</p>
                 <h3 class="zn-about__caption-title">Ruang Kerja untuk Berkarya</h3>
-                <p class="zn-about__caption-text">Kantor PT Astabrata Teknologi dirancang sebagai ruang kerja yang nyaman dan kolaboratif, tempat tim kami bertukar ide, berdiskusi, dan mengembangkan solusi teknologi terbaik untuk setiap klien.</p>
+                <p class="zn-about__caption-text">PT Asta Brata Teknologi adalah perusahaan penyedia solusi teknologi yang berkomitmen menghadirkan inovasi digital terbaik bagi setiap klien. Berlandaskan lingkungan kerja yang nyaman dan berorientasi pada kolaborasi, kami membina budaya pertukaran ide serta diskusi yang dinamis guna merancang dan mengembangkan layanan teknologi yang efektif, tepat guna, dan bernilai tinggi.</p>
             </div>
         </div>
     </section>
