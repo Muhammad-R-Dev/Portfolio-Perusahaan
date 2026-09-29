@@ -24,11 +24,21 @@ class AdminServiceController extends Controller
         $validated = $request->validate([
             'title'       => 'required',
             'description' => 'required',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // Kita hapus 'mimes' bawaan laravel, dan naikin kapasitas jadi 10MB (10240 KB)
+            'image'       => 'nullable|file|max:10240',
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('services', 'public');
+            $file = $request->file('image');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'jfif', 'heic'];
+            
+            // Validasi ekstensi manual (Bypass kelemahan deteksi MIME Laravel)
+            if (!in_array($ext, $allowed)) {
+                return back()->withErrors(['image' => 'Format file gagal diupload. Pastikan formatnya jpg, jpeg, png, jfif, atau heic.']);
+            }
+            
+            $validated['image'] = $file->store('services', 'public');
         }
 
         Service::create($validated);
@@ -49,15 +59,25 @@ class AdminServiceController extends Controller
         $validated = $request->validate([
             'title'       => 'required',
             'description' => 'required',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // Kapasitas 10MB
+            'image'       => 'nullable|file|max:10240',
         ]);
 
         $service = Service::findOrFail($id);
 
         if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $allowed = ['jpg', 'jpeg', 'png', 'gif', 'jfif', 'heic'];
+            
+            if (!in_array($ext, $allowed)) {
+                return back()->withErrors(['image' => 'Format file gagal diupload. Pastikan formatnya jpg, jpeg, png, jfif, atau heic.']);
+            }
+
             // Ganti gambar: hapus file lama, simpan yang baru
             $this->hapusGambarLama($service->image);
-            $validated['image'] = $request->file('image')->store('services', 'public');
+            $validated['image'] = $file->store('services', 'public');
+            
         } elseif ($request->boolean('hapus_gambar')) {
             // User menekan "hapus gambar" tanpa upload gambar baru
             $this->hapusGambarLama($service->image);
