@@ -75,32 +75,33 @@
                 <p>Orang-orang hebat di balik setiap baris kode dan desain yang kami buat.</p>
             </div>
 
-            <div class="th-slider-container" id="thSliderContainer">
-                <div class="th-slider-track" id="thSliderTrack">
-                    @forelse($teams as $team)
-                    <div class="th-card" data-title="{{ $team->nama }}" data-desc="{{ $team->jabatan }} &bull; {{ $team->divisi }}">
-                        <div class="th-card-photo">
-                            <img src="{{ $team->foto_url }}" alt="{{ $team->nama }}">
-                            <div class="th-hover-overlay"><span>{{ $team->jabatan }}</span></div>
-                        </div>
-                        <div class="th-card-name">
-                            <h3>{{ $team->nama }}</h3>
-                            <p>{{ $team->jabatan }}</p>
-                        </div>
+            <div class="team-grid">
+                @forelse($teams as $team)
+                <article class="team-card">
+                    <div class="team-card-bg">
+                        <img src="{{ $team->foto_url }}" alt="" aria-hidden="true" loading="lazy">
                     </div>
-                    @empty
-                    <div class="th-card" data-title="Tim Astabrata" data-desc="Segera hadir">
-                        <div class="th-card-photo">
-                            <img src="{{ asset('image/profile.png') }}" alt="Tim Astabrata">
-                            <div class="th-hover-overlay"><span>Segera hadir</span></div>
-                        </div>
-                        <div class="th-card-name">
-                            <h3>Tim Astabrata</h3>
-                            <p>Segera hadir</p>
-                        </div>
+                    <img class="team-card-avatar" src="{{ $team->foto_url }}" alt="{{ $team->nama }}" loading="lazy">
+                    <div class="team-card-content">
+                        <h3>{{ $team->nama }}</h3>
+                        <p class="team-card-role">{{ $team->jabatan }}</p>
+                        @if($team->divisi)
+                            <span class="team-card-divisi">{{ $team->divisi }}</span>
+                        @endif
                     </div>
-                    @endforelse
-                </div>
+                </article>
+                @empty
+                <article class="team-card">
+                    <div class="team-card-bg">
+                        <img src="{{ asset('image/profile.png') }}" alt="" aria-hidden="true">
+                    </div>
+                    <img class="team-card-avatar" src="{{ asset('image/profile.png') }}" alt="Tim Astabrata">
+                    <div class="team-card-content">
+                        <h3>Tim Astabrata</h3>
+                        <p class="team-card-role">Segera hadir</p>
+                    </div>
+                </article>
+                @endforelse
             </div>
         </div>
     </section>
@@ -985,11 +986,7 @@
 
     #tim-kami { scroll-margin-top: 90px; }
 
-    /* ===== Tim Kami ===== */
-    :root {
-        --th-card-width: 240px;
-    }
-
+    /* ===== Tim Kami: card biasa, maksimal 3 kolom ===== */
     .team-section {
         width: 100%;
         max-width: 100%;
@@ -1015,240 +1012,140 @@
         margin-left: -5vw;
         margin-right: -5vw;
         background: transparent;
-        padding: 56px 20px 20px;
+        padding: 56px 20px 72px;
         overflow: hidden;
         box-sizing: border-box;
     }
 
-    .th-slider-container {
+    .team-grid {
         position: relative;
         z-index: 5;
-        perspective: 1500px;
-        perspective-origin: 50% 50%;
-        cursor: grab;
-        width: 100%;
-        max-width: none;
-        margin: 0;
-        overflow: hidden;
-        touch-action: pan-y;
-    }
-
-    .th-slider-container.dragging {
-        cursor: grabbing;
-    }
-
-    .th-slider-track {
-        position: relative;
-        width: 100%;
-        transform-style: preserve-3d;
-        will-change: transform;
-    }
-
-    .th-card {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: var(--th-card-width);
-        background: transparent;
-        overflow: hidden;
-        transform-style: preserve-3d;
-        cursor: pointer;
-        will-change: transform, clip-path;
-        border-radius: 6px;
-        box-shadow: 
-            0 18px 40px rgba(9, 67, 86, 0.14),
-            0 6px 16px rgba(9, 67, 86, 0.06);
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center; /* baris terakhir yang tidak penuh tetap rata tengah */
+        gap: 24px;
+        max-width: 900px;
+        margin: 0 auto;
     }
 
-    .th-card-photo {
+    /* Card berbentuk persegi (1:1): foto mengisi bagian atas, nama + jabatan di bawah */
+    /* ===== Card profil: foto latar + foto bulat menumpuk + konten miring ===== */
+    .team-card {
+        --tc-bg: #f1f5f6;
+        --tc-ink: #094356;
+        --tc-muted: #55666b;
         position: relative;
-        flex: 1 1 auto;
-        min-height: 0;
         overflow: hidden;
-        background: #eef3f3;
-        border-radius: 6px;
+        width: 280px;
+        max-width: 100%;
+        height: 330px;
+        text-align: center;
+        border-radius: 10px;
+        background: var(--tc-bg);
+        box-shadow: 0 4px 16px rgba(9, 67, 86, 0.1);
+        transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+    .team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 34px rgba(9, 67, 86, 0.2);
     }
 
-    .th-card-photo img {
+    /* Latar atas: foto anggota yang diburamkan, diberi lapisan teal supaya seragam */
+    .team-card-bg {
+        position: relative;
+        width: 100%;
+        height: 54%;
+        overflow: hidden;
+        background: #094356;
+    }
+    .team-card-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(9, 67, 86, 0.38);
+    }
+    .team-card-bg img {
+        display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
-        pointer-events: none;
-        position: relative;
-        z-index: 1;
+        object-position: center top;
+        filter: blur(6px);
+        transform: scale(1.25);
     }
 
-    /* Nama + jabatan menumpuk di atas foto (tanpa kotak putih terpisah),
-       memakai gradien gelap di bawah supaya teks tetap terbaca. */
-    .th-card-name {
+    /* Foto bulat di tengah, separuh menumpuk di latar */
+    .team-card-avatar {
         position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 4;
-        padding: 44px 14px 22px;
-        text-align: left;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.55) 55%, transparent 100%);
-        pointer-events: none;
-    }
-
-    .th-card-name h3 {
-        margin: 0;
-        color: #ffffff;
-        font-family: 'Sora', sans-serif;
-        font-size: clamp(14px, 2vw, 19px);
-        line-height: 1.2;
-        font-weight: 800;
-        word-break: break-word;
-        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
-        position: relative;
-        z-index: 1;
-    }
-
-    .th-card-name p {
-        margin: 4px 0 0;
-        color: #f0f0f0;
-        font-family: 'Poppins', sans-serif;
-        font-size: clamp(10px, 1.5vw, 12.5px);
-        line-height: 1.3;
-        font-weight: 500;
-        word-break: break-word;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Saat kartu diperbesar, info sudah ditampilkan oleh .th-expand-info,
-       jadi overlay kecil ini disembunyikan agar tidak dobel. */
-    .th-card.clone .th-card-name {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        .th-card-name { padding: 28px 8px 16px; }
-        .th-card-name h3 { font-size: clamp(11px, 3vw, 14px); }
-        .th-card-name p { font-size: clamp(9px, 2.4vw, 11px); }
-    }
-
-    .th-card::before,
-    .th-card::after {
-        display: none !important;
-    }
-
-    .th-card-photo .th-hover-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.22);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 2;
-        border-radius: 6px;
-    }
-
-    .th-card:hover .th-card-photo .th-hover-overlay {
-        opacity: 1;
-    }
-
-    .th-card .th-hover-overlay span {
-        display: none; /* jabatan sudah tampil di bagian bawah foto */
-        color: white;
-        font-family: 'Poppins', sans-serif;
-        font-size: clamp(11px, 2.5vw, 15px);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        text-align: center;
-        padding: 0 8px;
-    }
-
-    .th-slider-track.blurred .th-card:not(.expanded) {
-        filter: blur(8px);
-        transition: filter 0.6s ease;
-    }
-
-    .th-card.expanded {
-        z-index: 1000 !important;
-    }
-
-    .th-expand-close {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.92);
-        border: none;
+        left: 50%;
+        bottom: 50%;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        object-fit: cover;
+        object-position: center top;
+        border: 3px solid #ffffff;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+        transform: translateX(-50%);
+        z-index: 20;
     }
 
-    .th-expand-close.visible {
-        opacity: 1;
-        pointer-events: all;
-    }
-
-    .th-expand-close:hover {
-        background: #ff6b35;
-        color: white;
-        transform: rotate(90deg) scale(1.1);
-    }
-
-    .th-expand-close svg {
-        width: 18px;
-        height: 18px;
-        stroke: #094356;
-    }
-
-    .th-expand-close:hover svg {
-        stroke: white;
-    }
-
-    .th-expand-info {
+    /* Area konten dengan tepi atas miring */
+    .team-card-content {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 5;
-        padding: 24px 20px 20px;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.55) 55%, transparent 100%);
-        opacity: 0;
-        transform: translateY(12px);
-        transition: opacity 0.4s ease, transform 0.4s ease;
-        pointer-events: none;
+        height: 50%;
+        padding: 16px 18px;
+        background: var(--tc-bg);
+        z-index: 10;
     }
-
-    .th-expand-info.visible {
-        opacity: 1;
-        transform: translateY(0);
+    .team-card-content::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        bottom: 40px;
+        width: 120%;
+        height: 100%;
+        background: var(--tc-bg);
+        transform: rotate(-13deg);
+        z-index: -1;
     }
-
-    .th-expand-info h2 {
+    .team-card-content h3 {
+        margin: 0;
         font-family: 'Sora', sans-serif;
-        font-size: clamp(18px, 4vw, 26px);
-        font-weight: 800;
-        color: #ffffff;
-        margin-bottom: 6px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        line-height: 1.3;
+        color: var(--tc-ink);
+        overflow-wrap: anywhere;
+    }
+    .team-card-role {
+        margin: 6px 0 0;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        color: var(--tc-muted);
+    }
+    .team-card-divisi {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 3px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--tc-ink);
+        color: var(--tc-ink);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 500;
     }
 
-    .th-expand-info p {
-        font-family: 'Poppins', sans-serif;
-        font-size: clamp(12px, 2.5vw, 15px);
-        color: #f0f0f0;
-        line-height: 1.5;
+    @media (max-width: 560px) {
+        .team-grid { max-width: 300px; }
+        .team-card { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .team-card, .team-card:hover { transition: none; transform: none; }
     }
 
     /* Gallery Section */
@@ -1773,6 +1670,48 @@
         from { transform: scale(0.9); opacity: 0; }
         to { transform: scale(1); opacity: 1; }
     }
+
+    /* ============ DARK MODE (html[data-theme="dark"]) ============
+       Latar hitam penuh pojok kiri-kanan, teks teal gelap diganti teal terang. */
+    html[data-theme="dark"] .page-wrapper,
+    html[data-theme="dark"] .zn-about,
+    html[data-theme="dark"] .gallery-section,
+    html[data-theme="dark"] .team-section { background: #0a0f1a; }
+
+    html[data-theme="dark"] .zn-about,
+    html[data-theme="dark"] .zn-about__title,
+    html[data-theme="dark"] .zn-about__subtext,
+    html[data-theme="dark"] .about-header .eyebrow,
+    html[data-theme="dark"] .about-header h1,
+    html[data-theme="dark"] .section-heading h2,
+    html[data-theme="dark"] .section-heading p,
+    html[data-theme="dark"] .gallery-section .section-heading p { color: #8fd0bf; }
+
+    html[data-theme="dark"] .subtitle,
+    html[data-theme="dark"] .gallery-empty { color: #aab8b4; }
+
+    html[data-theme="dark"] .gallery-filter { --gf-text: #c9d4d1; --gf-accent: #8fd0bf; }
+    html[data-theme="dark"] .gallery-particles { --particle-color: #4FA8B5; }
+
+    html[data-theme="dark"] .gallery-card { background: #151c2c; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
+    html[data-theme="dark"] .gallery-card::before {
+        background: linear-gradient(110deg, #151c2c 30%, #1f2940 50%, #151c2c 70%);
+        background-size: 200% 100%;
+    }
+
+    /* Latar animasi partikel (dibuat lewat JS dengan warna inline terang) */
+    html[data-theme="dark"] .particle-background #particle-canvas > div { background: #0a0f1a !important; }
+
+    /* Tim Kami (dark mode) */
+    html[data-theme="dark"] .team-card {
+        --tc-bg: #151c2c;
+        --tc-ink: #e8f1ee;
+        --tc-muted: #9aa8a4;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+    html[data-theme="dark"] .team-card:hover { box-shadow: 0 16px 34px rgba(0, 0, 0, 0.65); }
+    html[data-theme="dark"] .team-card-divisi { border-color: #8fd0bf; color: #8fd0bf; }
+    html[data-theme="dark"] .team-card-avatar { border-color: #151c2c; }
 </style>
 @endpush
 
@@ -2096,13 +2035,8 @@
         const teamSection = document.querySelector('.team-section');
         if (teamSection) {
             const teamHeading = teamSection.querySelectorAll('.section-heading h2, .section-heading p');
-            const teamSlider = teamSection.querySelector('.th-slider-container');
+            const teamSlider = teamSection.querySelector('.team-grid');
 
-            // PENTING: jangan menganimasikan .th-card satu per satu di sini.
-            // Posisi/rotasi 3D tiap kartu sudah diatur penuh oleh slider (TeamHtmlSlider);
-            // kalau ScrollTrigger ikut menggeser y/scale/opacity kartu yang sama, keduanya
-            // saling menimpa dan kartu bisa "turun sendiri" / nyangkut di posisi salah.
-            // Jadi cukup animasikan pembungkus slider-nya saja.
             gsap.timeline({
                 defaults: { ease: 'power3.out' },
                 scrollTrigger: { trigger: teamSection, start: 'top 80%', end: 'bottom 20%', toggleActions: TOGGLE }
@@ -2176,446 +2110,6 @@
             new ParticleNetwork(canvasDiv, options);
         }
     });
-
-    /* ===== Tim Kami — Slider 3D ===== */
-    (function () {
-        const BASE_POSITIONS = [
-            { height: 620, z: 220, rotateY: 48, y: 0, clip: 'polygon(0px 0px, 100% 10%, 100% 90%, 0px 100%)' },
-            { height: 580, z: 165, rotateY: 35, y: 0, clip: 'polygon(0px 0px, 100% 8%, 100% 92%, 0px 100%)' },
-            { height: 495, z: 110, rotateY: 15, y: 0, clip: 'polygon(0px 0px, 100% 7%, 100% 93%, 0px 100%)' },
-            { height: 420, z: 66, rotateY: 15, y: 0, clip: 'polygon(0px 0px, 100% 7%, 100% 93%, 0px 100%)' },
-            { height: 353, z: 46, rotateY: 6, y: 0, clip: 'polygon(0px 0px, 100% 7%, 100% 93%, 0px 100%)' },
-            { height: 310, z: 0, rotateY: 0, y: 0, clip: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' },
-            { height: 353, z: 54, rotateY: 348, y: 0, clip: 'polygon(0px 7%, 100% 0px, 100% 100%, 0px 93%)' },
-            { height: 420, z: 89, rotateY: -15, y: 0, clip: 'polygon(0px 7%, 100% 0px, 100% 100%, 0px 93%)' },
-            { height: 495, z: 135, rotateY: -15, y: 1, clip: 'polygon(0px 7%, 100% 0px, 100% 100%, 0px 93%)' },
-            { height: 580, z: 195, rotateY: 325, y: 0, clip: 'polygon(0px 8%, 100% 0px, 100% 100%, 0px 92%)' },
-            { height: 620, z: 240, rotateY: 312, y: 0, clip: 'polygon(0px 10%, 100% 0px, 100% 100%, 0px 90%)' }
-        ];
-
-        const BASE_CARD_WIDTH = 240;
-        const BASE_GAP = 8;
-        const BASE_PERSPECTIVE = 1500;
-        const CENTER_SLOT = Math.floor(BASE_POSITIONS.length / 2);
-        const MAX_BASE_HEIGHT = Math.max(...BASE_POSITIONS.map((p) => p.height));
-
-        function thComputeScale(width) {
-            const MAX_W = 1200, MIN_W = 320;
-            const MAX_S = 1, MIN_S = 0.42;
-            if (width >= MAX_W) return MAX_S;
-            if (width <= MIN_W) return MIN_S;
-            const t = (width - MIN_W) / (MAX_W - MIN_W);
-            return MIN_S + t * (MAX_S - MIN_S);
-        }
-
-        function thClamp(val, min, max) {
-            return Math.max(min, Math.min(max, val));
-        }
-
-        class TeamHtmlSlider {
-            constructor() {
-                this.container = document.getElementById('thSliderContainer');
-                this.track = document.getElementById('thSliderTrack');
-                if (!this.container || !this.track) return;
-
-                this.cards = Array.from(document.querySelectorAll('.th-card'));
-                this.totalCards = this.cards.length;
-
-                this.isDragging = false;
-                this.isAnimating = false;
-                this.startX = 0;
-                this.dragDistance = 0;
-                this.threshold = 50;
-                this.expandedCard = null;
-                this.offset = 0;
-
-                this.sectionEl = this.container.closest('.team-section');
-
-                this.scale = thComputeScale(window.innerWidth);
-                this.positions = this.getScaledPositions(this.scale);
-
-                this.trackXTo = gsap.quickTo(this.track, 'x', { duration: 0.4, ease: 'power3.out' });
-
-                this.init();
-            }
-
-            getScaledPositions(scale) {
-                const cardW = BASE_CARD_WIDTH * scale;
-                const gap = BASE_GAP * scale;
-                const step = cardW + gap;
-
-                return BASE_POSITIONS.map((p, slot) => ({
-                    height: p.height * scale,
-                    z: p.z * scale,
-                    rotateY: p.rotateY,
-                    y: p.y * scale,
-                    clip: p.clip,
-                    x: (slot - CENTER_SLOT) * step
-                }));
-            }
-
-            computeRel(i, offsetVal) {
-                const half = Math.floor(this.totalCards / 2);
-                let rel = ((i - offsetVal) % this.totalCards + this.totalCards) % this.totalCards;
-                if (rel > half) rel -= this.totalCards;
-                return rel;
-            }
-
-            computeSlot(i, offsetVal) {
-                const rel = this.computeRel(i, offsetVal);
-                const slot = CENTER_SLOT + rel;
-                return Math.max(0, Math.min(BASE_POSITIONS.length - 1, slot));
-            }
-
-            getSlot(i) {
-                return this.computeSlot(i, this.offset);
-            }
-
-            buildTransform(pos) {
-                return `translate(-50%, -50%) translateX(${pos.x}px) translateZ(${pos.z}px) rotateY(${pos.rotateY}deg) translateY(${pos.y}px)`;
-            }
-
-            init() {
-                this.applyResponsiveSizing();
-                this.applyPositions();
-                this.attachEvents();
-            }
-
-            applyResponsiveSizing() {
-                const perspective = Math.max(600, BASE_PERSPECTIVE * this.scale);
-                document.documentElement.style.setProperty('--th-card-width', `${BASE_CARD_WIDTH * this.scale}px`);
-                this.container.style.perspective = `${perspective}px`;
-                this.track.style.height = `${this.computeTrackHeight(perspective)}px`;
-            }
-
-            // Desktop: tinggi penuh (tidak berubah).
-            // Mobile: layar sempit hanya menampilkan ~3-5 kartu tengah, sedangkan kartu
-            // terjangkung (620px x skala) ada di luar layar. Tinggi track dipangkas sesuai
-            // kartu yang benar-benar terlihat supaya tidak ada ruang kosong di bawah tim,
-            // sehingga bagian galeri naik mendekat.
-            computeTrackHeight(perspective) {
-                const full = MAX_BASE_HEIGHT * this.scale;
-                if (window.innerWidth > 768) return full;
-
-                const halfView = (this.container.clientWidth || window.innerWidth) / 2;
-                const cardHalf = (BASE_CARD_WIDTH * this.scale) / 2;
-                const usedSlots = new Set(this.cards.map((_, i) => this.computeSlot(i, 0)));
-
-                let tallest = 0;
-                usedSlots.forEach((slot) => {
-                    const p = this.positions[slot];
-                    if (Math.abs(p.x) - cardHalf >= halfView) return; // di luar layar
-                    const depthScale = perspective / Math.max(1, perspective - p.z); // kartu yang maju tampak lebih besar
-                    tallest = Math.max(tallest, p.height * depthScale);
-                });
-
-                if (!tallest) return full;
-                const breathing = 44; // ruang untuk bayangan kartu (container overflow: hidden)
-                return Math.min(full, Math.ceil(tallest + breathing));
-            }
-
-            applyPositions(animate = false) {
-                this.cards.forEach((card, index) => {
-                    const pos = this.positions[this.getSlot(index)];
-                    const transform = this.buildTransform(pos);
-
-                    if (animate) {
-                        gsap.to(card, { height: pos.height, clipPath: pos.clip, transform, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
-                    } else {
-                        gsap.set(card, { height: pos.height, clipPath: pos.clip, transform });
-                    }
-                });
-            }
-
-            handleResize() {
-                const newScale = thComputeScale(window.innerWidth);
-                if (Math.abs(newScale - this.scale) < 0.001) return;
-
-                this.scale = newScale;
-                this.positions = this.getScaledPositions(this.scale);
-                this.applyResponsiveSizing();
-
-                if (!this.expandedCard) {
-                    this.applyPositions(false);
-                }
-            }
-
-            expandCard(card) {
-                if (this.expandedCard || this.isAnimating) return;
-
-                this.expandedCard = card;
-                const title = card.dataset.title;
-                const desc = card.dataset.desc;
-
-                const sectionRect = this.sectionEl.getBoundingClientRect();
-                const rect = card.getBoundingClientRect();
-                const clone = card.cloneNode(true);
-                const overlay = clone.querySelector('.th-hover-overlay');
-                if (overlay) overlay.remove();
-
-                clone.style.position = 'absolute';
-                // Clone menyalin inline transform kartu asli (translate -50%, translateX, rotateY, dst).
-                // Karena posisinya sudah dihitung lewat left/top, transform itu harus dibuang;
-                // kalau tidak, clone muncul melenceng dulu lalu "melompat" ke tengah.
-                clone.style.transform = 'none';
-                clone.style.opacity = '1';
-                clone.style.visibility = 'visible';
-                clone.style.left = (rect.left - sectionRect.left) + 'px';
-                clone.style.top = (rect.top - sectionRect.top) + 'px';
-                clone.style.width = rect.width + 'px';
-                clone.style.height = rect.height + 'px';
-                clone.style.margin = '0';
-                clone.style.zIndex = '1000';
-                clone.classList.add('clone');
-
-                const closeBtnEl = document.createElement('button');
-                closeBtnEl.className = 'th-expand-close';
-                closeBtnEl.setAttribute('aria-label', 'Tutup');
-                closeBtnEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" /></svg>';
-                closeBtnEl.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.closeCard();
-                });
-                clone.appendChild(closeBtnEl);
-
-                const infoEl = document.createElement('div');
-                infoEl.className = 'th-expand-info';
-                infoEl.innerHTML = `<h2>${title}</h2><p>${desc}</p>`;
-                clone.appendChild(infoEl);
-
-                this.sectionEl.appendChild(clone);
-                this.cardClone = clone;
-                this.closeBtnEl = closeBtnEl;
-                this.infoEl = infoEl;
-
-                gsap.set(card, { opacity: 0 });
-                this.track.classList.add('blurred');
-
-                const finalWidth = Math.min(500, sectionRect.width * 0.85);
-                const finalHeight = Math.min(600, sectionRect.height * 0.85);
-                const centerX = sectionRect.width / 2;
-                const centerY = sectionRect.height / 2;
-
-                gsap.to(clone, {
-                    width: finalWidth,
-                    height: finalHeight,
-                    left: centerX - finalWidth / 2,
-                    top: centerY - finalHeight / 2,
-                    clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-                    duration: 0.8,
-                    ease: 'power2.out',
-                    onComplete: () => {
-                        closeBtnEl.classList.add('visible');
-                        infoEl.classList.add('visible');
-                    }
-                });
-            }
-
-            closeCard() {
-                if (!this.expandedCard) return;
-
-                const card = this.expandedCard;
-                const clone = this.cardClone;
-                const closeBtnEl = this.closeBtnEl;
-                const infoEl = this.infoEl;
-
-                if (closeBtnEl) closeBtnEl.classList.remove('visible');
-                if (infoEl) infoEl.classList.remove('visible');
-
-                const sectionRect = this.sectionEl.getBoundingClientRect();
-                const rect = card.getBoundingClientRect();
-                const index = this.cards.indexOf(card);
-                const pos = this.positions[this.getSlot(index)];
-
-                gsap.to(clone, {
-                    width: rect.width,
-                    height: rect.height,
-                    left: (rect.left - sectionRect.left),
-                    top: (rect.top - sectionRect.top),
-                    clipPath: pos.clip,
-                    duration: 0.8,
-                    ease: 'power2.out',
-                    onComplete: () => {
-                        clone.remove();
-                        gsap.set(card, { opacity: 1 });
-                        this.track.classList.remove('blurred');
-                        this.expandedCard = null;
-                        this.cardClone = null;
-                        this.closeBtnEl = null;
-                        this.infoEl = null;
-                    }
-                });
-            }
-
-            checkScrollClose() {
-                if (!this.expandedCard) return;
-                const rect = this.sectionEl.getBoundingClientRect();
-                if (rect.bottom < 0 || rect.top > window.innerHeight) {
-                    this.closeCard();
-                }
-            }
-
-            rotate(direction) {
-                if (this.expandedCard || this.isAnimating) return;
-
-                this.isAnimating = true;
-                const oldOffset = this.offset;
-                this.offset = (this.offset + (direction === 'next' ? 1 : -1) + this.totalCards) % this.totalCards;
-
-                this.cards.forEach((card, index) => {
-                    const oldRel = this.computeRel(index, oldOffset);
-                    const newRel = this.computeRel(index, this.offset);
-                    const pos = this.positions[this.getSlot(index)];
-
-                    const isWrap = Math.abs(newRel - oldRel) > 1;
-
-                    if (isWrap) {
-                        gsap.to(card, {
-                            opacity: 0,
-                            duration: 0.18,
-                            ease: 'power1.out',
-                            overwrite: 'auto',
-                            onComplete: () => {
-                                gsap.set(card, { height: pos.height, clipPath: pos.clip, transform: this.buildTransform(pos) });
-                                gsap.to(card, {
-                                    opacity: 1,
-                                    duration: 0.27,
-                                    ease: 'power1.in',
-                                    onComplete: () => {
-                                        if (index === this.cards.length - 1) this.isAnimating = false;
-                                    }
-                                });
-                            }
-                        });
-                    } else {
-                        gsap.set(card, { clipPath: pos.clip });
-                        gsap.to(card, {
-                            height: pos.height,
-                            transform: this.buildTransform(pos),
-                            opacity: 1,
-                            duration: 0.45,
-                            ease: 'power2.out',
-                            overwrite: 'auto',
-                            onComplete: () => {
-                                if (index === this.cards.length - 1) this.isAnimating = false;
-                            }
-                        });
-                    }
-                });
-
-                this.trackXTo(0);
-            }
-
-            attachEvents() {
-                this.cards.forEach((card) => {
-                    card.addEventListener('click', () => {
-                        if (!this.isDragging && !this.expandedCard) {
-                            this.expandCard(card);
-                        }
-                    });
-                });
-
-                this.container.addEventListener('mousedown', (e) => this.handleDragStart(e));
-                this.container.addEventListener('touchstart', (e) => this.handleDragStart(e), { passive: false });
-
-                document.addEventListener('mousemove', (e) => this.handleDragMove(e));
-                document.addEventListener('touchmove', (e) => this.handleDragMove(e), { passive: false });
-
-                document.addEventListener('mouseup', () => this.handleDragEnd());
-                document.addEventListener('touchend', () => this.handleDragEnd());
-
-                this.container.addEventListener('wheel', (e) => {
-                    if (this.expandedCard || this.isAnimating) return;
-                    e.preventDefault();
-                    const direction = e.deltaY > 0 || e.deltaX > 0 ? 'next' : 'prev';
-                    this.rotate(direction);
-                }, { passive: false });
-
-                document.addEventListener('keydown', (e) => {
-                    if (document.getElementById('imageModal').classList.contains('show')) return;
-
-                    if (e.key === 'Escape' && this.expandedCard) {
-                        this.closeCard();
-                    } else if (e.key === 'ArrowLeft' && !this.expandedCard) {
-                        this.rotate('prev');
-                    } else if (e.key === 'ArrowRight' && !this.expandedCard) {
-                        this.rotate('next');
-                    }
-                });
-
-                window.addEventListener('scroll', () => this.checkScrollClose(), { passive: true });
-
-                let resizeTimer;
-                const onResize = () => {
-                    clearTimeout(resizeTimer);
-                    resizeTimer = setTimeout(() => this.handleResize(), 120);
-                };
-                window.addEventListener('resize', onResize);
-                window.addEventListener('orientationchange', onResize);
-            }
-
-            handleDragStart(e) {
-                if (this.expandedCard) return;
-                this.isDragging = true;
-                this.container.classList.add('dragging');
-                const isMouse = e.type.includes('mouse');
-                this.startX = isMouse ? e.clientX : e.touches[0].clientX;
-                this.startY = isMouse ? e.clientY : e.touches[0].clientY;
-                this.gesture = isMouse ? 'h' : null; // arah geser: 'h' (slider) / 'v' (scroll halaman)
-                this.dragDistance = 0;
-            }
-
-            handleDragMove(e) {
-                if (!this.isDragging) return;
-
-                const isMouse = e.type.includes('mouse');
-                const currentX = isMouse ? e.clientX : e.touches[0].clientX;
-
-                // Layar sentuh: kalau jari bergerak dominan ke atas/bawah, biarkan halaman scroll
-                // normal (dulu selalu di-preventDefault sehingga halaman "macet" saat jari di slider).
-                if (!isMouse) {
-                    if (this.gesture === null) {
-                        const dx = Math.abs(currentX - this.startX);
-                        const dy = Math.abs(e.touches[0].clientY - this.startY);
-                        if (dx < 8 && dy < 8) return; // belum jelas arahnya
-                        this.gesture = dx > dy ? 'h' : 'v';
-                    }
-                    if (this.gesture === 'v') {
-                        this.isDragging = false;
-                        this.container.classList.remove('dragging');
-                        this.trackXTo(0);
-                        return;
-                    }
-                }
-
-                e.preventDefault();
-                this.dragDistance = currentX - this.startX;
-
-                const liveOffset = thClamp(this.dragDistance, -this.threshold, this.threshold) * 0.5;
-                this.trackXTo(liveOffset);
-
-                if (Math.abs(this.dragDistance) > this.threshold) {
-                    const direction = this.dragDistance > 0 ? 'prev' : 'next';
-                    if (!this.isAnimating) {
-                        this.rotate(direction);
-                        this.startX = currentX;
-                        this.dragDistance = 0;
-                    }
-                }
-            }
-
-            handleDragEnd() {
-                if (!this.isDragging) return;
-                this.isDragging = false;
-                this.container.classList.remove('dragging');
-                this.trackXTo(0);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            new TeamHtmlSlider();
-        });
-    })();
 
     /* ===== Galeri: filter + masonry ===== */
     document.addEventListener('DOMContentLoaded', function () {

@@ -14,6 +14,11 @@ use App\Http\Controllers\Admin\SettingController;
 // ================= FRONTEND ROUTES =================
 Route::get('/', [CompanyProfileController::class, 'index'])->name('home');
 Route::get('/about', [CompanyProfileController::class, 'about'])->name('about');
+Route::get('/layanan', function () {
+    // NOTE: samakan query/urutan ini dengan yang dipakai di CompanyProfileController@index (halaman home)
+    $services = \App\Models\Service::latest()->get();
+    return view('pages.layanan', compact('services'));
+})->name('layanan');
 Route::get('/contact', [CompanyProfileController::class, 'contact'])->name('contact');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{blog:slug}', [BlogController::class, 'show'])->name('blog.show');
@@ -112,14 +117,54 @@ Route::middleware('auth')->group(function () {
         Route::put('/kelola-galeri/{galeri}', [GalleryController::class, 'update'])->name('kelola-galeri.update');
         Route::delete('/kelola-galeri/{galeri}', [GalleryController::class, 'destroy'])->name('kelola-galeri.destroy');
 
-        // 7. Halaman Setting
-        Route::get('/setting', function () {
-            return view('admin.pages.setting');
-        })->name('setting');
+        // 7. Halaman Setting (menu + sub halaman)
+        Route::prefix('setting')->name('setting.')->group(function () {
 
-        // 8. Kelola Setting (Username & Password)
-        Route::post('/setting/username', [SettingController::class, 'updateUsername'])->name('setting.username.update');
-        Route::post('/setting/password', [SettingController::class, 'updatePassword'])->name('setting.password.update');
+            // 7.1 Menu utama Settings (grid pilihan)
+            Route::get('/', function () {
+                return view('admin.pages.setting');
+            })->name('index');
+
+            // 7.2 Edit Akun (username & password)
+            Route::get('/account', function () {
+                return view('admin.pages.setting-account');
+            })->name('account');
+
+            // 7.3 Pengaturan Navbar & Header
+            // NOTE: masih mockup tampilan, belum ada SettingController khusus.
+            // Nanti kalau sudah siap backend-nya, ganti closure ini dengan
+            // [NavbarSettingController::class, 'edit'] (atau sejenisnya).
+            Route::get('/navbar', function () {
+                return view('admin.pages.setting-navbar');
+            })->name('navbar');
+
+            // 7.4 Edit FAQ
+            // NOTE: masih mockup tampilan, belum ada FaqController.
+            Route::get('/faq', function () {
+                return view('admin.pages.setting-faq');
+            })->name('faq');
+
+            // 7.5 Edit Welcome
+            // NOTE: masih mockup tampilan, belum ada WelcomeController.
+            Route::get('/welcome', function () {
+                return view('admin.pages.setting-welcome');
+            })->name('welcome');
+
+            // 7.5.2 Pengaturan Kontak & Lokasi
+            // NOTE: masih mockup tampilan, belum ada ContactController.
+            Route::get('/contact', function () {
+                return view('admin.pages.setting-contact');
+            })->name('contact');
+
+            // 7.6 Banner
+            Route::get('/banner', function () {
+                return view('admin.pages.setting-banner');
+            })->name('banner');
+
+            // 7.6 Kelola Setting (Username & Password) - proses submit form Edit Akun
+            Route::post('/username', [SettingController::class, 'updateUsername'])->name('username.update');
+            Route::post('/password', [SettingController::class, 'updatePassword'])->name('password.update');
+        });
 
         // PENTING: route spesifik (bulk-delete, delete-all) HARUS didaftarkan
         // SEBELUM Route::resource('clients', ...), supaya tidak "ketangkep"

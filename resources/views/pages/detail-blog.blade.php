@@ -394,7 +394,46 @@
             font-size: 0.74rem;
             color: var(--muted);
         }
+
+        /* ============ LATAR PENUH KIRI-KANAN + DARK MODE ============ */
+        html, body { width: 100%; margin: 0; background: #FFFFFF; }
+        html[data-theme="dark"] { color-scheme: dark; }
+        html[data-theme="dark"],
+        html[data-theme="dark"] body { background: #0a0f1a; }
+        html[data-theme="dark"] {
+            --primary-tint: #14303a;
+            --muted: #9aa8a4;
+            --border: #26304a;
+            --text: #e8f1ee;
+            --text-soft: rgba(232, 241, 238, 0.82);
+            --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.45);
+            --shadow-lift: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+        html[data-theme="dark"] .detail-wrapper { background: #0a0f1a; }
+        html[data-theme="dark"] .detail-title,
+        html[data-theme="dark"] .detail-body a,
+        html[data-theme="dark"] .detail-badge,
+        html[data-theme="dark"] .detail-meta-item svg,
+        html[data-theme="dark"] .sidebar-category,
+        html[data-theme="dark"] .sidebar-card:hover .sidebar-info h3 { color: #8fd0bf; }
+        html[data-theme="dark"] .detail-image-frame,
+        html[data-theme="dark"] .sidebar-image { background-color: #151c2c; }
     </style>
+    <script>
+        // Terapkan tema tersimpan (dari tombol navbar) sebelum halaman digambar
+        (function () {
+            try {
+                var t = localStorage.getItem('theme');
+                if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+            // Ikuti perubahan tema dari tab/halaman lain
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'theme' && (e.newValue === 'dark' || e.newValue === 'light')) {
+                    document.documentElement.setAttribute('data-theme', e.newValue);
+                }
+            });
+        })();
+    </script>
 </head>
 <body>
     {{-- Header hijau dengan tombol kembali mepet pojok kiri full --}}

@@ -46,8 +46,8 @@
 		</li>
 	</ul>
 	<ul class="side-menu bottom">
-		<li class="{{ request()->routeIs('admin.setting') ? 'active' : '' }}">
-			<a href="{{ route('admin.setting') }}">
+	<li class="{{ request()->routeIs('admin.setting.*') ? 'active' : '' }}">
+    <a href="{{ route('admin.setting.index') }}">
 				<i class='bx bxs-cog bx-sm bx-spin-hover' ></i>
 				<span class="text">Settings</span>
 			</a>

@@ -335,6 +335,37 @@
         font-size: 0.8rem;
     }
 }
+
+/* ============ DARK MODE (html[data-theme="dark"]) ============
+   Warna footer disamakan dengan navbar gelap: rgb(28, 40, 66) */
+html[data-theme="dark"] .footer-cta {
+    background-color: #1c2842;
+    background-image:
+        linear-gradient(90deg,
+            #1c2842 0%,
+            #1c2842 32%,
+            rgba(28, 40, 66, 0.92) 45%,
+            rgba(28, 40, 66, 0.55) 62%,
+            rgba(28, 40, 66, 0.15) 80%,
+            rgba(28, 40, 66, 0) 100%
+        ),
+        url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
+}
+html[data-theme="dark"] .custom-footer {
+    background-color: #1c2842;
+    border-top: 1px solid rgba(143, 208, 191, 0.16);
+}
+@media (max-width: 768px) {
+    html[data-theme="dark"] .footer-cta {
+        background-image:
+            linear-gradient(180deg,
+                rgba(28, 40, 66, 0.75) 0%,
+                rgba(28, 40, 66, 0.88) 40%,
+                #1c2842 75%
+            ),
+            url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
+    }
+}
 </style>
 
 <!-- ============ CTA BANNER (with background photo + smooth gradient blend) ============ -->
@@ -366,6 +397,7 @@
             <h4>Tautan Cepat</h4>
             <ul>
                 <li><a href="{{ url('/') }}">Beranda</a></li>
+                <li><a href="{{ url('/layanan') }}">Layanan</a></li>
                 <li><a href="{{ url('/projects') }}">Project</a></li>
                 <li><a href="{{ url('/about') }}">About</a></li>
                 <li><a href="{{ url('/contact') }}">Contact</a></li>

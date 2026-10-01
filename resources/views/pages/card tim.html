@@ -1,0 +1,290 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Modern Profile Card</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        * {
+            transition: all 0.4s ease;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+
+        /* =========================
+           MODERN PROFILE CARD
+        ========================= */
+
+        .profile-card-3 {
+            position: relative;
+            overflow: hidden;
+            width: 360px;
+            height: 368px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            background: #ffffff;
+        }
+
+        /* Background Image */
+        .profile-card-3 .background-block {
+            float: left;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .profile-card-3 .background-block .background {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            vertical-align: top;
+
+            opacity: 0.9;
+
+            filter: blur(0.5px);
+
+            transform: scale(1.15);
+        }
+
+        /* Card Content */
+        .profile-card-3 .card-content {
+            width: 100%;
+            padding: 15px 25px;
+            color: #232323;
+
+            float: left;
+
+            background: #efefef;
+
+            height: 50%;
+
+            border-radius: 0 0 5px 5px;
+
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Slanted Background */
+        .profile-card-3 .card-content::before {
+            content: '';
+
+            background: #efefef;
+
+            width: 120%;
+            height: 100%;
+
+            left: 11px;
+            bottom: 51px;
+
+            position: absolute;
+
+            z-index: -1;
+
+            transform: rotate(-13deg);
+        }
+
+        /* Profile Image */
+        .profile-card-3 .profile {
+            border-radius: 50%;
+
+            position: absolute;
+
+            bottom: 50%;
+            left: 50%;
+
+            width: 100px;
+            height: 100px;
+
+            object-fit: cover;
+
+            opacity: 1;
+
+            box-shadow:
+                3px 3px 20px rgba(0, 0, 0, 0.5);
+
+            border: 2px solid rgba(255, 255, 255, 1);
+
+            transform: translate(-50%, 0%);
+
+            z-index: 999;
+        }
+
+        /* Name */
+        .profile-card-3 h2 {
+            margin: 0 0 5px;
+
+            font-weight: 600;
+
+            font-size: 25px;
+        }
+
+        /* Job */
+        .profile-card-3 h2 small {
+            display: block;
+
+            font-size: 15px;
+
+            margin-top: 10px;
+
+            font-weight: 400;
+        }
+
+        /* Social Icons */
+        .profile-card-3 .icon-block {
+            float: left;
+
+            width: 100%;
+
+            margin-top: 15px;
+        }
+
+        .profile-card-3 .icon-block a {
+            text-decoration: none;
+        }
+
+        .profile-card-3 i {
+            display: inline-block;
+
+            font-size: 16px;
+
+            color: #232323;
+
+            text-align: center;
+
+            border: 1px solid #232323;
+
+            width: 30px;
+            height: 30px;
+
+            line-height: 30px;
+
+            border-radius: 50%;
+
+            margin: 0 5px;
+        }
+
+        /* Hover Icon */
+        .profile-card-3 i:hover {
+            background-color: #232323;
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            transform: translateY(-3px);
+        }
+
+        /* Card Hover */
+        .profile-card-3:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 480px) {
+
+            .profile-card-3 {
+                width: calc(100% - 30px);
+                max-width: 360px;
+            }
+
+            .profile-card-3 h2 {
+                font-size: 22px;
+            }
+
+            .profile-card-3 h2 small {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Modern Profile Card -->
+    <div class="profile-card-3">
+
+        <!-- Background -->
+        <div class="background-block">
+            <img
+                src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+                alt="Background"
+                class="background"
+            >
+        </div>
+
+        <!-- Profile Image -->
+        <div class="profile-thumb-block">
+            <img
+                src="https://randomuser.me/api/portraits/men/41.jpg"
+                alt="Profile"
+                class="profile"
+            >
+        </div>
+
+        <!-- Content -->
+        <div class="card-content">
+
+            <h2>
+                Justin Mccoy
+                <small>Designer</small>
+            </h2>
+
+            <!-- Social Media -->
+            <div class="icon-block">
+
+                <a href="#" aria-label="Facebook">
+                    <i class="fa fa-facebook"></i>
+                </a>
+
+                <a href="#" aria-label="Twitter">
+                    <i class="fa fa-twitter"></i>
+                </a>
+
+                <a href="#" aria-label="Google Plus">
+                    <i class="fa fa-google-plus"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+```

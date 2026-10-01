@@ -686,6 +686,99 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    /* ===== Latar penuh sampai pojok kiri & kanan (mode terang maupun gelap) ===== */
+    html, body {
+        margin: 0;
+        background-color: #FFFFFF;
+        overflow-x: hidden;   /* cadangan untuk browser lama */
+        overflow-x: clip;     /* mencegah scroll ke samping akibat lebar 100vw, tanpa memutus posisi fixed navbar */
+    }
+    html[data-theme="dark"],
+    html[data-theme="dark"] body { background-color: #0a0f1a; }
+    /* Pembungkus halaman dilebarkan penuh selebar layar, dan tidak lagi memotong (overflow hidden) elemen full-width di dalamnya */
+    .page-wrapper {
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        box-sizing: border-box;
+        overflow: visible;
+        overflow-x: clip;
+    }
+
+    /* ===== Mode gelap halaman Blog (aktif lewat html[data-theme="dark"], diatur tombol di navbar) ===== */
+    html[data-theme="dark"] {
+        --text: #e8eef0;
+        --text-soft: rgba(232, 238, 240, 0.68);
+        --muted: #8b97a8;
+        --sage: #8b97a8;
+        --cream: #131a2c;
+        --cream-warm: #1f2a44;
+        --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.35);
+        --shadow-lift: 0 22px 48px rgba(0, 0, 0, 0.5);
+    }
+    .page-wrapper, .content-area, .page-header-inner, .project-card .card-content { transition: background-color 0.5s ease, color 0.5s ease; }
+
+    html[data-theme="dark"] .page-wrapper,
+    html[data-theme="dark"] .content-area,
+    html[data-theme="dark"] .page-header-inner { background-color: #0a0f1a; }
+    html[data-theme="dark"] .page-header-inner::before { background-image: radial-gradient(circle at top left, transparent 70%, #0a0f1a 70%); }
+    html[data-theme="dark"] .page-header-inner::after { background-image: radial-gradient(circle at top right, transparent 70%, #0a0f1a 70%); }
+
+    /* --- Kolom cari & filter --- */
+    html[data-theme="dark"] .search-bar-divider,
+    html[data-theme="dark"] .row-filter-divider { background: rgba(255, 255, 255, 0.16); }
+    html[data-theme="dark"] .header-search-input::placeholder { color: rgba(232, 238, 240, 0.45); }
+    html[data-theme="dark"] .header-search-btn .filter-icon { color: #e8eef0; }
+    html[data-theme="dark"] .count-filter-dropdown,
+    html[data-theme="dark"] .category-filter-dropdown { background: #182036; border-color: rgba(255, 255, 255, 0.1); }
+    html[data-theme="dark"] .count-filter-dropdown li.active,
+    html[data-theme="dark"] .category-filter-dropdown li.active { background: #0d6f86; color: #FFFFFF; }
+
+    /* Mobile: bar pencarian berbentuk pil putih */
+    @media (max-width: 640px) {
+        html[data-theme="dark"] .header-search-bar,
+        html[data-theme="dark"] .header-search-bar:focus-within { background: #182036; border-color: rgba(255, 255, 255, 0.14); }
+        html[data-theme="dark"] .header-search-bar:focus-within { border-color: #8fd0bf; box-shadow: 0 0 0 4px rgba(143, 208, 191, 0.14); }
+    }
+    /* Ikon filter di mobile dipaksa hitam oleh kode asli, jadi perlu !important */
+    html[data-theme="dark"] .header-search-btn .filter-icon,
+    html[data-theme="dark"] .count-filter-btn .row-filter-icon { color: #e8eef0 !important; stroke: #e8eef0; }
+
+    /* Desktop: input & tombol filter berbentuk pil putih */
+    @media (min-width: 641px) {
+        html[data-theme="dark"] .header-search-input,
+        html[data-theme="dark"] .header-search-btn,
+        html[data-theme="dark"] .count-filter-btn { background: #182036; border-color: rgba(255, 255, 255, 0.14); }
+        html[data-theme="dark"] .header-search-input:focus { background: #182036; border-color: #8fd0bf; box-shadow: 0 0 0 4px rgba(143, 208, 191, 0.14); }
+        html[data-theme="dark"] .header-search-btn:hover,
+        html[data-theme="dark"] .count-filter-btn:hover { background: #1f2a44; border-color: rgba(255, 255, 255, 0.28); }
+        html[data-theme="dark"] .header-search-btn.active,
+        html[data-theme="dark"] .category-filter.open .header-search-btn,
+        html[data-theme="dark"] .count-filter.open .count-filter-btn,
+        html[data-theme="dark"] .category-filter.has-selection .header-search-btn { background: #1f2a44; border-color: #8fd0bf; }
+        html[data-theme="dark"] .header-search-btn .filter-icon { color: #e8eef0; }
+    }
+
+    /* --- Kartu artikel --- */
+    html[data-theme="dark"] .project-card { background-color: #131a2c; }
+    html[data-theme="dark"] .project-card .card-content { background: #131a2c; border-top-color: rgba(255, 255, 255, 0.06); }
+    html[data-theme="dark"] .project-card .background-hider { background: #131a2c; }
+    html[data-theme="dark"] .project-card .card-text-content h3 { color: #eef6f3; }
+    html[data-theme="dark"] .project-card .card-footer { border-top-color: rgba(255, 255, 255, 0.1); }
+    html[data-theme="dark"] .project-card .btn-detail { background: #1f2a44; color: #8fd0bf; }
+    html[data-theme="dark"] .project-card:hover .btn-detail { background: #0d6f86; color: #FFFFFF; }
+    html[data-theme="dark"] .project-card:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+
+    /* --- Pagination --- */
+    html[data-theme="dark"] .blog-pagination button { background: #182036; border-color: rgba(255, 255, 255, 0.14); color: #e8eef0; }
+    html[data-theme="dark"] .blog-pagination button:hover:not(:disabled) { background: #1f2a44; border-color: rgba(143, 208, 191, 0.5); }
+    html[data-theme="dark"] .blog-pagination button.active { background: #0d6f86; border-color: #0d6f86; color: #FFFFFF; }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     /* ===== Particle Technology Background Khusus Area Konten Bawah ===== */

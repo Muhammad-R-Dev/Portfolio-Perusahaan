@@ -661,6 +661,32 @@
         .envelope-wrapper { justify-content: center; }
         .envelope { margin: 0 auto; }
     }
+
+    /* ============ DARK MODE (html[data-theme="dark"]) ============ */
+    html[data-theme="dark"] .contact-page {
+        --ink: #e8f1ee;
+        --muted: #9aa8a4;
+        --hero-bg: #0f1626;
+        --line: #26304a;
+        --soft: #1a2238;
+        --accent: #4FA8B5;
+        background: #0a0f1a;
+    }
+    html[data-theme="dark"] .contact-card { background: #0a0f1a; }
+    html[data-theme="dark"] .contact-hero.has-image {
+        background-image:
+            linear-gradient(90deg, rgba(15,22,38,0.96) 0%, rgba(15,22,38,0.86) 45%, rgba(15,22,38,0.25) 100%),
+            var(--hero-image);
+    }
+    html[data-theme="dark"] .hero-particles #particle-canvas > div { background: #0f1626 !important; }
+    html[data-theme="dark"] .success-popup-box { background: #151c2c; color: #e8f1ee; }
+    @media (max-width: 900px) {
+        html[data-theme="dark"] .contact-hero.has-image {
+            background-image:
+                linear-gradient(rgba(15,22,38,0.9), rgba(15,22,38,0.9)),
+                var(--hero-image);
+        }
+    }
 </style>
 @endpush
 

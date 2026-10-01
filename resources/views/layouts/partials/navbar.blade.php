@@ -90,11 +90,13 @@
 
     .header {
       z-index: 2001;
-      padding: 20px 5%;
+      padding: 20px 5% 20px 5%;
+      padding-right: 28px; /* tombol menu mojok kanan, tetap ada jarak dari tepi */
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
+      overflow: hidden;
       transition: all 0.4s ease;
       box-sizing: border-box;
     }
@@ -102,6 +104,7 @@
     .header.scrolled {
         background: rgba(255, 255, 255, 0.97);
         padding: 12px 5%;
+        padding-right: 28px;
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
         backdrop-filter: blur(10px);
     }
@@ -152,7 +155,7 @@
       flex-flow: column;
       justify-content: space-between;
       align-items: flex-start;
-      width: 35em;
+      width: 23em;
       height: 100%;
       margin-left: auto;
       position: relative;
@@ -258,78 +261,11 @@
       transform: scale3d(1, 0, 1);
     }
 
-    .menu-details {
-      padding-left: var(--menu-padding);
-      grid-column-gap: 1.25em;
-      grid-row-gap: 1.25em;
-      flex-flow: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      display: flex;
-    }
-
     .p-small {
       font-size: .875em;
       font-family: Arial, Helvetica, sans-serif;
       margin: 0;
       color: #131313;
-    }
-
-    .socials-row {
-      grid-column-gap: 1em;
-      grid-row-gap: 1em;
-      flex-flow: row;
-      align-items: center;
-      display: flex;
-    }
-
-    /* ------- Social Media Icons ------- */
-    .social-icon-link {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #FFFFFF;
-      border: 1px solid rgba(9, 67, 86, 0.16);
-      color: #094356;
-      box-shadow: 0 2px 10px rgba(9, 67, 86, 0.08);
-      transition: background-color 0.3s ease, color 0.3s ease,
-                  border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-      flex-shrink: 0;
-    }
-
-    .social-icon-link svg {
-      width: 19px;
-      height: 19px;
-      transition: transform 0.35s cubic-bezier(.65, .05, 0, 1);
-    }
-
-    @media (hover: hover) {
-      .social-icon-link:hover {
-        background-color: #094356;
-        border-color: #094356;
-        color: #FFFFFF;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 18px rgba(9, 67, 86, 0.28);
-      }
-
-      .social-icon-link:hover svg {
-        transform: scale(1.12);
-      }
-    }
-
-    @media screen and (max-width: 768px) {
-      .social-icon-link {
-        width: 38px;
-        height: 38px;
-      }
-
-      .social-icon-link svg {
-        width: 16px;
-        height: 16px;
-      }
     }
 
     .p-large {
@@ -421,6 +357,9 @@
 
     /* ------- Responsive Styles ------- */
     @media screen and (max-width: 768px) {
+      .header,
+      .header.scrolled { padding-right: 18px; }
+
       .nav {
         --menu-padding: 1em;
       }
@@ -439,12 +378,9 @@
       .menu {
         padding-top: calc(6 * var(--menu-padding));
         padding-bottom: calc(3 * var(--menu-padding));
-        width: 100%;
+        width: 60%;
       }
 
-      .menu-details {
-        margin-bottom: 1em;
-      }
 
       .bg-panel {
         border-top-left-radius: 0;
@@ -459,10 +395,6 @@
         font-size: 4em;
       }
 
-      .socials-row {
-        grid-column-gap: 1em;
-        grid-row-gap: 1em;
-      }
 
       .p-large.text-link {
         font-size: 1em;
@@ -487,6 +419,16 @@
       align-items: center;
       gap: 26px;
       pointer-events: auto;
+    }
+
+    /* Logo + nama hilang saat sidebar menu terbuka */
+    .nav-left {
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+    .header.menu-open .nav-left {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
 
     .back-button {
@@ -544,10 +486,354 @@
       .back-button svg { width: 14px; height: 14px; }
       .back-button:hover { box-shadow: 0 4px 12px rgba(9, 67, 86, 0.25); }
     }
+    /* ------- Tombol Dark / Light Mode: HANYA matahari & bulan (ringkas) ------- */
+    /* Dibuat 100x100px (font-size 10px, satuan em) lalu diperkecil dengan scale. */
+    .theme-toggle-wrap {
+      --tt-scale: 0.28;
+      position: relative;
+      z-index: 2; /* di atas .nav-sky, tidak pernah ketutup background */
+      flex-shrink: 0;
+      width: calc(100px * var(--tt-scale));
+      height: calc(100px * var(--tt-scale));
+      margin-right: 0.9rem;
+    }
+    .theme-toggle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 10em;
+      height: 10em;
+      font-size: 10px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      overflow: visible;
+      isolation: isolate;
+      cursor: pointer;
+      transform: scale(var(--tt-scale));
+      transform-origin: 0 0;
+      -webkit-tap-highlight-color: transparent;
+      --tt-ease: cubic-bezier(.65, .05, 0, 1);
+      transition: background 0.6s var(--tt-ease);
+    }
+    .theme-toggle *, .theme-toggle *::before, .theme-toggle *::after { box-sizing: border-box; }
+    .theme-toggle:focus-visible { outline: 3px solid #094356; outline-offset: 5px; }
+    /* bayangan cekung di dalam, seperti tombol aslinya */
+    .theme-toggle:active .tt-sun,
+    .theme-toggle:active .tt-moon { filter: brightness(0.92); }
+
+    /* Matahari & bulan: satu-satunya isi tombol, saling berganti dengan memutar + memudar */
+    .tt-sun, .tt-moon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 6.4em;
+      height: 6.4em;
+      margin: -3.2em 0 0 -3.2em;
+      border-radius: 50%;
+      transition: transform 0.6s var(--tt-ease), opacity 0.45s ease;
+      z-index: 2;
+    }
+    .tt-sun {
+      background: #fbc72d;
+      box-shadow: inset 0.2em 0.2em 0.4em rgba(255, 255, 255, 0.5),
+                  inset -0.3em -0.3em 0.5em rgba(0, 0, 0, 0.2);
+    }
+    /* Sinar matahari: bintang bergerigi 12 sinar di belakang lingkaran matahari */
+    .tt-rays {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 9em;
+      height: 9em;
+      margin: -4.5em 0 0 -4.5em;
+      z-index: 1;
+      transition: transform 0.6s var(--tt-ease), opacity 0.45s ease;
+    }
+    .tt-rays::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, #ffd84d 0%, #f9b81c 100%);
+      -webkit-clip-path: polygon(50.00% 0.00%, 59.84% 13.29%, 75.00% 6.70%, 76.87% 23.13%, 93.30% 25.00%, 86.71% 40.16%, 100.00% 50.00%, 86.71% 59.84%, 93.30% 75.00%, 76.87% 76.87%, 75.00% 93.30%, 59.84% 86.71%, 50.00% 100.00%, 40.16% 86.71%, 25.00% 93.30%, 23.13% 76.87%, 6.70% 75.00%, 13.29% 59.84%, 0.00% 50.00%, 13.29% 40.16%, 6.70% 25.00%, 23.13% 23.13%, 25.00% 6.70%, 40.16% 13.29%);
+      clip-path: polygon(50.00% 0.00%, 59.84% 13.29%, 75.00% 6.70%, 76.87% 23.13%, 93.30% 25.00%, 86.71% 40.16%, 100.00% 50.00%, 86.71% 59.84%, 93.30% 75.00%, 76.87% 76.87%, 75.00% 93.30%, 59.84% 86.71%, 50.00% 100.00%, 40.16% 86.71%, 25.00% 93.30%, 23.13% 76.87%, 6.70% 75.00%, 13.29% 59.84%, 0.00% 50.00%, 13.29% 40.16%, 6.70% 25.00%, 23.13% 23.13%, 25.00% 6.70%, 40.16% 13.29%);
+    }
+    .theme-toggle[data-theme="dark"] .tt-rays { opacity: 0; transform: rotate(120deg) scale(0.3); }
+    .tt-moon {
+      background: #cccfd9;
+      box-shadow: inset 0.2em 0.2em 0.4em rgba(255, 255, 255, 0.55), inset -0.3em -0.3em 0.5em rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transform: rotate(-120deg) scale(0.3);
+    }
+    .theme-toggle[data-theme="dark"] .tt-sun { opacity: 0; transform: rotate(120deg) scale(0.3); }
+    .theme-toggle[data-theme="dark"] .tt-moon { opacity: 1; transform: rotate(0) scale(1); }
+    /* Kawah bulan: tetap bagian dari "bulan", bukan elemen langit terpisah */
+    .tt-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: #9da8bc;
+    }
+    /* Detail di dalam matahari (bintik hangat, seperti kawah di bulan) */
+    .tt-spot {
+      position: absolute;
+      border-radius: 50%;
+      background: #f2a516;
+      box-shadow: inset 0.08em 0.08em 0.15em rgba(0, 0, 0, 0.18);
+    }
+    .tt-spot1 { width: 1.1em; height: 1.1em; top: 1.1em; left: 2.7em; }
+    .tt-spot2 { width: 1.7em; height: 1.7em; top: 3.1em; left: 1.1em; }
+    .tt-spot3 { width: 1.2em; height: 1.2em; top: 3.8em; left: 3.9em; }
+    .tt-dot1 { width: 1.1em; height: 1.1em; top: 1.1em; left: 2.7em; }
+    .tt-dot2 { width: 1.7em; height: 1.7em; top: 3.1em; left: 1.1em; }
+    .tt-dot3 { width: 1.2em; height: 1.2em; top: 3.8em; left: 3.9em; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tt-sun, .tt-moon, .tt-rays { transition-duration: 0.01s; }
+    }
+    @media screen and (max-width: 768px) {
+      .theme-toggle-wrap { --tt-scale: 0.26; margin-right: 0.7rem; }
+    }
+
+    /* ------- Background langit di navbar: awan + langit biru (terang), bintang (gelap) -------
+       Lapisan ini murni dekoratif, diletakkan paling belakang di dalam .header (z-index 0),
+       sedangkan logo & tombol-tombol ada di .nav-row (z-index 1) sehingga tidak pernah
+       tertutup / mengganggu tombol menu maupun tombol dark-light. Otomatis disembunyikan
+       saat navbar sudah solid (scrolled/pinned/menu dibuka) supaya tidak dobel dengan background putih/gelap. ------- */
+    .nav-row {
+      position: relative;
+      z-index: 1;
+    }
+    .header { --sky-w: 270px; } /* lebar langit di sisi kanan (mencakup ikon matahari/bulan + tombol menu) */
+    .nav-sky {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: var(--sky-w);
+      /* sisi kiri memudar halus jadi transparan (bukan potongan melengkung) */
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 18%, #000 45%);
+      mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 18%, #000 45%);
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 1;
+      background: linear-gradient(180deg, #bfe0f7 0%, #eef7fd 100%);
+      transition: background 0.6s ease, opacity 0.4s ease;
+    }
+    html[data-theme="dark"] .nav-sky {
+      background: linear-gradient(180deg, #171b2e 0%, #0f1222 100%);
+    }
+    .header.menu-open .nav-sky {
+      opacity: 0;
+    }
+    .nav-sky-clouds {
+      position: absolute;
+      inset: 0;
+      transition: opacity 0.5s ease, transform 0.6s cubic-bezier(.65, .05, 0, 1);
+    }
+    .nav-sky-clouds span {
+      position: absolute;
+      bottom: -1.8rem;
+      aspect-ratio: 1;
+      width: 2.8rem;
+      border-radius: 50%;
+      background: #ffffff;
+      opacity: 0.95;
+      animation: nsky-drift 22s ease-in-out infinite;
+    }
+    .nav-sky-clouds span::before {
+      content: '';
+      position: absolute;
+      width: 75%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #ffffff;
+      left: 55%;
+      top: 22%;
+    }
+    .nav-sky-clouds span:nth-child(1) { left: 4%;  bottom: -1.9rem; animation-delay: 0s; }
+    .nav-sky-clouds span:nth-child(2) { left: 24%; bottom: -1.7rem; width: 2.3rem; animation-delay: 3s; animation-duration: 18s; }
+    .nav-sky-clouds span:nth-child(3) { left: 46%; bottom: -1.8rem; width: 2.9rem; animation-delay: 1.5s; }
+    .nav-sky-clouds span:nth-child(4) { left: 68%; bottom: -1.6rem; width: 2.2rem; animation-delay: 4s; animation-duration: 20s; }
+    .nav-sky-clouds span:nth-child(5) { left: 86%; bottom: -1.7rem; width: 2.4rem; animation-delay: 2s; }
+    @keyframes nsky-drift {
+      0%, 100% { transform: translateX(-0.8rem); }
+      50% { transform: translateX(0.8rem); }
+    }
+    .nav-sky-stars {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.6s ease 0.1s, transform 0.6s cubic-bezier(.65, .05, 0, 1);
+    }
+    .nav-sky-star {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: 0.5rem;
+      height: 0.5rem;
+      background: #f8fcff;
+      clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
+      transform: scale(var(--s));
+      animation: nsky-twinkle 3s ease-in-out var(--d) infinite;
+    }
+    @keyframes nsky-twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    html[data-theme="dark"] .nav-sky-clouds { opacity: 0; }
+    html[data-theme="dark"] .nav-sky-stars { opacity: 1; transform: scale(1); }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-sky-clouds span, .nav-sky-star { animation: none; }
+    }
+    @media screen and (max-width: 768px) {
+      .header { --sky-w: 240px; }
+    }
+
+    /* ------- Tema gelap untuk navbar (aktif via html[data-theme="dark"]) ------- */
+    /* Navbar sengaja dibuat lebih terang (slate kebiruan) dari latar halaman (#0a0f1a) supaya terlihat terpisah */
+    html[data-theme="dark"] .header.scrolled,
+    html[data-theme="dark"] .header.header--pinned {
+      background: rgba(28, 40, 66, 0.94);
+      border-bottom: 1px solid rgba(143, 208, 191, 0.16);
+      box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55);
+    }
+    html[data-theme="dark"] .header .nav-brand-text,
+    html[data-theme="dark"] .header .menu-button .p-large,
+    html[data-theme="dark"] .header .menu-button-icon {
+      color: #e8f1ee;
+    }
+    html[data-theme="dark"] .header .nav-brand-text span {
+      color: #8fd0bf;
+    }
+
+    /* ------- Sidebar (panel menu): langit berawan saat terang, langit berbintang saat gelap ------- */
+    .bg-panel--sky {
+      overflow: hidden;
+      background: linear-gradient(180deg, #cfe6f8 0%, #e9f4fb 60%, #f4f9fd 100%);
+      transition: background 0.6s ease;
+    }
+    .menu-sky { position: absolute; inset: 0; pointer-events: none; }
+
+    /* Awan (mode terang) */
+    .ms-clouds { position: absolute; inset: 0; transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.65, .05, 0, 1); }
+    .ms-layer { position: absolute; left: -4rem; right: -4rem; bottom: 0; height: 0; }
+    .ms-layer span { position: absolute; aspect-ratio: 1; border-radius: 50%; }
+    .ms-layer--back { animation: ms-drift 26s ease-in-out infinite; }
+    .ms-layer--front { animation: ms-drift 19s ease-in-out infinite reverse; }
+    .ms-layer--back span { background: #bcd9ef; }
+    .ms-layer--front span { background: #ffffff; box-shadow: 0 -0.4rem 1.4rem rgba(120, 165, 205, 0.25); }
+    .ms-layer--back span:nth-child(1) { width: 36%; left: -4%; bottom: -5rem; }
+    .ms-layer--back span:nth-child(2) { width: 40%; left: 16%; bottom: -7rem; }
+    .ms-layer--back span:nth-child(3) { width: 38%; left: 38%; bottom: -4.5rem; }
+    .ms-layer--back span:nth-child(4) { width: 42%; left: 58%; bottom: -7rem; }
+    .ms-layer--back span:nth-child(5) { width: 36%; left: 80%; bottom: -5rem; }
+    .ms-layer--front span:nth-child(1) { width: 30%; left: 2%; bottom: -8rem; }
+    .ms-layer--front span:nth-child(2) { width: 36%; left: 20%; bottom: -10rem; }
+    .ms-layer--front span:nth-child(3) { width: 32%; left: 42%; bottom: -7.5rem; }
+    .ms-layer--front span:nth-child(4) { width: 38%; left: 60%; bottom: -10rem; }
+    .ms-layer--front span:nth-child(5) { width: 30%; left: 84%; bottom: -8rem; }
+    @keyframes ms-drift {
+      0%, 100% { transform: translateX(-1.5rem); }
+      50% { transform: translateX(1.5rem); }
+    }
+
+    /* Bintang (mode gelap) */
+    .ms-stars { position: absolute; inset: 0; opacity: 0; transform: scale(0.96); transition: opacity 0.6s ease 0.1s, transform 0.6s cubic-bezier(.65, .05, 0, 1); }
+    .ms-star {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: 1.6rem;
+      height: 1.6rem;
+      background: #f8fcff;
+      -webkit-clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
+      clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
+      transform: scale(var(--s));
+      animation: ms-twinkle 3.2s ease-in-out var(--d) infinite;
+    }
+    @keyframes ms-twinkle {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 1; }
+    }
+
+    html[data-theme="dark"] .bg-panel--sky { background: linear-gradient(180deg, #1f2234 0%, #191c2d 55%, #14172a 100%); }
+    html[data-theme="dark"] .bg-panel.first { background-color: #0d4257; }
+    html[data-theme="dark"] .bg-panel.second { background-color: #171b2e; }
+    html[data-theme="dark"] .ms-clouds { opacity: 0; transform: scale(0.9); }
+    html[data-theme="dark"] .ms-stars { opacity: 1; transform: scale(1); }
+    html[data-theme="dark"] .overlay { background-color: #000000aa; }
+
+    /* Teks & ikon di dalam sidebar saat gelap */
+    html[data-theme="dark"] .menu-link-heading { color: #eef3f1; text-shadow: 0px 1em 0px #2c3352; }
+    html[data-theme="dark"] .menu .eyebrow { color: #8fd0bf; }
+    html[data-theme="dark"] .menu .p-small,
+    html[data-theme="dark"] .menu .p-large { color: #c9d4d1; }
+    @media (hover: hover) {
+      html[data-theme="dark"] .menu-link:hover .menu-link-heading { text-shadow: 0px 1em 0px #ffffff; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ms-layer, .ms-star { animation: none; }
+    }
+
+    /* ============================================================
+       TEMA GLOBAL: latar penuh sampai pojok kiri & kanan layar
+       Terang  = putih  (#ffffff)
+       Gelap   = hitam  (#0a0f1a)
+       Berganti lewat tombol di navbar (html[data-theme]).
+       ============================================================ */
+    :root {
+      --site-bg: #ffffff;
+      --site-fg: #14211b;
+      color-scheme: light;
+    }
+    html[data-theme="dark"] {
+      --site-bg: #0a0f1a;
+      --site-fg: #e8f1ee;
+      color-scheme: dark;
+    }
+    html,
+    html body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--site-bg) !important;
+      transition: background-color 0.4s ease;
+    }
+    html[data-theme="dark"] body { color: var(--site-fg); }
+    @media (prefers-reduced-motion: reduce) {
+      html, html body { transition: none; }
+    }
 </style>
+
+<script>
+  // Terapkan tema tersimpan sedini mungkin supaya halaman tidak "berkedip"
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
 
 <div class="osmo-ui">
   <header class="header @unless (request()->routeIs('home')) header--pinned @endunless" id="navHeader">
+      <div class="nav-sky" aria-hidden="true">
+        <div class="nav-sky-clouds">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="nav-sky-stars">
+          <span class="nav-sky-star" style="--x:6%;--y:30%;--s:0.8;--d:0.0s"></span>
+          <span class="nav-sky-star" style="--x:18%;--y:55%;--s:0.6;--d:0.5s"></span>
+          <span class="nav-sky-star" style="--x:34%;--y:20%;--s:0.9;--d:1.0s"></span>
+          <span class="nav-sky-star" style="--x:50%;--y:60%;--s:0.5;--d:1.5s"></span>
+          <span class="nav-sky-star" style="--x:66%;--y:25%;--s:0.7;--d:2.0s"></span>
+          <span class="nav-sky-star" style="--x:80%;--y:50%;--s:0.6;--d:0.3s"></span>
+          <span class="nav-sky-star" style="--x:92%;--y:30%;--s:0.8;--d:0.8s"></span>
+        </div>
+      </div>
       <nav class="nav-row">
         <div class="nav-left">
           <a href="{{ url('/') }}" class="nav-brand nav-logo-row">
@@ -559,6 +845,21 @@
           </a>
         </div>
         <div class="nav-row__right">
+          <div class="theme-toggle-wrap">
+            <button type="button" id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Ganti mode gelap / terang" data-theme="light">
+              <span class="tt-rays"></span>
+              <span class="tt-sun">
+                <span class="tt-spot tt-spot1"></span>
+                <span class="tt-spot tt-spot2"></span>
+                <span class="tt-spot tt-spot3"></span>
+              </span>
+              <span class="tt-moon">
+                <span class="tt-dot tt-dot1"></span>
+                <span class="tt-dot tt-dot2"></span>
+                <span class="tt-dot tt-dot3"></span>
+              </span>
+            </button>
+          </div>
           <button role="button" data-menu-toggle="" class="menu-button">
             <div class="menu-button-text">
               <p class="p-large">Menu</p>
@@ -586,7 +887,34 @@
     <div class="menu-bg">
       <div class="bg-panel first"></div>
       <div class="bg-panel second"></div>
-      <div class="bg-panel"></div>
+      <div class="bg-panel bg-panel--sky">
+        <div class="menu-sky" aria-hidden="true">
+          <div class="ms-stars">
+          <span class="ms-star" style="--x:8%;--y:6%;--s:1;--d:0.00s"></span>
+          <span class="ms-star" style="--x:22%;--y:14%;--s:0.6;--d:0.45s"></span>
+          <span class="ms-star" style="--x:40%;--y:5%;--s:0.8;--d:0.90s"></span>
+          <span class="ms-star" style="--x:63%;--y:10%;--s:1.1;--d:1.35s"></span>
+          <span class="ms-star" style="--x:84%;--y:7%;--s:0.7;--d:1.80s"></span>
+          <span class="ms-star" style="--x:12%;--y:28%;--s:0.7;--d:2.25s"></span>
+          <span class="ms-star" style="--x:33%;--y:34%;--s:0.5;--d:2.70s"></span>
+          <span class="ms-star" style="--x:55%;--y:26%;--s:0.6;--d:0.15s"></span>
+          <span class="ms-star" style="--x:76%;--y:31%;--s:1;--d:0.60s"></span>
+          <span class="ms-star" style="--x:92%;--y:24%;--s:0.5;--d:1.05s"></span>
+          <span class="ms-star" style="--x:6%;--y:52%;--s:0.5;--d:1.50s"></span>
+          <span class="ms-star" style="--x:28%;--y:60%;--s:0.7;--d:1.95s"></span>
+          <span class="ms-star" style="--x:88%;--y:48%;--s:0.6;--d:2.40s"></span>
+          <span class="ms-star" style="--x:70%;--y:55%;--s:0.5;--d:2.85s"></span>
+          </div>
+          <div class="ms-clouds">
+            <div class="ms-layer ms-layer--back">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="ms-layer ms-layer--front">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="menu-inner">
       <ul class="menu-list">
@@ -598,56 +926,34 @@
           </a>
         </li>
         <li class="menu-list-item">
+          <a href="{{ url('/layanan') }}" class="menu-link w-inline-block">
+            <p class="menu-link-heading">Layanan</p>
+            <p class="eyebrow">02</p>
+            <div class="menu-link-bg"></div>
+          </a>
+        </li>
+        <li class="menu-list-item">
           <a href="{{ url('/blog') }}" class="menu-link w-inline-block">
             <p class="menu-link-heading">Blog</p>
-            <p class="eyebrow">02</p>
+            <p class="eyebrow">03</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
         <li class="menu-list-item">
           <a href="{{ url('/about') }}" class="menu-link w-inline-block">
             <p class="menu-link-heading">About</p>
-            <p class="eyebrow">03</p>
+            <p class="eyebrow">04</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
         <li class="menu-list-item">
           <a href="{{ url('/contact') }}" class="menu-link w-inline-block">
             <p class="menu-link-heading">Contact</p>
-            <p class="eyebrow">04</p>
-            <div class="menu-link-bg"></div>
-          </a>
-        </li>
-        <li class="menu-list-item">
-          <a href="javascript:void(0)" data-menu-toggle="" class="menu-link w-inline-block">
-            <p class="menu-link-heading">Close</p>
             <p class="eyebrow">05</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
       </ul>
-      <div class="menu-details">
-        <p data-menu-fade="" class="p-small">Socials</p>
-        <div class="socials-row">
-          <a data-menu-fade="" href="#" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
-          </a>
-          <a data-menu-fade="" href="#" class="social-icon-link" aria-label="LinkedIn" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.446-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.266 2.37 4.266 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452z"></path>
-            </svg>
-          </a>
-          <a data-menu-fade="" href="#" class="social-icon-link" aria-label="X / Twitter" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
     </div>
   </nav>
 </div>
@@ -742,6 +1048,26 @@
         }
 
         initMenu();
+
+        // Tombol Dark / Light Mode
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const applyTheme = (theme) => {
+                document.documentElement.setAttribute('data-theme', theme);
+                themeToggle.setAttribute('data-theme', theme);
+                themeToggle.setAttribute('aria-checked', theme === 'dark' ? 'true' : 'false');
+                document.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+            };
+            let saved = 'light';
+            try { saved = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'; } catch (e) {}
+            applyTheme(saved);
+
+            themeToggle.addEventListener('click', () => {
+                const next = themeToggle.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+                try { localStorage.setItem('theme', next); } catch (e) {}
+            });
+        }
 
         // Tombol Back: kembali ke halaman sebelumnya kalau ada riwayatnya
         // dari situs ini, kalau tidak (misal dibuka langsung dari link luar) balik ke Beranda

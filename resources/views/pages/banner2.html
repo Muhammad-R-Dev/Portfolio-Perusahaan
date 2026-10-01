@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astabrata Teknologi</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --x: 0;
+      --y: 0;
+      --scroll: 0;
+      --gap: clamp(1rem, 4vw, 3rem);
+      --ink: #14161a;
+      --muted: #5d636e;
+      --line: #e6e8ec;
+    }
+
+    html { color-scheme: light only; }
+
+    body {
+      margin: 0;
+      background: #fff;
+      color: var(--ink);
+      font-family: 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      min-height: 100svh;
+      padding: var(--gap);
+      display: grid;
+      place-items: center;
+    }
+
+    article {
+      position: relative;
+      width: 100%;
+      height: calc(100svh - 2 * var(--gap));
+      overflow: hidden;
+      border-radius: clamp(1.5rem, 4vw, 3rem);
+      container-type: inline-size;
+      background: transparent;
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+
+    .assets {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .assets > img,
+    .tower-mask {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      height: 100%;
+      width: 130cqw;
+    }
+
+    .assets > img {
+      object-fit: cover;
+      object-position: 50% 43%;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .assets > img.sky {
+      filter: saturate(1.5) brightness(0.9);
+      translate: calc(-50% + (var(--x) * 3cqw)) calc(var(--y) * -10px);
+    }
+
+    .assets > img.tower {
+      translate: calc(-50% + (var(--x) * 5cqw)) calc(var(--y) * -20px);
+    }
+
+    /* Big title block: name + subtitle */
+    .title {
+      position: absolute;
+      left: 50%;
+      top: 8%;
+      margin: 0;
+      text-align: center;
+      text-transform: uppercase;
+      font-family: 'Bebas Neue', sans-serif;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .title .name {
+      display: block;
+      font-size: 17cqw;
+      line-height: 0.82;
+      letter-spacing: 0.01em;
+    }
+
+    .title .sub {
+      display: block;
+      font-size: 4.6cqw;
+      line-height: 1;
+      letter-spacing: 0.9em;
+      margin-right: -0.9em; /* balance trailing letter-spacing */
+      margin-top: -0.9cqw;
+    }
+
+    /* Solid text: behind the tower, moves down on scroll */
+    .title.solid {
+      color: #fff;
+      translate:
+        calc(-50% + (var(--x) * -6cqw))
+        calc((var(--y) * -20px) + (var(--scroll) * 0.55px));
+    }
+
+    /* Outline: only for the subtitle, only visible where the tower covers it.
+       Exact same position as the solid text (no offset). */
+    .tower-mask {
+      translate: calc(-50% + (var(--x) * 5cqw)) calc(var(--y) * -20px);
+      pointer-events: none;
+      -webkit-mask-image: url('https://assets.codepen.io/605876/do-not-copy-osaka-tower.png');
+      mask-image: url('https://assets.codepen.io/605876/do-not-copy-osaka-tower.png');
+      -webkit-mask-size: cover;
+      mask-size: cover;
+      -webkit-mask-position: 50% 43%;
+      mask-position: 50% 43%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+    }
+
+    .tower-mask .title {
+      color: transparent;
+      /* box already moves with the tower (+5cqw*x); cancel it so the text
+         lands exactly where the solid one is */
+      translate:
+        calc(-50% + (var(--x) * -11cqw))
+        calc(var(--scroll) * 0.55px);
+    }
+
+    .tower-mask .name { visibility: hidden; }
+
+    .tower-mask .sub {
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.95);
+    }
+
+    /* Mobile / portrait: landscape card, cropped like desktop */
+    @media (orientation: portrait), (max-width: 700px) {
+      article {
+        height: auto;
+        aspect-ratio: 2 / 1.1;
+        border-radius: clamp(1.25rem, 6vw, 2rem);
+      }
+    }
+
+    /* ---------- CONTENT ---------- */
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: clamp(2rem, 6vw, 5rem) var(--gap) 4rem;
+    }
+
+    .eyebrow {
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 1rem;
+    }
+
+    .content h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-size: clamp(2.6rem, 8vw, 5.5rem);
+      line-height: 0.95;
+      margin: 0 0 1.25rem;
+      text-transform: uppercase;
+    }
+
+    .lead {
+      max-width: 60ch;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 3rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      background: #fafbfc;
+    }
+
+    .card .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      line-height: 1;
+      color: #c9ced6;
+    }
+
+    .card h3 {
+      margin: 0.75rem 0 0.5rem;
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--muted);
+      font-size: 0.97rem;
+    }
+
+    .facts {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      border-top: 1px solid var(--line);
+    }
+
+    .fact {
+      padding: 1.5rem 0;
+    }
+
+    .fact b {
+      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-size: 2.6rem;
+      line-height: 1;
+    }
+
+    .fact span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem var(--gap) 3rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--line);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="hero">
+    <article>
+      <div class="assets">
+        <img class="sky"
+             src="https://assets.codepen.io/605876/do-not-copy-osaka-sky.jpeg"
+             alt="Osaka sky" />
+
+        <h3 class="title solid"><span class="name">Astabrata</span><span class="sub">Teknologi</span></h3>
+
+        <img class="tower"
+             src="https://assets.codepen.io/605876/do-not-copy-osaka-tower.png"
+             alt="Osaka Tower" />
+
+        <div class="tower-mask" aria-hidden="true">
+          <h3 class="title"><span class="name">Astabrata</span><span class="sub">Teknologi</span></h3>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <main class="content">
+    <p class="eyebrow">Jepang · Kansai</p>
+    <h2>Kota yang tidak<br>pernah kehabisan rasa</h2>
+    <p class="lead">
+      Osaka dikenal sebagai dapur Jepang. Kota pelabuhan yang hangat, ramai,
+      dan penuh makanan jalanan, dengan sejarah samurai yang masih terasa
+      di sekitar kastilnya.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Kastil Osaka</h3>
+        <p>Dibangun oleh Toyotomi Hideyoshi pada abad ke-16. Dikelilingi taman luas yang indah saat sakura mekar.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Dotonbori</h3>
+        <p>Kawasan tepi kanal yang bersinar di malam hari, tempat mencoba takoyaki dan okonomiyaki.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Shinsekai</h3>
+        <p>Distrik bergaya retro dengan Tsutenkaku Tower dan restoran kushikatsu yang legendaris.</p>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><b>1583</b><span>Pembangunan kastil dimulai</span></div>
+      <div class="fact"><b>Kansai</b><span>Wilayah</span></div>
+      <div class="fact"><b>Takoyaki</b><span>Kuliner ikonik</span></div>
+    </div>
+  </main>
+
+  <footer>Osaka · Jepang</footer>
+
+  <script type="module">
+    import gsap from 'https://esm.sh/gsap@3.12.0';
+
+    const root = document.documentElement;
+
+    // Mouse parallax
+    window.addEventListener('mousemove', ({ x, y }) => {
+      gsap.set(root, {
+        '--x': gsap.utils.mapRange(0, window.innerWidth, -1, 1, x),
+        '--y': gsap.utils.mapRange(0, window.innerHeight, -1, 1, y)
+      });
+    });
+
+    // Swipe / drag left & right (touch + pen), both directions
+    const card = document.querySelector('article');
+    let dragging = false, startX = 0, startVal = 0;
+
+    card.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return; // mouse already follows hover
+      dragging = true;
+      startX = e.clientX;
+      startVal = parseFloat(getComputedStyle(root).getPropertyValue('--x')) || 0;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const half = card.getBoundingClientRect().width / 2;
+      const v = gsap.utils.clamp(-1, 1, startVal + (e.clientX - startX) / half);
+      gsap.to(root, { '--x': v, duration: 0.25, ease: 'power2.out', overwrite: true });
+    });
+    const end = () => { dragging = false; };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+
+    // Scroll parallax: title moves down
+    const onScroll = () => {
+      const s = Math.min(window.scrollY, window.innerHeight * 1.2);
+      root.style.setProperty('--scroll', s);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Device orientation (mobile)
+    const handleOrientation = ({ beta, gamma }) => {
+      if (beta == null || gamma == null) return;
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+      gsap.set(root, {
+        '--x': gsap.utils.clamp(-1, 1,
+          isLandscape
+            ? gsap.utils.mapRange(-45, 45, -1, 1, beta)
+            : gsap.utils.mapRange(-45, 45, -1, 1, gamma)),
+        '--y': gsap.utils.clamp(-1, 1,
+          isLandscape
+            ? gsap.utils.mapRange(20, 70, 1, -1, Math.abs(gamma))
+            : gsap.utils.mapRange(20, 70, 1, -1, beta))
+      });
+    };
+
+    const START = () => {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          DeviceOrientationEvent.requestPermission) {
+        DeviceOrientationEvent.requestPermission()
+          .then((r) => { if (r === 'granted') window.addEventListener('deviceorientation', handleOrientation); })
+          .catch(() => {});
+      } else {
+        window.addEventListener('deviceorientation', handleOrientation);
+      }
+    };
+    document.body.addEventListener('click', START, { once: true });
+  </script>
+</body>
+</html>
