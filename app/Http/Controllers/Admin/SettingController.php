@@ -63,4 +63,5 @@ class SettingController extends Controller
 
         return back()->with('success', 'Sandi berhasil diperbarui.');
     }
+
 }

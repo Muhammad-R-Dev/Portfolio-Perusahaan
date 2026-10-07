@@ -9,6 +9,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    @php
+        // Warna header mengikuti navbar (Settings > Header & Footer), sama seperti navbar_blade.php
+        $__navSet = $siteSetting ?? null;
+        if (class_exists(\App\Models\SiteSetting::class)) {
+            try {
+                $__navFresh = \App\Models\SiteSetting::first();
+                if ($__navFresh) { $__navSet = $__navFresh; }
+            } catch (\Throwable $e) {}
+        }
+        $__navColor = function ($key, $default) use ($__navSet) {
+            $v = $__navSet->{$key} ?? null;
+            return (is_string($v) && preg_match('/^#[0-9a-fA-F]{6}$/', $v)) ? $v : $default;
+        };
+    @endphp
+    <style>
+        :root {
+            --nav-bg: {{ $__navColor('navbar_bg_light', '#094356') }};
+            --nav-text: {{ $__navColor('navbar_text_light', '#ffffff') }};
+        }
+        html[data-theme="dark"] {
+            --nav-bg: {{ $__navColor('navbar_bg_dark', '#094356') }};
+            --nav-text: {{ $__navColor('navbar_text_dark', '#ffffff') }};
+        }
+    </style>
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; }
@@ -54,7 +78,7 @@
         /* Header hijau: full lebar dari pojok kiri ke pojok kanan */
         .top-header {
             width: 100%;
-            background: var(--primary);
+            background: var(--nav-bg);
             position: sticky;
             top: 0;
             z-index: 50;
@@ -67,6 +91,40 @@
             height: 60px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Tombol dark / light mode (pojok kanan atas, gaya sama dengan navbar) */
+        .theme-toggle {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: var(--nav-text);
+            cursor: pointer;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.25s ease;
+        }
+        .theme-toggle:hover { transform: scale(1.08); }
+        .theme-toggle:active { transform: scale(0.94); }
+        .theme-toggle:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 4px; border-radius: 6px; }
+        .tt-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 22px;
+            height: 22px;
+            margin: -11px 0 0 -11px;
+            transition: transform 0.5s cubic-bezier(.65, .05, 0, 1), opacity 0.35s ease;
+        }
+        .tt-icon--moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        .theme-toggle[data-theme="dark"] .tt-icon--sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+        .theme-toggle[data-theme="dark"] .tt-icon--moon { opacity: 1; transform: rotate(0) scale(1); }
+        @media (prefers-reduced-motion: reduce) {
+            .tt-icon, .theme-toggle { transition-duration: 0.01s; }
         }
 
         /* Tombol kembali simpel dengan ikon < (di atas latar hijau) */
@@ -78,7 +136,7 @@
             border: none;
             border-radius: 8px;
             background: transparent;
-            color: #FFFFFF;
+            color: var(--nav-text);
             font-family: var(--font-body);
             font-size: 0.92rem;
             font-weight: 500;
@@ -87,7 +145,7 @@
             transition: background 0.2s ease;
         }
         .back-button:hover {
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(127, 127, 127, 0.16);
         }
         .back-button:active { transform: scale(0.97); }
         .back-button svg { width: 20px; height: 20px; }
@@ -313,7 +371,7 @@
         .tab-label {
             display: inline-block;
             vertical-align: top;
-            background: var(--primary);
+            background: #000000;
             color: #FFFFFF;
             font-family: var(--font-heading);
             font-size: 0.82rem;
@@ -416,6 +474,7 @@
         html[data-theme="dark"] .detail-meta-item svg,
         html[data-theme="dark"] .sidebar-category,
         html[data-theme="dark"] .sidebar-card:hover .sidebar-info h3 { color: #8fd0bf; }
+        html[data-theme="dark"] .tab-label { background: #FFFFFF; color: #000000; }
         html[data-theme="dark"] .detail-image-frame,
         html[data-theme="dark"] .sidebar-image { background-color: #151c2c; }
     </style>
@@ -444,6 +503,15 @@
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
                 Kembali
+            </button>
+            <button type="button" id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Ganti mode gelap / terang" data-theme="light">
+                <svg class="tt-icon tt-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>
+                </svg>
+                <svg class="tt-icon tt-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>
+                </svg>
             </button>
         </div>
     </header>
@@ -644,6 +712,25 @@
     </script>
 
     <script>
+        // Tombol dark / light mode (kunci 'theme' sama dengan navbar)
+        (function () {
+            const themeToggle = document.getElementById('themeToggle');
+            if (!themeToggle) return;
+            const applyTheme = (theme) => {
+                document.documentElement.setAttribute('data-theme', theme);
+                themeToggle.setAttribute('data-theme', theme);
+                themeToggle.setAttribute('aria-checked', theme === 'dark' ? 'true' : 'false');
+            };
+            let saved = 'light';
+            try { saved = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'; } catch (e) {}
+            applyTheme(saved);
+            themeToggle.addEventListener('click', () => {
+                const next = themeToggle.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+                try { localStorage.setItem('theme', next); } catch (e) {}
+            });
+        })();
+
         document.getElementById('backButton').addEventListener('click', function () {
             if (document.referrer && document.referrer.includes(window.location.host) && window.history.length > 1) {
                 window.history.back();

@@ -6,7 +6,31 @@
 @section('search-placeholder', 'Cari galeri...')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
+		/* ===== Modal Crop Gambar (bebas: landscape / potret / 1:1 / bebas) ===== */
+		.crop-modal-box { max-width: 580px; width: 92%; }
+		.crop-modal-body { margin-bottom: 4px; }
+		.crop-container {
+			width: 100%; max-height: 420px; min-height: 260px;
+			background: transparent; overflow: hidden; border-radius: 12px;
+		}
+		.crop-container img { display: block; max-width: 100%; }
+		.crop-hint { margin-top: 10px; font-size: 12px; color: var(--dark-grey); text-align: center; }
+		.crop-container.crop-circle .cropper-view-box,
+		.crop-container.crop-circle .cropper-face { border-radius: 50%; }
+		.crop-ratio-options {
+			display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; justify-content: center;
+		}
+		.crop-ratio-btn {
+			padding: 6px 16px; border-radius: 20px; border: 1px solid var(--grey);
+			background: var(--light); cursor: pointer; font-size: 12px;
+			font-family: var(--poppins); color: var(--dark); transition: .15s ease;
+		}
+		.crop-ratio-btn.active { background: var(--blue); color: var(--light); border-color: var(--blue); }
+		/* Pastikan modal crop selalu tampil di DEPAN modal form tambah/edit (#galleryModal pakai z-index 5000) */
+		#cropModal { z-index: 5600; }
+
 		#content main .head-title .btn-download {
 			height: 36px;
 			padding: 0 16px;
@@ -341,12 +365,12 @@
 			color: var(--dark-grey);
 			padding: 18px;
 		}
-		#galleryModal .gallery-media-empty .bx {
-			font-size: 38px;
-			color: var(--blue);
-			display: block;
-			margin-bottom: 8px;
+		#galleryModal .gallery-media-shape {
+			width: 110px; height: 90px; margin: 0 auto 10px;
+			border: 2px dashed var(--blue); border-radius: 8px;
+			background: transparent; display: flex; align-items: center; justify-content: center;
 		}
+		#galleryModal .gallery-media-shape .bx { font-size: 28px; color: var(--blue); margin: 0; }
 		#galleryModal .gallery-media-empty strong {
 			display: block;
 			color: var(--dark);
@@ -357,6 +381,11 @@
 			display: block;
 			font-size: 11px;
 			line-height: 1.5;
+		}
+		#galleryModal .gallery-media-empty .gallery-media-size-hint {
+			margin-top: 4px;
+			font-weight: 600;
+			color: var(--blue);
 		}
 
 		#galleryModal .gallery-media-actions {
@@ -504,6 +533,17 @@
 			filter: brightness(.9);
 		}
 		.modal-box .btn-save {
+			background: var(--blue);
+			color: var(--light);
+		}
+		/* Tombol Batal/Terapkan pada modal Crop Foto -> merah & biru, konsisten di mode terang/gelap */
+		#cropModal .btn-cancel,
+		#cropModal .btn-cancel:hover {
+			background: var(--red);
+			color: var(--light);
+		}
+		#cropModal .btn-save,
+		#cropModal .btn-save:hover {
 			background: var(--blue);
 			color: var(--light);
 		}
@@ -805,14 +845,15 @@
 			transform: none;
 			box-shadow: none;
 		}
+		/* Kategori: teks biasa, sama seperti kolom Judul (tanpa badge) */
 		#content main .gallery-table .table-category-tag {
-			display: inline-block;
-			background: var(--light-blue);
-			color: var(--blue);
-			font-size: 12px;
-			font-weight: 600;
-			padding: 4px 14px;
-			border-radius: 20px;
+			display: inline;
+			background: none;
+			color: inherit;
+			font-size: inherit;
+			font-weight: inherit;
+			padding: 0;
+			border-radius: 0;
 			white-space: nowrap;
 		}
 		#content main .gallery-table .table-actions {
@@ -1057,6 +1098,121 @@
 			#galleryModal .modal-actions { margin: 14px -16px -20px -16px; padding: 14px 16px; }
 		}
 
+
+		/* ===== Layout kartu daftar (seperti Kelola Proyek, Blog, Layanan & Tim) ===== */
+		#content main .head-title.page-header-fixed { position: fixed; z-index: 60; padding: 10px 0; margin: 0; }
+		@media screen and (min-width: 769px) {
+			#content main .table-section { isolation: isolate; padding: 0 24px 24px 24px; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+			#content main .table-section .table-toolbar {
+				position: sticky; top: 0; z-index: 5; background: var(--light, #fff) !important; background-clip: padding-box;
+				margin: 0 -24px 0 -24px; padding: 24px 24px 16px 24px;
+			}
+			#content main .table-section .table-responsive { overflow: visible; }
+			#content main .table-section table thead th {
+				position: sticky; top: var(--head-h, 0px); z-index: 4; background: var(--light, #fff) !important;
+				background-clip: padding-box; box-shadow: 0 1px 0 var(--grey);
+			}
+		}
+
+		/* Input kategori manual ("Lainnya...") */
+		#galleryModal .gallery-form-left .form-group input#photoCategoryLainnya {
+			margin-top: 10px;
+		}
+
+		/* ============================================================
+		   DARK MODE - PALET LEBIH TERANG & BERLAPIS (slate-navy)
+		   (sama seperti Kelola Proyek, Layanan, Blog & Tim)
+		     halaman  #1b2538  <  kartu  #25324a  <  input/hover  #34456a
+		   Hanya berlaku di area konten & modal halaman ini (sidebar tidak diubah).
+		   ============================================================ */
+		body.dark #content,
+		body.dark #content main,
+		body.dark .modal-overlay,
+		body.dark .zoom-modal-overlay {
+			--light: #25324a;          /* kartu, modal, header tabel */
+			--grey: #34456a;           /* input, hover baris, border */
+			--dark: #eef2f9;           /* teks utama */
+			--dark-grey: #a9b8d2;      /* teks sekunder */
+			--light-blue: #2f4a7a;     /* baris terpilih, tag kategori */
+			--light-orange: #4d3b33;
+			--blue: #4f8ef7;
+			--red: #ef5a5a;
+		}
+		body.dark #content {
+			background: #1b2538 !important;
+		}
+		body.dark #content main .gallery-table tbody tr:hover {
+			background: #2d3c5a !important;
+		}
+		body.dark .modal-box {
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+		}
+		body.dark #galleryModal .gallery-form-left .form-group input[type="text"],
+		body.dark #galleryModal .gallery-form-left .form-group select {
+			background: var(--grey) !important;
+			border-color: var(--grey) !important;
+		}
+		body.dark #galleryModal .gallery-form-left .form-group input[type="text"]:focus,
+		body.dark #galleryModal .gallery-form-left .form-group select:focus {
+			border-color: #4f8ef7 !important;
+			box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.25);
+		}
+		body.dark #galleryModal .gallery-media-preview {
+			border-color: #4a5f8a;
+		}
+
+		/* ============================================================
+		   LIGHT MODE - AREA BERLAPIS AGAR MUDAH DIBEDAKAN
+		     halaman  #e9eef5  <  kartu putih (+ border & bayangan)  <  input #f1f5f9
+		   ============================================================ */
+		body:not(.dark) #content,
+		body:not(.dark) #content main,
+		body:not(.dark) .modal-overlay,
+		body:not(.dark) .zoom-modal-overlay {
+			--light: #ffffff;          /* kartu, modal, header tabel */
+			--grey: #e2e8f0;           /* input, border */
+			--dark: #1e293b;           /* teks utama */
+			--dark-grey: #64748b;      /* teks sekunder */
+			--light-blue: #dbeafe;     /* baris terpilih, tag kategori */
+			--light-orange: #fee2e2;
+		}
+		body:not(.dark) #content {
+			background: #e9eef5 !important;
+		}
+		body:not(.dark) #content main .box-info li,
+		body:not(.dark) #content main .table-section,
+		body:not(.dark) #content main .gallery-card {
+			border: 1px solid #d5deea;
+			box-shadow: 0 2px 8px rgba(30, 41, 59, 0.07);
+		}
+		body:not(.dark) #content main .gallery-table tbody tr:hover {
+			background: #f1f5f9;
+		}
+		body:not(.dark) #galleryModal .gallery-form-left .form-group input[type="text"],
+		body:not(.dark) #galleryModal .gallery-form-left .form-group select {
+			background: #f1f5f9 !important;
+			border-color: #cbd5e1 !important;
+		}
+		body:not(.dark) #galleryModal .gallery-form-left .form-group input[type="text"]:focus,
+		body:not(.dark) #galleryModal .gallery-form-left .form-group select:focus {
+			background: #fff !important;
+			border-color: #3b82f6 !important;
+		}
+		body:not(.dark) #galleryModal .gallery-media-card {
+			border-color: #d5deea;
+		}
+		body:not(.dark) #galleryModal .gallery-media-preview {
+			background: #f1f5f9;
+			border-color: #cbd5e1;
+		}
+
+		/* Garis pembatas antar baris daftar (seperti daftar Tim) */
+		#content main .gallery-table thead th {
+			border-bottom: 1px solid var(--grey);
+		}
+		#content main .gallery-table tbody tr:not(:last-child) td {
+			border-bottom: 1px solid var(--grey);
+		}
 </style>
 @endpush
 
@@ -1121,6 +1277,16 @@
 			</div>
 
 			<!-- Daftar Galeri (Tabel) -->
+			@php
+				// Kategori bawaan + kategori buatan sendiri yang sudah dipakai di data galeri
+				$kategoriBawaan = ['kegiatan', 'fasilitas', 'tim', 'acara'];
+				$kategoriLain = collect($galleries)->pluck('kategori')
+					->map(fn ($k) => trim((string) $k))
+					->filter()
+					->unique(fn ($k) => strtolower($k))
+					->reject(fn ($k) => in_array(strtolower($k), $kategoriBawaan))
+					->values();
+			@endphp
 			<div class="table-section">
 				<div class="table-toolbar">
 					<h3>Daftar Foto Galeri</h3>
@@ -1135,6 +1301,9 @@
 							<option value="fasilitas">Fasilitas</option>
 							<option value="tim">Tim</option>
 							<option value="acara">Acara</option>
+							@foreach($kategoriLain as $kat)
+							<option value="{{ strtolower($kat) }}">{{ ucfirst($kat) }}</option>
+							@endforeach
 						</select>
 						<select id="galleryFilterPerPage" class="filter-select">
 							<option value="">Semua</option>
@@ -1171,10 +1340,10 @@
 									<img src="{{ $gallery->foto_url }}" alt="{{ $gallery->judul }}" class="table-thumb"
 										data-zoom
 										data-zoom-title="{{ $gallery->judul }}"
-										data-zoom-category="{{ $gallery->kategori_label }}">
+										data-zoom-category="{{ in_array(strtolower($gallery->kategori), $kategoriBawaan) ? $gallery->kategori_label : ucfirst($gallery->kategori) }}">
 								</td>
 								<td>{{ $gallery->judul }}</td>
-								<td><span class="table-category-tag">{{ $gallery->kategori_label }}</span></td>
+								<td><span class="table-category-tag">{{ in_array(strtolower($gallery->kategori), $kategoriBawaan) ? $gallery->kategori_label : ucfirst($gallery->kategori) }}</span></td>
 								<td class="action-cell">
 									<div class="table-actions">
 										<button type="button" class="btn-edit" title="Edit"
@@ -1235,7 +1404,12 @@
 										<option value="fasilitas">Fasilitas</option>
 										<option value="tim">Tim</option>
 										<option value="acara">Acara</option>
+										@foreach($kategoriLain as $kat)
+										<option value="{{ $kat }}">{{ ucfirst($kat) }}</option>
+										@endforeach
+										<option value="__lainnya__">Lainnya... (ketik sendiri)</option>
 									</select>
+									<input type="text" id="photoCategoryLainnya" maxlength="50" placeholder="Ketik kategori baru" autocomplete="off" style="display:none;">
 								</div>
 							</div>
 
@@ -1245,9 +1419,12 @@
 
 									<div class="gallery-media-preview upload-clickable" id="galleryMediaPreview" title="Klik untuk memilih foto">
 										<div class="gallery-media-empty" id="galleryMediaEmpty">
-											<i class='bx bx-image-add'></i>
+											<div class="gallery-media-shape" aria-hidden="true">
+												<i class='bx bx-image-add'></i>
+											</div>
 											<strong>Upload Foto</strong>
 											<span>Klik area ini untuk memilih foto</span>
+											<span class="gallery-media-size-hint">Rasio bebas — Landscape 16:9, Potret 3:4, atau 1:1</span>
 										</div>
 
 										<img
@@ -1286,6 +1463,32 @@
 				</div>
 			</div>
 
+			<!-- Modal Crop Gambar (bebas: landscape / potret / 1:1 / bebas, sesuai kebutuhan galeri) -->
+			<div class="modal-overlay" id="cropModal">
+				<div class="modal-box crop-modal-box">
+					<div class="modal-head">
+						<h3>Sesuaikan Foto</h3>
+						<i class='bx bx-x' onclick="closeCropModal()"></i>
+					</div>
+					<div class="crop-modal-body">
+						<div class="crop-container" id="cropContainer">
+							<img id="cropImageEl" src="" alt="Crop foto">
+						</div>
+						<div class="crop-ratio-options" id="cropRatioOptions">
+							<button type="button" class="crop-ratio-btn active" data-ratio="free">Bebas</button>
+							<button type="button" class="crop-ratio-btn" data-ratio="1.7778">Landscape (16:9)</button>
+							<button type="button" class="crop-ratio-btn" data-ratio="0.75">Potret (3:4)</button>
+							<button type="button" class="crop-ratio-btn" data-ratio="1">1:1</button>
+						</div>
+						<p class="crop-hint">Galeri bebas: pilih rasio di atas atau geser sudut area crop untuk bentuk bebas.</p>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-cancel" onclick="closeCropModal()">Batal</button>
+						<button type="button" class="btn btn-save" id="btnApplyCrop">Terapkan</button>
+					</div>
+				</div>
+			</div>
+
 			<!-- Modal Konfirmasi Hapus -->
 			<div class="modal-overlay" id="deleteConfirmModal">
 				<div class="modal-box modal-confirm">
@@ -1295,6 +1498,18 @@
 					<div class="modal-actions">
 						<button type="button" class="btn-cancel" id="btnCancelDelete">Batal</button>
 						<button type="button" class="btn-danger" id="btnConfirmDelete">Ya, Hapus</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal Notifikasi Gagal (error validasi dari server) -->
+			<div class="modal-overlay" id="errorModal">
+				<div class="modal-box modal-confirm">
+					<div class="confirm-icon"><i class='bx bx-error-circle'></i></div>
+					<h2>Gagal!</h2>
+					<p id="errorMessage" style="white-space:pre-line;"></p>
+					<div class="modal-actions">
+						<button type="button" class="btn-save" id="btnCloseError">OK</button>
 					</div>
 				</div>
 			</div>
@@ -1313,7 +1528,86 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script>
+		/* ============================================================
+		   MODAL CROP FOTO — pakai Cropper.js
+		   Galeri bebas: Bebas / Landscape (16:9) / Potret (3:4) / 1:1
+		   ============================================================ */
+		(function () {
+			const cropModal        = document.getElementById('cropModal');
+			const cropContainer    = document.getElementById('cropContainer');
+			const cropImageEl      = document.getElementById('cropImageEl');
+			const btnApplyCrop     = document.getElementById('btnApplyCrop');
+			const cropRatioOptions = document.getElementById('cropRatioOptions');
+			const cropRatioBtns    = cropRatioOptions ? Array.from(cropRatioOptions.querySelectorAll('.crop-ratio-btn')) : [];
+			let cropper = null;
+			let cropApplyCallback = null;
+			let cropTargetInput = null;
+
+			window.openCropModal = function (file, aspectRatio, inputEl, onApply, circle) {
+				cropTargetInput = inputEl;
+				cropApplyCallback = onApply;
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					cropImageEl.src = e.target.result;
+					cropModal.classList.add('show');
+					cropContainer.classList.toggle('crop-circle', !!circle);
+
+					// Reset pilihan rasio ke "Bebas" setiap kali buka modal
+					cropRatioBtns.forEach(function (b) { b.classList.toggle('active', b.dataset.ratio === 'free'); });
+
+					if (cropper) { cropper.destroy(); cropper = null; }
+					cropper = new Cropper(cropImageEl, {
+						aspectRatio: isNaN(aspectRatio) ? NaN : aspectRatio,
+						viewMode: 1,
+						autoCropArea: 1,
+						background: true,
+						responsive: true,
+						dragMode: 'move'
+					});
+				};
+				reader.readAsDataURL(file);
+			};
+
+			window.closeCropModal = function () {
+				cropModal.classList.remove('show');
+				if (cropper) { cropper.destroy(); cropper = null; }
+				if (cropTargetInput) { cropTargetInput.value = ''; }
+				cropTargetInput = null;
+				cropApplyCallback = null;
+			};
+
+			// Tombol pilihan rasio (khusus galeri: bebas / landscape / potret / 1:1)
+			cropRatioBtns.forEach(function (btn) {
+				btn.addEventListener('click', function () {
+					if (!cropper) return;
+					cropRatioBtns.forEach(function (b) { b.classList.remove('active'); });
+					btn.classList.add('active');
+					const r = btn.dataset.ratio;
+					cropper.setAspectRatio(r === 'free' ? NaN : parseFloat(r));
+				});
+			});
+
+			btnApplyCrop.addEventListener('click', function () {
+				if (!cropper || !cropApplyCallback) return;
+				const canvas = cropper.getCroppedCanvas({ imageSmoothingQuality: 'high' });
+				canvas.toBlob(function (blob) {
+					const croppedFile = new File([blob], 'galeri-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+					const cb = cropApplyCallback;
+					const inputEl = cropTargetInput;
+					cropModal.classList.remove('show');
+					if (cropper) { cropper.destroy(); cropper = null; }
+					cropTargetInput = null;
+					cropApplyCallback = null;
+					cb(croppedFile, inputEl);
+				}, 'image/jpeg', 0.92);
+			});
+
+			// Catatan: modal crop SENGAJA tidak ditutup saat klik di luar area kartu.
+			// Pengguna harus menekan tombol "Batal" atau "Terapkan" untuk menutupnya.
+		})();
+
 		/* ================= KELOLA GALERI (khusus halaman ini) ================= */
 
 		const galleryTableRows = () => Array.from(document.querySelectorAll('#galleryTable tbody .gallery-row'));
@@ -1650,6 +1944,15 @@
 			}
 		@endif
 
+		// Tampilkan error validasi dari server (sebelumnya gagal simpan tidak terlihat sama sekali)
+		const errorModal = document.getElementById('errorModal');
+		document.getElementById('btnCloseError').addEventListener('click', function () { errorModal.classList.remove('show'); });
+		errorModal.addEventListener('click', function (e) { if (e.target === errorModal) errorModal.classList.remove('show'); });
+		@if($errors->any())
+			document.getElementById('errorMessage').textContent = @json(implode("\n", $errors->all()));
+			errorModal.classList.add('show');
+		@endif
+
 		/* ---------- MODAL TAMBAH / EDIT FOTO ---------- */
 
 		const galleryModal   = document.getElementById('galleryModal');
@@ -1693,8 +1996,59 @@
 			setGalleryMediaPreview('');
 		}
 
+		// ===== Kategori: pilihan "Lainnya..." untuk mengetik kategori sendiri =====
+		const photoCategoryLainnya = document.getElementById('photoCategoryLainnya');
+
+		function toggleKategoriLainnya() {
+			const aktif = photoCategory.value === '__lainnya__';
+			photoCategoryLainnya.style.display = aktif ? 'block' : 'none';
+			photoCategoryLainnya.required = aktif;
+			if (!aktif) photoCategoryLainnya.value = '';
+		}
+		photoCategory.addEventListener('change', function () {
+			toggleKategoriLainnya();
+			if (photoCategory.value === '__lainnya__') photoCategoryLainnya.focus();
+		});
+
+		// Cari option kategori yang sama (tanpa membedakan huruf besar/kecil)
+		function findKategoriOption(nilai) {
+			const target = String(nilai || '').trim().toLowerCase();
+			return Array.from(photoCategory.options).find(function (o) {
+				return o.value !== '__lainnya__' && o.value.toLowerCase() === target;
+			});
+		}
+
+		function tambahKategoriOption(nilai) {
+			const opt = new Option(nilai.charAt(0).toUpperCase() + nilai.slice(1), nilai);
+			photoCategory.insertBefore(opt, photoCategory.querySelector('option[value="__lainnya__"]'));
+			return opt;
+		}
+
+		// Set kategori (dipakai saat edit); kalau belum ada di daftar, ditambahkan sebagai pilihan
+		function setKategoriValue(nilai) {
+			const val = String(nilai || '').trim();
+			let opt = findKategoriOption(val);
+			if (!opt && val) opt = tambahKategoriOption(val);
+			photoCategory.value = opt ? opt.value : 'kegiatan';
+			toggleKategoriLainnya();
+		}
+
+		// Saat disimpan: teks yang diketik menjadi nilai kategori yang dikirim
+		galleryForm.addEventListener('submit', function (e) {
+			if (photoCategory.value !== '__lainnya__') return;
+			const teks = photoCategoryLainnya.value.trim().replace(/\s+/g, ' ');
+			if (!teks) {
+				e.preventDefault();
+				photoCategoryLainnya.focus();
+				return;
+			}
+			const opt = findKategoriOption(teks) || tambahKategoriOption(teks);
+			photoCategory.value = opt.value;
+		});
+
 		function openModal(mode, data = null) {
 			galleryForm.reset();
+			toggleKategoriLainnya();
 			setGalleryMediaPreview('');
 			hapusGambarInput.value = '0';
 			photoInput.required = true;
@@ -1706,7 +2060,7 @@
 				photoInput.required = false;
 
 				photoTitle.value = data.judul;
-				photoCategory.value = data.kategori;
+				setKategoriValue(data.kategori);
 
 				if (data.foto) {
 					setGalleryMediaPreview(data.foto);
@@ -1788,12 +2142,13 @@
 				return;
 			}
 
-			const reader = new FileReader();
-			reader.onload = function (e) {
-				setGalleryMediaPreview(e.target.result);
+			openCropModal(file, NaN, photoInput, function (croppedFile, inputEl) {
+				const dt = new DataTransfer();
+				dt.items.add(croppedFile);
+				inputEl.files = dt.files;
+				setGalleryMediaPreview(URL.createObjectURL(croppedFile));
 				hapusGambarInput.value = '0';
-			};
-			reader.readAsDataURL(file);
+			}, false);
 		});
 
 		// Tombol zoom
@@ -1893,5 +2248,42 @@
 			menu.style.display = 'none';
 		  });
 		});
+
+	/* ===== Header diam di atas; kartu daftar bisa discroll ===== */
+	(function () {
+		var main = document.querySelector('#content main');
+		var header = main ? main.querySelector('.head-title') : null;
+		var card = document.querySelector('#content main .table-section');
+		if (!main || !header || !card) return;
+		var spacer = null;
+		function pinHeader() {
+			if (header.classList.contains('page-header-fixed')) return;
+			var r = header.getBoundingClientRect();
+			spacer = document.createElement('div');
+			spacer.style.height = r.height + 'px';
+			header.parentNode.insertBefore(spacer, header.nextSibling);
+			header.style.top = r.top + 'px';
+			header.classList.add('page-header-fixed');
+		}
+		function syncLayout() {
+			var mainTop = main.getBoundingClientRect().top;
+			main.style.height = (window.innerHeight - mainTop) + 'px';
+			main.style.overflow = 'hidden';
+			var ref = spacer || header;
+			var hr = ref.getBoundingClientRect();
+			header.style.left = hr.left + 'px';
+			header.style.width = hr.width + 'px';
+			var cardTop = card.getBoundingClientRect().top;
+			var available = window.innerHeight - cardTop - 24;
+			if (available < 200) available = 200;
+			card.style.maxHeight = available + 'px';
+			var headEl = card.querySelector('.table-toolbar');
+			if (headEl) card.style.setProperty('--head-h', headEl.offsetHeight + 'px');
+		}
+		pinHeader();
+		syncLayout();
+		window.addEventListener('resize', syncLayout);
+		setTimeout(syncLayout, 300);
+	})();
 </script>
 @endpush

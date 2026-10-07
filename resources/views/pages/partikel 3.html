@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Particle Galaxy</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    body {
+      cursor: crosshair;
+    }
+
+    #scene {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <script>
+    // ======================================================
+    // Interactive Particle Galaxy
+    // - Partikel mengikuti kursor dengan gerakan halus.
+    // - Saat kursor diam, partikel bergerak perlahan secara acak.
+    // - Tidak menumpuk/berputar terus di satu titik.
+    // ======================================================
+
+    const canvas = document.getElementById('scene');
+    const ctx = canvas.getContext('2d');
+
+    let width = 0;
+    let height = 0;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const settings = {
+      particleCount: 500,
+      maxSpeed: 2.2,
+      idleSpeed: 0.22,
+      followStrength: 0.012,
+      mouseInfluenceRadius: 520,
+      mouseTrailStrength: 0.08,
+      friction: 0.965,
+      randomDrift: 0.028,
+      returnStrength: 0.0008,
+      edgeMargin: 80,
+      particleSizeMin: 1.2,
+      particleSizeMax: 2.7
+    };
+
+    const mouse = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+      previousX: 0,
+      previousY: 0,
+      speed: 0,
+      active: false,
+      lastMove: 0
+    };
+
+    const particles = [];
+
+    const colors = [
+      [255, 255, 255],
+      [0, 150, 255],
+      [255, 255, 128],
+      [255, 255, 255],
+      [120, 200, 255]
+    ];
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Jangan memindahkan mouse target ke satu titik tengah.
+      // Hanya inisialisasi bila memang belum pernah ada posisi pointer.
+      if (!mouse.active) {
+        mouse.targetX = width * 0.5;
+        mouse.targetY = height * 0.5;
+        mouse.x = mouse.targetX;
+        mouse.y = mouse.targetY;
+      }
+    }
+
+    function randomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createParticle(i) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.sqrt(Math.random()) * Math.min(width, height) * 0.72;
+      const centerX = width * 0.5;
+      const centerY = height * 0.5;
+
+      const color = randomColor();
+
+      return {
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
+        vx: rand(-0.25, 0.25),
+        vy: rand(-0.25, 0.25),
+        size: rand(settings.particleSizeMin, settings.particleSizeMax),
+        alpha: rand(0.3, 0.9),
+        color: color,
+        angle: Math.random() * Math.PI * 2,
+        wander: rand(0.002, 0.009),
+        phase: Math.random() * Math.PI * 2,
+        seed: Math.random() * 1000,
+        life: rand(0, Math.PI * 2),
+        index: i
+      };
+    }
+
+    function createParticles() {
+      particles.length = 0;
+      for (let i = 0; i < settings.particleCount; i++) {
+        particles.push(createParticle(i));
+      }
+    }
+
+    function updateMouse(x, y) {
+      const dx = x - mouse.targetX;
+      const dy = y - mouse.targetY;
+      mouse.speed = Math.min(Math.sqrt(dx * dx + dy * dy), 80);
+      mouse.targetX = x;
+      mouse.targetY = y;
+      mouse.active = true;
+      mouse.lastMove = performance.now();
+    }
+
+    canvas.addEventListener('pointermove', (event) => {
+      updateMouse(event.clientX, event.clientY);
+    }, { passive: true });
+
+    canvas.addEventListener('pointerleave', () => {
+      mouse.active = false;
+    });
+
+    window.addEventListener('resize', resize);
+
+    function clampSpeed(p) {
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > settings.maxSpeed) {
+        const scale = settings.maxSpeed / speed;
+        p.vx *= scale;
+        p.vy *= scale;
+      }
+    }
+
+    function wrapParticle(p) {
+      const m = settings.edgeMargin;
+
+      if (p.x < -m) p.x = width + m;
+      if (p.x > width + m) p.x = -m;
+      if (p.y < -m) p.y = height + m;
+      if (p.y > height + m) p.y = -m;
+    }
+
+    function updateParticle(p, time) {
+      // Gerakan acak yang lambat ketika pointer tidak aktif/diam.
+      p.angle += Math.sin(time * 0.00035 + p.phase) * p.wander;
+
+      const wanderX = Math.cos(p.angle + p.phase) * settings.randomDrift;
+      const wanderY = Math.sin(p.angle * 1.13 + p.phase) * settings.randomDrift;
+
+      p.vx += wanderX;
+      p.vy += wanderY;
+
+      // Titik fokus selalu mengikuti posisi kursor secara halus.
+      const smoothMouse = 0.065;
+      mouse.x += (mouse.targetX - mouse.x) * smoothMouse;
+      mouse.y += (mouse.targetY - mouse.y) * smoothMouse;
+
+      const dx = mouse.x - p.x;
+      const dy = mouse.y - p.y;
+      const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      const normalizedX = dx / distance;
+      const normalizedY = dy / distance;
+
+      // Pengaruh kursor lebih terasa ketika kursor bergerak.
+      const inactivity = Math.min((performance.now() - mouse.lastMove) / 1200, 1);
+      const activity = 1 - inactivity;
+      const radius = settings.mouseInfluenceRadius;
+      const falloff = Math.max(0, 1 - distance / radius);
+
+      // Tarikan ke arah kursor tetap ada, tetapi dibuat ringan saat idle.
+      const follow = settings.followStrength * (0.35 + activity * 1.8) * falloff;
+      p.vx += normalizedX * follow;
+      p.vy += normalizedY * follow;
+
+      // Ketika kursor bergerak, beri sedikit dorongan mengikuti arah geraknya.
+      if (activity > 0) {
+        const moveX = mouse.targetX - mouse.previousX;
+        const moveY = mouse.targetY - mouse.previousY;
+        p.vx += moveX * settings.mouseTrailStrength * falloff * 0.015;
+        p.vy += moveY * settings.mouseTrailStrength * falloff * 0.015;
+      }
+
+      // Dorongan sangat kecil menjauh dari pusat layar agar idle tidak selalu berkumpul di tengah.
+      const centerX = width * 0.5;
+      const centerY = height * 0.5;
+      const centerDx = p.x - centerX;
+      const centerDy = p.y - centerY;
+      const centerDistance = Math.sqrt(centerDx * centerDx + centerDy * centerDy) || 1;
+      if (centerDistance < Math.min(width, height) * 0.28) {
+        p.vx += (centerDx / centerDistance) * settings.returnStrength;
+        p.vy += (centerDy / centerDistance) * settings.returnStrength;
+      }
+
+      // Redam kecepatan sehingga pergerakan tidak meledak atau berputar kencang.
+      const idleDamping = mouse.speed < 1 ? 0.985 : settings.friction;
+      p.vx *= idleDamping;
+      p.vy *= idleDamping;
+
+      // Pastikan ketika idle masih ada gerakan lembut.
+      const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (currentSpeed < settings.idleSpeed) {
+        const extra = (settings.idleSpeed - currentSpeed) * 0.025;
+        p.vx += Math.cos(p.angle) * extra;
+        p.vy += Math.sin(p.angle) * extra;
+      }
+
+      clampSpeed(p);
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      p.life += 0.01 + p.wander;
+
+      // Sedikit variasi alpha agar tidak monoton.
+      const pulse = Math.sin(p.life * 1.6 + p.phase) * 0.15;
+      p.renderAlpha = Math.max(0.14, Math.min(0.95, p.alpha + pulse));
+
+      wrapParticle(p);
+    }
+
+    function drawParticle(p) {
+      const [r, g, b] = p.color;
+      const glow = p.size * 4.5;
+
+      const gradient = ctx.createRadialGradient(
+        p.x, p.y, 0,
+        p.x, p.y, glow
+      );
+
+      gradient.addColorStop(0, `rgba(${r},${g},${b},${p.renderAlpha})`);
+      gradient.addColorStop(0.22, `rgba(${r},${g},${b},${p.renderAlpha * 0.55})`);
+      gradient.addColorStop(0.55, `rgba(${r},${g},${b},${p.renderAlpha * 0.16})`);
+      gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, glow, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(${r},${g},${b},${Math.min(1, p.renderAlpha + 0.1)})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawMouseGlow() {
+      if (!mouse.active) return;
+
+      const dx = mouse.targetX - mouse.x;
+      const dy = mouse.targetY - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const alpha = Math.min(0.14, dist / 900);
+
+      if (alpha <= 0.002) return;
+
+      const gradient = ctx.createRadialGradient(
+        mouse.x, mouse.y, 0,
+        mouse.x, mouse.y, 150
+      );
+      gradient.addColorStop(0, `rgba(0,150,255,${alpha})`);
+      gradient.addColorStop(1, 'rgba(0,150,255,0)');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 150, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    let lastTime = performance.now();
+
+    function animate(time) {
+      const delta = Math.min((time - lastTime) / 16.666, 2);
+      lastTime = time;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Simpan posisi mouse sebelum update untuk arah gerak berikutnya.
+      mouse.previousX += (mouse.targetX - mouse.previousX) * 0.2;
+      mouse.previousY += (mouse.targetY - mouse.previousY) * 0.2;
+      mouse.speed *= 0.9;
+
+      for (const p of particles) {
+        updateParticle(p, time);
+
+        // delta membantu kestabilan jika FPS berubah.
+        if (delta > 1.3) {
+          p.x += p.vx * (delta - 1) * 0.2;
+          p.y += p.vy * (delta - 1) * 0.2;
+        }
+
+        drawParticle(p);
+      }
+
+      drawMouseGlow();
+      requestAnimationFrame(animate);
+    }
+
+    resize();
+    createParticles();
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

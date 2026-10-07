@@ -3,10 +3,14 @@
 @section('title', 'About Us - PT Astabrata Teknologi')
 
 @section('content')
+@php
+    $aboutBgUrl = \App\Models\PageSetting::for('about')->bgUrl();
+    $aboutDescBgUrl = \App\Models\PageSetting::for('about_desc')->bgUrl();
+@endphp
 <div class="page-wrapper">
-<section class="hero" id="home" aria-label="Hero">
+    <section class="hero" id="home" aria-label="Hero">
       <div class="hero__wrapper">
-        <div class="hero__row">
+        <div class="hero__row" @if($aboutBgUrl) style="--hero-bg: url('{{ $aboutBgUrl }}')" @endif>
 
           <div class="hero__stage">
             <!-- Video background utama -->
@@ -41,29 +45,32 @@
     <section class="zn-about" id="about-content">
         <div class="zn-about__container">
             <p class="zn-about__eyebrow">Tentang Kami</p>
-            <h3 class="zn-about__title">PT Astabrata Teknologi</h3>
+            @php $ps = \App\Models\PageSetting::for('about'); @endphp
+            @include('partials.page-style', ['ps' => $ps])
+            <h3 class="zn-about__title">{{ $ps->titleText() }}</h3>
 
             <div class="zn-about__subtext">
-                <p>Membangun inovasi masa depan melalui solusi teknologi</p>
-                <p>PT Astabrata Teknologi adalah perusahaan penyedia layanan IT terkemuka yang berdedikasi </p>
+                @foreach($ps->descriptionLines() as $descLine)
+                    <p>{{ $descLine }}</p>
+                @endforeach
             </div>
         </div>
 
         <div class="zn-about__viewport" id="znClip" aria-label="Zentry shared adventure artwork">
             <div class="zn-about__image" id="znMask">
-                <img class="zn-about__img" src="{{ asset('image/kantor.jpeg') }}" alt="Background">
+                <img class="zn-about__img" src="{{ $aboutDescBgUrl ?: asset('image/kantor.jpeg') }}" alt="Background">
             </div>
 
             <!-- Muncul saat gambar sudah membesar penuh (scroll sampai paling bawah) -->
             <div class="zn-about__shade" id="znShade" aria-hidden="true"></div>
             <div class="zn-about__caption" id="znCaption">
-                <p class="zn-about__caption-eyebrow">Kantor Kami</p>
-                <h3 class="zn-about__caption-title">Ruang Kerja untuk Berkarya</h3>
-                <p class="zn-about__caption-text">PT Asta Brata Teknologi adalah perusahaan penyedia solusi teknologi yang berkomitmen menghadirkan inovasi digital terbaik bagi setiap klien. Berlandaskan lingkungan kerja yang nyaman dan berorientasi pada kolaborasi, kami membina budaya pertukaran ide serta diskusi yang dinamis guna merancang dan mengembangkan layanan teknologi yang efektif, tepat guna, dan bernilai tinggi.</p>
+                <h3 class="zn-about__caption-title">{{ $ps->titleText() }}</h3>
+                <p class="zn-about__caption-text">{{ $ps->captionText() }}</p>
             </div>
         </div>
     </section>
 
+    <!-- ===== TIM KAMI ===== -->
     <section class="team-section reveal" id="tim-kami">
         <div class="th-card-wrapper">
             <div class="particle-background" aria-hidden="true">
@@ -72,35 +79,85 @@
 
             <div class="section-heading text-center">
                 <h2>Tim Kami</h2>
-                <p>Orang-orang hebat di balik setiap baris kode dan desain yang kami buat.</p>
             </div>
 
             <div class="team-grid">
                 @forelse($teams as $team)
-                <article class="team-card">
-                    <div class="team-card-bg">
-                        <img src="{{ $team->foto_url }}" alt="" aria-hidden="true" loading="lazy">
-                    </div>
-                    <img class="team-card-avatar" src="{{ $team->foto_url }}" alt="{{ $team->nama }}" loading="lazy">
-                    <div class="team-card-content">
-                        <h3>{{ $team->nama }}</h3>
-                        <p class="team-card-role">{{ $team->jabatan }}</p>
-                        @if($team->divisi)
-                            <span class="team-card-divisi">{{ $team->divisi }}</span>
-                        @endif
-                    </div>
-                </article>
+                    @php
+                        $sosmedData = [];
+                        if (is_array($team->sosial_media)) {
+                            $sosmedData = $team->sosial_media;
+                        } elseif (!empty($team->sosial_media) && $team->sosial_media !== 'null') {
+                            $decoded = json_decode($team->sosial_media, true);
+                            $sosmedData = is_array($decoded) ? $decoded : [$team->sosial_media];
+                        }
+                        $sosmedData = array_slice($sosmedData, 0, 3);
+                    @endphp
+
+                    <article class="team-card">
+                        <div class="team-card-image-content">
+                            <span class="team-card-overlay" aria-hidden="true"></span>
+
+                            <div class="team-card-image">
+                                <img src="{{ $team->foto_url }}" alt="{{ $team->nama }}" class="team-card-img" loading="lazy">
+                            </div>
+                        </div>
+
+                        <div class="team-card-content">
+                            <h3 class="team-card-name">{{ $team->nama }}</h3>
+                            <p class="team-card-role">{{ $team->jabatan }}</p>
+
+                            @if(count($sosmedData) > 0)
+                                <div class="team-card-sosmed-wrapper" aria-label="Sosial media {{ $team->nama }}">
+                                    @foreach($sosmedData as $link)
+                                        @php
+                                            $iconClass = 'bx-link';
+                                            $textClass = 'brand-text-link';
+                                            $label = 'Link';
+                                            $lLink = strtolower($link);
+
+                                            if (str_contains($lLink, 'instagram.com')) { $iconClass = 'bxl-instagram'; $textClass = 'brand-text-ig'; $label = 'Instagram'; }
+                                            elseif (str_contains($lLink, 'linkedin.com')) { $iconClass = 'bxl-linkedin-square'; $textClass = 'brand-text-in'; $label = 'LinkedIn'; }
+                                            elseif (str_contains($lLink, 'github.com')) { $iconClass = 'bxl-github'; $textClass = 'brand-text-gh'; $label = 'GitHub'; }
+                                            elseif (str_contains($lLink, 'facebook.com')) { $iconClass = 'bxl-facebook-circle'; $textClass = 'brand-text-fb'; $label = 'Facebook'; }
+                                            elseif (str_contains($lLink, 'twitter.com') || str_contains($lLink, 'x.com')) { $iconClass = 'x-logo'; $textClass = 'brand-text-x'; $label = 'X'; }
+                                            elseif (str_contains($lLink, 'youtube.com')) { $iconClass = 'bxl-youtube'; $textClass = 'brand-text-yt'; $label = 'YouTube'; }
+                                            elseif (str_contains($lLink, 'tiktok.com')) { $iconClass = 'bxl-tiktok'; $textClass = 'brand-text-tt'; $label = 'TikTok'; }
+                                            elseif (str_contains($lLink, 'wa.me') || str_contains($lLink, 'whatsapp')) { $iconClass = 'bxl-whatsapp'; $textClass = 'brand-text-wa'; $label = 'WhatsApp'; }
+                                        @endphp
+
+                                        <a class="team-card-sosmed {{ $textClass }}"
+                                           href="{{ $link }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           title="{{ $label }}"
+                                           aria-label="{{ $label }} {{ $team->nama }}">
+                                            @if($iconClass === 'x-logo')
+                                                <svg class="team-card-sosmed-x" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                                                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+                                                </svg>
+                                            @else
+                                                <i class='bx {{ $iconClass }}'></i>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </article>
                 @empty
-                <article class="team-card">
-                    <div class="team-card-bg">
-                        <img src="{{ asset('image/profile.png') }}" alt="" aria-hidden="true">
-                    </div>
-                    <img class="team-card-avatar" src="{{ asset('image/profile.png') }}" alt="Tim Astabrata">
-                    <div class="team-card-content">
-                        <h3>Tim Astabrata</h3>
-                        <p class="team-card-role">Segera hadir</p>
-                    </div>
-                </article>
+                    <article class="team-card">
+                        <div class="team-card-image-content">
+                            <span class="team-card-overlay" aria-hidden="true"></span>
+                            <div class="team-card-image">
+                                <img src="{{ asset('image/profile.png') }}" alt="Tim Astabrata" class="team-card-img">
+                            </div>
+                        </div>
+                        <div class="team-card-content">
+                            <h3 class="team-card-name">Tim Astabrata</h3>
+                            <p class="team-card-role">Segera hadir</p>
+                        </div>
+                    </article>
                 @endforelse
             </div>
         </div>
@@ -123,7 +180,6 @@
         <div class="gallery-inner">
             <div class="section-heading text-center">
                 <h2>Galeri Kegiatan</h2>
-                <p>Momen-momen di balik layar tim Astabrata Teknologi.</p>
             </div>
 
             @if($galleryList->count() > 1)
@@ -210,7 +266,7 @@
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&family=Roboto:wght@400;500;600;700&family=Sora:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 <style>
 /* ===== HERO REDEFINE (dipindahkan dari hero HTML) ===== */
@@ -236,7 +292,7 @@
   z-index:10;
   background-image:
     linear-gradient(180deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,.15) 35%,rgba(0,0,0,.65) 100%),
-    url("https://images.unsplash.com/photo-1718220216044-006f43e3a9b1?fm=jpg&q=80&w=2400&auto=format&fit=crop");
+    var(--hero-bg, url("https://images.unsplash.com/photo-1718220216044-006f43e3a9b1?fm=jpg&q=80&w=2400&auto=format&fit=crop"));
   background-size:cover;
   background-position:center;
 }
@@ -321,7 +377,7 @@
   pointer-events:none;
 }
 .hero__tech--inside{
-  color:#094356 !important;
+  color:var(--title-color,#094356) !important;
   z-index:0;
 }
 .hero__label--top,
@@ -338,7 +394,7 @@
   z-index:3;
 }
 .hero__label--inside{
-  color:#094356 !important;
+  color:var(--title-color,#094356) !important;
   z-index:0;
 }
 .hero__btn{
@@ -424,11 +480,8 @@
   .hero__subtitle { max-width: 200px; top: 62%; }
 }
 
-/* ===== DESKTOP: TEKNOLOGI lebih besar & Astabrata Teknologi digeser ke atas =====
-   (mobile tidak diubah). Layer putih & hitam harus selalu sama persis. */
+/* ===== DESKTOP: TEKNOLOGI lebih besar & Astabrata Teknologi digeser ke atas ===== */
 @media (min-width: 992px) {
-  /* Bagian bawah hero di-crop (100dvh -> 86dvh) supaya tepi bawah gambar/video
-     mendekati tulisan Astabrata Teknologi. Yang terpotong hanya bagian bawah. */
   .hero { min-height: 86dvh; }
   .hero__row {
     height: 86dvh;
@@ -438,8 +491,6 @@
   .hero__bg,
   .hero__next-video { object-position: center top; }
 
-  /* Jarak antara "Astabrata" dan "TEKNOLOGI": bottom label = posisi tech + tinggi tech + gap.
-     Ubah --tech-gap untuk memperlebar / mempersempit jarak (berlaku ke layer putih & hitam). */
   .hero {
     --tech-size: clamp(16px, 1.6vw, 24px);
     --tech-gap: 20px;
@@ -453,7 +504,7 @@
   }
 }
 
-/* ===== ZENTRY ABOUT (mengikuti banner.html) ===== */
+/* ===== ZENTRY ABOUT ===== */
 .zn-about{
   position:relative;
   z-index:5;
@@ -474,7 +525,8 @@
   gap:20px;
 }
 .zn-about__eyebrow{
-  font-family:robert,Arial,sans-serif;
+  color:var(--title-color,#094356);
+  font-family:'Google Sans Flex', robert,Arial,sans-serif;
   font-size:16px;
   letter-spacing:.08em;
   margin:0;
@@ -483,21 +535,23 @@
 }
 .zn-about__title{
   color:#094356;
-  font-family:zentry,Impact,Arial Black,sans-serif;
-  font-weight:900;
-  font-size:clamp(42px,7vw,100px);
-  line-height:1;
+  font-family:'Google Sans Flex', 'Sora','Poppins',sans-serif;
+  font-weight:700;
+  font-size:clamp(32px,5.2vw,72px);
+  letter-spacing:-.03em;
+  line-height:1.1;
   margin:0;
   max-width:1100px;
-  text-transform:uppercase;
+  text-transform:none;
 }
 .zn-about__subtext{
   color:#094356;
   display:grid;
-  font-family:robert,Arial,sans-serif;
-  font-weight:700;
+  font-family:'Google Sans Flex', 'Poppins',sans-serif;
+  font-size:clamp(15px,1.4vw,18px);
+  font-weight:400;
   gap:6px;
-  line-height:1.25;
+  line-height:1.6;
   opacity:.9;
   text-align:center;
   margin:0;
@@ -527,9 +581,8 @@
   position:absolute;
   width:100%;
 }
-/* Deskripsi kantor: muncul di atas gambar yang sudah penuh layar */
 .zn-about__shade{
-  background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,0) 75%);
+  background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.62) 30%,rgba(0,0,0,.28) 58%,rgba(0,0,0,0) 85%);
   inset:0;
   opacity:0;
   pointer-events:none;
@@ -552,7 +605,7 @@
 }
 .zn-about__caption > *{margin:0;opacity:0;visibility:hidden}
 .zn-about__caption-eyebrow{
-  font-family:robert,Arial,sans-serif;
+  font-family:'Google Sans Flex', robert,Arial,sans-serif;
   font-size:14px;
   font-weight:700;
   letter-spacing:.12em;
@@ -561,34 +614,34 @@
 }
 .zn-about__caption-title{
   color:#fff;
-  font-family:zentry,Impact,Arial Black,sans-serif;
-  font-weight:900;
-  font-size:clamp(30px,4.5vw,64px);
-  line-height:1;
-  text-transform:uppercase;
+  font-family:'Google Sans Flex', 'Sora','Poppins',sans-serif;
+  font-weight:700;
+  font-size:clamp(26px,3.6vw,52px);
+  letter-spacing:-.03em;
+  line-height:1.1;
+  text-transform:none;
 }
 .zn-about__caption-text{
-  font-family:robert,Arial,sans-serif;
-  font-size:clamp(14px,1.4vw,18px);
-  font-weight:700;
-  line-height:1.4;
+  font-family:'Google Sans Flex', 'Poppins',sans-serif;
+  font-size:clamp(14px,1.3vw,17px);
+  font-weight:400;
+  line-height:1.65;
+  color:rgba(255,255,255,.9);
 }
 @media (max-width:600px){
   .zn-about__caption{padding:0 20px 8vh;gap:10px}
   .zn-about__caption-eyebrow{font-size:11px}
-}
-@media (max-width:600px){
   .zn-about{padding-top:50px}
-  .zn-about__title{font-size:42px}
+  .zn-about__title{font-size:30px}
   .zn-about__eyebrow{font-size:12px}
   .zn-about__image{height:400px;width:290px}
 }
 
-    /* RESET PENTING UNTUK MENCEGAH MENGGESER KE KANAN */
+    /* RESET PENTING */
     html, body {
         width: 100% !important;
         max-width: 100vw !important;
-        overflow-x: hidden !important; /* MENGUNCI LAYAR KANAN KIRI */
+        overflow-x: hidden !important;
         margin: 0;
         padding: 0;
     }
@@ -613,8 +666,6 @@
         z-index: 5;
     }
 
-    /* DESKTOP: hero digeser ke atas, mendekati navbar (tinggi navbar saat discroll = 64px).
-       Harus setelah aturan .page-wrapper di atas supaya tidak tertimpa. Mobile tidak diubah. */
     @media (min-width: 992px) {
         .page-wrapper { padding-top: 64px; }
     }
@@ -624,7 +675,7 @@
         margin-bottom: 60px;
     }
     .about-header .eyebrow {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
         color: #094356;
         font-weight: 600;
         letter-spacing: 0.1em;
@@ -634,7 +685,7 @@
         margin-bottom: 15px;
     }
     .about-header h1 {
-        font-family: 'Sora', sans-serif;
+        font-family: 'Google Sans Flex', 'Sora', sans-serif;
         font-size: 3.5rem;
         color: #094356;
         margin-bottom: 20px;
@@ -650,19 +701,18 @@
     .section-heading {
         margin-bottom: 50px;
     }
-    /* Judul section (Tim Kami & Galeri Kegiatan): font sama dengan judul "PT Astabrata Teknologi" (.zn-about__title), warna hitam */
     .section-heading h2 {
-        font-family: zentry, Impact, 'Arial Black', sans-serif;
-        font-weight: 900;
-        font-size: 2.5rem;
-        line-height: 1;
-        text-transform: uppercase;
+        font-family: 'Google Sans Flex', 'Sora', 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        text-transform: none;
         color: #094356;
         margin-bottom: 10px;
     }
-    /* Teks deskripsi: font sama dengan "Membangun inovasi masa depan melalui solusi teknologi" (.zn-about__subtext), warna hitam */
     .section-heading p {
-        font-family: robert, Arial, sans-serif;
+        font-family: 'Google Sans Flex', robert, Arial, sans-serif;
         font-weight: 700;
         line-height: 1.25;
         color: #094356;
@@ -706,284 +756,6 @@
         opacity: 1;
     }
 
-    /* ===== Siapa Kami (gaya mengikuti about.html: Roboto, biru teal, teks putih) ===== */
-    .about-section {
-        --about-font: "Roboto", ui-sans-serif, sans-serif;
-        --about-white: #ffffff;
-        --about-bg: #0d4358;
-        --about-blue-300: hsl(217, 80%, 55%);
-        --about-shadow-medium: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
-                               rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-    }
-
-    /* Band penuh selebar layar */
-    .about-content {
-        position: relative;
-        z-index: 5;
-        width: calc(100% + 10vw);
-        max-width: none;
-        margin-left: -5vw;
-        margin-right: -5vw;
-        padding: 6rem 5vw 5rem;
-        box-sizing: border-box;
-        overflow: hidden; /* foto yang dipojokkan & animasi scale tidak menyembul keluar band */
-        background-color: var(--about-bg);
-        color: var(--about-white);
-        font-family: var(--about-font);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-    }
-
-    .about-container {
-        position: relative;
-        display: grid;
-        align-items: stretch;
-        row-gap: 3rem;
-        column-gap: 2rem;
-        max-width: 75rem;
-        margin-inline: auto;
-    }
-
-    .about-text {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        row-gap: 1.5rem;
-        position: relative;
-        z-index: 5;
-        font-family: var(--about-font);
-    }
-
-    .about-text::before {
-        content: 'Welcome to Zentry';
-        display: block;
-        font-family: var(--about-font);
-        font-size: 0.85rem;
-        font-weight: 500;
-        letter-spacing: 0.18em;
-        color: rgba(255, 255, 255, 0.7);
-    }
-
-    .about-text h2 {
-        margin: 0;
-        font-family: var(--about-font);
-        font-size: clamp(2.65rem, 6vw, 4rem);
-        font-weight: 700;
-        line-height: 1.15;
-        letter-spacing: normal;
-        color: var(--about-white);
-        text-wrap: balance;
-    }
-
-    .about-text p {
-        margin: 0;
-        font-family: var(--about-font);
-        font-size: clamp(1rem, 2vw, 1.125rem);
-        font-weight: 400;
-        line-height: 1.5;
-        color: var(--about-white);
-        text-wrap: pretty;
-    }
-
-    .about-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        column-gap: 0.35rem;
-        padding: 0.5rem 1.25rem;
-        font-family: var(--about-font);
-        font-size: 1rem;
-        font-weight: 500;
-        line-height: 1.5;
-        white-space: nowrap;
-        text-decoration: none;
-        color: var(--about-white);
-        background-color: var(--about-blue-300);
-        border: none;
-        border-radius: 3rem;
-        box-shadow: var(--about-shadow-medium);
-        transition: all 0.25s ease;
-    }
-
-    .about-btn:hover {
-        color: var(--about-white);
-        filter: brightness(1.1);
-        transform: translateY(-2px);
-    }
-
-    /* MOBILE & TABLET (default, di bawah 64rem): layout bertumpuk.
-       Rasio dikunci sama dengan foto asli (kantor.jpeg 1152x921) supaya
-       seluruh foto tampil pas, tidak terpotong. Tanpa blur dan tanpa fade. */
-    .about-image {
-        position: relative;
-        z-index: 5;
-        width: 100%;
-        max-width: 40rem;
-        aspect-ratio: 1152 / 921;
-        justify-self: center;
-        border-radius: 0.6rem;
-        overflow: hidden;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
-
-    .about-image::before {
-        content: none;
-    }
-
-    /* Tint gelap tipis di bagian bawah foto + "selimut" tint tipis merata
-       di seluruh foto supaya warnanya lebih menyatu dengan background band */
-    .about-image::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-        pointer-events: none;
-        background:
-            linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%),
-            rgba(13, 67, 88, 0.22);
-    }
-
-    /* ===== Ikon sosial media =====
-       Sekarang menyatu di bawah paragraf deskripsi (.about-text), horizontal
-       di semua ukuran layar, diapit garis kiri & kanan. */
-    .about-social {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        column-gap: 1.25rem;
-        width: 100%;
-        position: relative;
-        z-index: 5;
-    }
-
-    .about-social > a {
-        font-size: 1.5rem;
-        line-height: 1;
-        text-decoration: none;
-        color: var(--about-white);
-        transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    .about-social > a:hover {
-        opacity: 0.7;
-        transform: translateY(-2px);
-    }
-
-    .about-social::before,
-    .about-social::after {
-        content: "";
-        flex: 1 1 0;
-        height: 1.5px;
-        background: var(--about-white);
-    }
-
-    /* DESKTOP (>= 64rem): 2 kolom, foto dipojokkan ke kanan.
-       Foto dikeluarkan dari alur grid (absolute terhadap .about-content yang
-       selebar layar) dan menempel di tepi kanan, atas, dan bawah band.
-       Lebar foto = kolom kanan + jarak container ke tepi layar
-       (max(5vw, (lebar band - 75rem) / 2)), jadi tetap mentok kanan di
-       layar selebar apa pun. Kolom kanan ikut mengecil di laptop kecil
-       (44vw) supaya kotak foto tidak jadi terlalu sempit/tinggi. */
-    @media screen and (min-width: 64rem) {
-        .about-container {
-            --about-img-col: min(38rem, 44vw);
-            position: static; /* supaya foto mengacu ke .about-content */
-            grid-template-columns: minmax(0, 1fr) var(--about-img-col);
-            column-gap: 4rem;
-        }
-
-        .about-image {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: calc(var(--about-img-col) + max(5vw, (100% - 75rem) / 2));
-            max-width: none;
-            aspect-ratio: auto;
-            justify-self: auto;
-            border-radius: 0;
-            /* Sisi kiri foto tertutup fade, jadi fokus ke papan nama + fasad:
-               sedikit ke kanan, dan agak ke atas supaya papan tidak terpotong. */
-            background-position: 60% 20%;
-            /* Sisi kiri foto larut jadi transparan sehingga warna band
-               (#0d4358) di belakangnya langsung tampil: foto, blur, dan
-               background menyatu, tanpa garis/seam putih di tepi kiri.
-               (Tepi kiri sengaja 100% transparan, jadi tidak ada piksel
-               foto yang bisa "bocor" akibat pembulatan sub-piksel.) */
-            -webkit-mask-image: linear-gradient(90deg,
-                transparent 0%,
-                rgba(0, 0, 0, 0.03) 7%,
-                rgba(0, 0, 0, 0.10) 14%,
-                rgba(0, 0, 0, 0.22) 21%,
-                rgba(0, 0, 0, 0.35) 28%,
-                rgba(0, 0, 0, 0.50) 35%,
-                rgba(0, 0, 0, 0.65) 42%,
-                rgba(0, 0, 0, 0.78) 49%,
-                rgba(0, 0, 0, 0.90) 56%,
-                rgba(0, 0, 0, 0.97) 63%,
-                #000 70%);
-            mask-image: linear-gradient(90deg,
-                transparent 0%,
-                rgba(0, 0, 0, 0.03) 7%,
-                rgba(0, 0, 0, 0.10) 14%,
-                rgba(0, 0, 0, 0.22) 21%,
-                rgba(0, 0, 0, 0.35) 28%,
-                rgba(0, 0, 0, 0.50) 35%,
-                rgba(0, 0, 0, 0.65) 42%,
-                rgba(0, 0, 0, 0.78) 49%,
-                rgba(0, 0, 0, 0.90) 56%,
-                rgba(0, 0, 0, 0.97) 63%,
-                #000 70%);
-        }
-
-        /* Blur hanya di sisi kiri (sempit), memudar ke kanan lewat mask */
-        .about-image::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            -webkit-mask-image: linear-gradient(90deg,
-                #000 0%,
-                rgba(0, 0, 0, 0.97) 3%,
-                rgba(0, 0, 0, 0.90) 6%,
-                rgba(0, 0, 0, 0.78) 10%,
-                rgba(0, 0, 0, 0.65) 13%,
-                rgba(0, 0, 0, 0.50) 16%,
-                rgba(0, 0, 0, 0.35) 19%,
-                rgba(0, 0, 0, 0.22) 22%,
-                rgba(0, 0, 0, 0.10) 26%,
-                rgba(0, 0, 0, 0.03) 29%,
-                transparent 32%);
-            mask-image: linear-gradient(90deg,
-                #000 0%,
-                rgba(0, 0, 0, 0.97) 3%,
-                rgba(0, 0, 0, 0.90) 6%,
-                rgba(0, 0, 0, 0.78) 10%,
-                rgba(0, 0, 0, 0.65) 13%,
-                rgba(0, 0, 0, 0.50) 16%,
-                rgba(0, 0, 0, 0.35) 19%,
-                rgba(0, 0, 0, 0.22) 22%,
-                rgba(0, 0, 0, 0.10) 26%,
-                rgba(0, 0, 0, 0.03) 29%,
-                transparent 32%);
-        }
-
-        /* Fade ke warna section kini ditangani mask di .about-image, jadi
-           overlay teal horizontal tidak diperlukan lagi (itulah yang dulu
-           menimbulkan garis putih tipis di tepi kiri). Sisakan tint bawah. */
-        .about-image::after {
-            background:
-                linear-gradient(180deg, rgba(13, 67, 88, 0) 60%, rgba(13, 67, 88, 0.45) 100%),
-                rgba(13, 67, 88, 0.22);
-        }
-    }
-
     #tim-kami { scroll-margin-top: 90px; }
 
     /* ===== Tim Kami: card biasa, maksimal 3 kolom ===== */
@@ -1020,132 +792,208 @@
     .team-grid {
         position: relative;
         z-index: 5;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center; /* baris terakhir yang tidak penuh tetap rata tengah */
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 300px));
+        justify-content: center;
         gap: 24px;
-        max-width: 900px;
+        max-width: 972px;
         margin: 0 auto;
     }
 
-    /* Card berbentuk persegi (1:1): foto mengisi bagian atas, nama + jabatan di bawah */
-    /* ===== Card profil: foto latar + foto bulat menumpuk + konten miring ===== */
+    /* ===== Tim Kami - gaya Card 3 ===== */
     .team-card {
-        --tc-bg: #f1f5f6;
-        --tc-ink: #094356;
-        --tc-muted: #55666b;
+        --tc-bg: #ffffff;
+        --tc-ink: #333333;
+        --tc-muted: #707070;
+        --tc-accent: var(--title-color, #094356);
         position: relative;
         overflow: hidden;
-        width: 280px;
-        max-width: 100%;
-        height: 330px;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        min-height: 382px;
         text-align: center;
-        border-radius: 10px;
+        border-radius: 25px;
         background: var(--tc-bg);
-        box-shadow: 0 4px 16px rgba(9, 67, 86, 0.1);
-        transition: transform 0.35s ease, box-shadow 0.35s ease;
-    }
-    .team-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 16px 34px rgba(9, 67, 86, 0.2);
+        box-shadow: 0 8px 24px rgba(9, 67, 86, 0.10);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    /* Latar atas: foto anggota yang diburamkan, diberi lapisan teal supaya seragam */
-    .team-card-bg {
-        position: relative;
-        width: 100%;
-        height: 54%;
-        overflow: hidden;
-        background: #094356;
+    .team-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 18px 35px rgba(9, 67, 86, 0.18);
     }
-    .team-card-bg::after {
-        content: '';
+
+    .team-card-image-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 25px 0;
+        row-gap: 5px;
+        overflow: hidden;
+    }
+
+    .team-card-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(9, 67, 86, 0.38);
+        width: 100%;
+        height: 100%;
+        background: var(--tc-accent);
+        border-radius: 25px 25px 0 25px;
     }
-    .team-card-bg img {
+
+    .team-card-overlay::before,
+    .team-card-overlay::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: -40px;
+        width: 40px;
+        height: 40px;
+        background: var(--tc-accent);
+    }
+
+    .team-card-overlay::after {
+        border-radius: 0 25px 0 0;
+        background: var(--tc-bg);
+    }
+
+    .team-card-image {
+        position: relative;
+        z-index: 2;
+        width: 150px;
+        height: 150px;
+        padding: 3px;
+        border-radius: 50%;
+        background: var(--tc-bg);
+    }
+
+    .team-card-img {
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: center top;
-        filter: blur(6px);
-        transform: scale(1.25);
-    }
-
-    /* Foto bulat di tengah, separuh menumpuk di latar */
-    .team-card-avatar {
-        position: absolute;
-        left: 50%;
-        bottom: 50%;
-        width: 100px;
-        height: 100px;
         border-radius: 50%;
-        object-fit: cover;
-        object-position: center top;
-        border: 3px solid #ffffff;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-        transform: translateX(-50%);
-        z-index: 20;
+        border: 4px solid var(--tc-accent);
     }
 
-    /* Area konten dengan tepi atas miring */
     .team-card-content {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 50%;
-        padding: 16px 18px;
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 172px;
+        padding: 18px 14px;
         background: var(--tc-bg);
-        z-index: 10;
     }
-    .team-card-content::before {
-        content: '';
-        position: absolute;
-        left: 8px;
-        bottom: 40px;
-        width: 120%;
-        height: 100%;
-        background: var(--tc-bg);
-        transform: rotate(-13deg);
-        z-index: -1;
-    }
-    .team-card-content h3 {
+
+    .team-card-name {
         margin: 0;
-        font-family: 'Sora', sans-serif;
-        font-size: 1.05rem;
-        font-weight: 700;
-        line-height: 1.3;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 1.35;
         color: var(--tc-ink);
+        text-align: center;
         overflow-wrap: anywhere;
     }
+
     .team-card-role {
-        margin: 6px 0 0;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.85rem;
-        line-height: 1.4;
+        margin: 7px 0 0;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
         color: var(--tc-muted);
+        text-align: center;
+        overflow-wrap: anywhere;
     }
-    .team-card-divisi {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 3px 12px;
-        border-radius: 999px;
-        border: 1px solid var(--tc-ink);
-        color: var(--tc-ink);
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.72rem;
-        font-weight: 500;
+
+    .team-card-sosmed-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+    }
+
+    .team-card-sosmed {
+        --sm-bg: var(--tc-accent);
+        --sm-fg: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border-radius: 50%;
+        border: none;
+        background: var(--sm-bg);
+        color: var(--sm-fg);
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .team-card-sosmed:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 14px rgba(0, 0, 0, 0.16);
+    }
+
+    .team-card-sosmed i {
+        font-size: 18px;
+        line-height: 1;
+        color: inherit;
+    }
+
+    .team-card-sosmed.brand-text-ig { --sm-fg: #fff; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+    .team-card-sosmed.brand-text-fb { --sm-bg: #1877F2; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-in { --sm-bg: #0A66C2; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-gh { --sm-bg: #24292f; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-x  { --sm-bg: #000000; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-yt { --sm-bg: #FF0000; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-tt { --sm-bg: #000000; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-wa { --sm-bg: #25D366; --sm-fg: #fff; }
+    .team-card-sosmed.brand-text-link { --sm-bg: var(--tc-accent); --sm-fg: #fff; }
+
+    @media (max-width: 1000px) {
+        .team-grid {
+            grid-template-columns: repeat(2, minmax(0, 300px));
+            max-width: 624px;
+        }
     }
 
     @media (max-width: 560px) {
-        .team-grid { max-width: 300px; }
-        .team-card { width: 100%; }
+        .team-grid {
+            grid-template-columns: 1fr;
+            max-width: 330px;
+            gap: 20px;
+        }
+
+        .team-card {
+            width: 100%;
+            min-height: 370px;
+        }
+
+        .team-card-image {
+            width: 124px;
+            height: 124px;
+        }
     }
+
     @media (prefers-reduced-motion: reduce) {
-        .team-card, .team-card:hover { transition: none; transform: none; }
+        .team-card,
+        .team-card:hover,
+        .team-card-sosmed,
+        .team-card-sosmed:hover {
+            transition: none;
+            transform: none;
+        }
     }
 
     /* Gallery Section */
@@ -1156,23 +1004,19 @@
         margin: 0 -5vw;
         padding: 40px 5vw 80px;
         box-sizing: border-box;
-        /* Latar putih polos; animasi partikel digambar oleh lapisan .gallery-particles di bawah. */
         background: #ffffff;
-        isolation: isolate; /* lapisan partikel tidak "bocor" ke bagian lain halaman */
+        isolation: isolate; 
     }
     .gallery-section .section-heading p {
         color: #094356;
     }
     .gallery-inner {
         position: relative;
-        z-index: 1; /* selalu di atas lapisan partikel */
+        z-index: 1; 
         max-width: 1200px;
         margin: 0 auto;
     }
 
-    /* ===== Partikel cincin (CSS Houdini PaintWorklet, dari bg.html) =====
-       Hanya aktif di browser yang mendukung paint() (Chrome/Edge/Brave/Opera).
-       Di browser lain (Firefox/Safari) latar tetap putih polos, tanpa error. */
     .gallery-particles {
         position: absolute;
         inset: 0;
@@ -1190,7 +1034,6 @@
         @keyframes galleryRing { 0% { --ring-radius: 150; } 100% { --ring-radius: 250; } }
 
         .gallery-particles {
-            /* Posisi cincin dikunci di tengah galeri (50% / 50%), tidak mengikuti mouse atau scroll. */
             --ring-x: 50;
             --ring-y: 50;
             --ring-radius: 100;
@@ -1211,13 +1054,12 @@
             .gallery-particles { animation: none; }
         }
     }
-    /* ===== Galeri: filter + masonry ===== */
+    
     .gallery-section .section-heading { margin-bottom: 28px; }
 
-    /* Navbar filter: teks menu + garis bawah pada menu aktif */
     .gallery-filter {
-        --gf-text: #094356;
-        --gf-accent: #094356;
+        --gf-text: var(--title-color, #094356);
+        --gf-accent: var(--title-color, #094356);
         display: flex;
         justify-content: center;
         margin: 0 auto 40px;
@@ -1242,9 +1084,10 @@
         position: relative;
         flex: 0 0 auto;
         padding: 8px 2px 14px;
-        font-family: robert, Arial, sans-serif;
-        font-size: 0.95rem;
-        font-weight: 700;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.01em;
         line-height: 1.25;
         white-space: nowrap;
         color: var(--gf-text);
@@ -1256,7 +1099,6 @@
         transition: color 0.25s ease;
     }
 
-    /* Garis bawah */
     .gallery-filter-btn::after {
         content: "";
         position: absolute;
@@ -1294,7 +1136,6 @@
         border-radius: 4px;
     }
 
-    /* Grid masonry: tinggi tiap kartu dihitung JS dari rasio foto (potret / lanskap) */
     .gallery-grid {
         --g-gap: 12px;
         display: grid;
@@ -1322,7 +1163,7 @@
         position: relative;
         align-self: start;
         min-width: 0;
-        height: 240px; /* sementara, diatur ulang oleh JS */
+        height: 240px; 
         margin: 0;
         overflow: hidden;
         border-radius: 16px;
@@ -1332,7 +1173,6 @@
         transition: box-shadow 0.35s ease;
     }
 
-    /* Skeleton shimmer selama foto belum termuat */
     .gallery-card::before {
         content: "";
         position: absolute;
@@ -1389,16 +1229,15 @@
     }
 
     .gallery-title {
-        font-family: 'Sora', sans-serif;
+        font-family: 'Google Sans Flex', 'Sora', sans-serif;
         font-size: 1rem;
         font-weight: 800;
         line-height: 1.25;
         color: #ffffff;
     }
 
-    /* kategori: teks polos di bawah judul (tanpa card) */
     .gallery-cat {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
         font-size: 0.8rem;
         font-weight: 500;
         line-height: 1.4;
@@ -1430,7 +1269,6 @@
         transform: none;
     }
 
-    /* Layar sentuh (tanpa hover): caption selalu terlihat, ikon zoom disembunyikan */
     @media (hover: none) {
         .gallery-overlay { opacity: 1; transform: none; padding-top: 36px; }
         .gallery-zoom { display: none; }
@@ -1445,7 +1283,7 @@
     .gallery-empty {
         padding: 40px 0 10px;
         text-align: center;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
         color: #57676D;
     }
 
@@ -1478,7 +1316,6 @@
         .gallery-card.is-entering { animation: none; }
     }
 
-    /* ===== MOBILE RESPONSIVE TWEAKS ===== */
     @media (max-width: 768px) {
         .about-content {
             padding: 4rem 5vw 3.5rem;
@@ -1496,13 +1333,11 @@
         }
         .th-card-wrapper .section-heading { margin-bottom: 18px; }
 
-        /* Galeri lebih naik mendekati bagian tim */
         .gallery-section { padding: 28px 5vw 56px; }
         .gallery-section .section-heading { margin-bottom: 20px; }
         .gallery-filter { margin-bottom: 24px; }
     }
 
-    /* ===== LIGHTBOX MODAL CSS ===== */
     .custom-modal {
         display: none;
         position: fixed;
@@ -1525,7 +1360,6 @@
         opacity: 1;
     }
 
-    /* Pembungkus mengikuti ukuran foto, jadi tombol bisa menempel di foto */
     .modal-content-wrapper {
         position: relative;
         display: block;
@@ -1545,12 +1379,11 @@
         display: block;
         width: auto;
         height: auto;
-        max-width: calc(100vw - 170px); /* sisakan ruang untuk tombol kiri & kanan */
+        max-width: calc(100vw - 170px); 
         max-height: 84vh;
         object-fit: contain;
     }
 
-    /* Judul + kategori di bawah foto (gradien gelap, seperti kartu tim) */
     .modal-info {
         position: absolute;
         left: 0;
@@ -1568,7 +1401,7 @@
 
     .modal-info-title {
         margin: 0;
-        font-family: 'Sora', sans-serif;
+        font-family: 'Google Sans Flex', 'Sora', sans-serif;
         font-size: clamp(18px, 4vw, 26px);
         font-weight: 800;
         line-height: 1.25;
@@ -1577,7 +1410,7 @@
 
     .modal-info-cat {
         margin: 0;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Google Sans Flex', 'Poppins', sans-serif;
         font-size: clamp(12px, 2.5vw, 15px);
         font-weight: 500;
         line-height: 1.5;
@@ -1589,7 +1422,6 @@
     .modal-info-cat[hidden],
     .modal-nav-btn[hidden] { display: none; }
 
-    /* Tombol silang: kanan atas foto, merah */
     .close-modal {
         position: absolute;
         top: 12px;
@@ -1618,7 +1450,6 @@
         transform: rotate(90deg) scale(1.08);
     }
 
-    /* Tombol kiri/kanan: menempel di samping foto */
     .modal-nav-btn {
         position: absolute;
         top: 50%;
@@ -1649,7 +1480,6 @@
     .prev-btn { left: -60px; }
     .next-btn { right: -60px; }
 
-    /* Mobile: foto hampir selebar layar, tombol pindah ke dalam foto (kiri & kanan) */
     @media (max-width: 768px) {
         .modal-content { max-width: calc(100vw - 24px); max-height: 78vh; }
         .modal-info { padding: 44px 16px 16px; }
@@ -1671,8 +1501,7 @@
         to { transform: scale(1); opacity: 1; }
     }
 
-    /* ============ DARK MODE (html[data-theme="dark"]) ============
-       Latar hitam penuh pojok kiri-kanan, teks teal gelap diganti teal terang. */
+    /* DARK MODE */
     html[data-theme="dark"] .page-wrapper,
     html[data-theme="dark"] .zn-about,
     html[data-theme="dark"] .gallery-section,
@@ -1699,7 +1528,6 @@
         background-size: 200% 100%;
     }
 
-    /* Latar animasi partikel (dibuat lewat JS dengan warna inline terang) */
     html[data-theme="dark"] .particle-background #particle-canvas > div { background: #0a0f1a !important; }
 
     /* Tim Kami (dark mode) */
@@ -1707,11 +1535,18 @@
         --tc-bg: #151c2c;
         --tc-ink: #e8f1ee;
         --tc-muted: #9aa8a4;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        --tc-accent: #0d6078;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
     }
-    html[data-theme="dark"] .team-card:hover { box-shadow: 0 16px 34px rgba(0, 0, 0, 0.65); }
-    html[data-theme="dark"] .team-card-divisi { border-color: #8fd0bf; color: #8fd0bf; }
-    html[data-theme="dark"] .team-card-avatar { border-color: #151c2c; }
+    html[data-theme="dark"] .team-card:hover { box-shadow: 0 18px 36px rgba(0, 0, 0, 0.62); }
+    html[data-theme="dark"] .team-card-overlay,
+    html[data-theme="dark"] .team-card-overlay::before { background: var(--tc-accent); }
+    html[data-theme="dark"] .team-card-overlay::after { background: var(--tc-bg); }
+
+    /* Sosmed (dark mode): brand gelap dibalik jadi putih agar tetap terlihat */
+    html[data-theme="dark"] .team-card-sosmed.brand-text-gh,
+    html[data-theme="dark"] .team-card-sosmed.brand-text-x,
+    html[data-theme="dark"] .team-card-sosmed.brand-text-tt { --sm-bg: #f2f5f4; --sm-fg: #111; }
 </style>
 @endpush
 
@@ -1731,7 +1566,6 @@
   const clip = document.querySelector("#clip");
   const mask = document.querySelector(".mask-clip-path");
 
-  // Sumber video sama seperti file asli.
   const videos = [
     @json(asset('files/hero-1.mp4')),
     @json(asset('files/hero-2.mp4')),
@@ -1773,7 +1607,6 @@
   playVideo(bgVideo);
   playVideo(currentVideo);
 
-  // Preview video berpindah ke background seperti implementasi asli.
   miniClick?.addEventListener("click", (event) => {
     event.preventDefault();
     if (isAnimating || window.matchMedia("(pointer: coarse)").matches) return;
@@ -1830,8 +1663,6 @@
     }, 0);
   });
 
-  // Kondisi awal hero harus benar-benar full.
-  // Di mobile, efek crop baru dimulai setelah user mulai scroll.
   if (heroRow) {
     gsap.set(heroRow, {
       clipPath:"polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
@@ -1854,7 +1685,6 @@
     });
   }
 
-  // Efek crop utama yang membuka gambar saat discroll ke bawah.
   if (clip && mask) {
     gsap.timeline({
       scrollTrigger:{
@@ -1872,48 +1702,23 @@
     });
   }
 
-  // Animasi masuk teks hero.
-  gsap.set(".hero__label", {
-    y:60,
-    opacity:0,
-    scale:.98
-  });
-  gsap.set(".hero__btn", {
-    y:18,
-    opacity:0,
-    scale:0
-  });
+  gsap.set(".hero__label", { y:60, opacity:0, scale:.98 });
+  gsap.set(".hero__btn", { y:18, opacity:0, scale:0 });
 
   const heroIntro = gsap.timeline({
     defaults:{ease:"power2.out"},
-    scrollTrigger:{
-      trigger:".hero",
-      start:"top 85%",
-      once:true
-    }
+    scrollTrigger:{ trigger:".hero", start:"top 85%", once:true }
   });
 
   heroIntro
-    .to(".hero__label", {
-      y:0,
-      opacity:1,
-      scale:1,
-      duration:.45,
-      stagger:.09
-    }, 0)
-    .to(".hero__btn", {
-      y:0,
-      opacity:1,
-      scale:1,
-      duration:.38,
-      ease:"back.out(1.5)"
-    }, ">-0.13");
+    .to(".hero__label", { y:0, opacity:1, scale:1, duration:.45, stagger:.09 }, 0)
+    .to(".hero__btn", { y:0, opacity:1, scale:1, duration:.38, ease:"back.out(1.5)" }, ">-0.13");
 
-  // Efek crop: gambar Zentry membesar saat discroll.
   const znClip = document.querySelector("#znClip");
   const znMask = document.querySelector("#znMask");
   const znShade = document.querySelector("#znShade");
   const znCaptionItems = document.querySelectorAll("#znCaption > *");
+  
   if (znClip && znMask) {
     const znTl = gsap.timeline({
       scrollTrigger:{
@@ -1926,17 +1731,8 @@
       }
     });
 
-    // Tahap 1: gambar membesar sampai penuh layar
-    znTl.to(znMask, {
-      width:"100vw",
-      height:"100vh",
-      borderRadius:0,
-      ease:"none",
-      duration:2
-    });
+    znTl.to(znMask, { width:"100vw", height:"100vh", borderRadius:0, ease:"none", duration:2 });
 
-    // Tahap 2: setelah penuh (scroll paling bawah), teks deskripsi kantor muncul.
-    // Kalau di-scroll balik ke atas, teks otomatis menghilang lagi (scrub).
     if (znShade) znTl.fromTo(znShade, { autoAlpha:0 }, { autoAlpha:1, ease:"none", duration:1 });
     if (znCaptionItems.length) znTl.fromTo(znCaptionItems,
       { autoAlpha:0, y:40 },
@@ -1947,7 +1743,31 @@
 })();
 </script>
 <script>
-    /* ===== Animasi Scroll (GSAP + ScrollTrigger) ===== */
+    /* Sinkronkan warna: eyebrow "Tentang Kami", filter galeri, dan teks hero layer ke-2
+       mengikuti warna judul (.zn-about__title), termasuk saat warnanya diubah. */
+    (function () {
+        var title = document.querySelector('.zn-about__title');
+        if (!title) return;
+        var root = document.documentElement;
+        function sync() {
+            var c = getComputedStyle(title).color;
+            if (c && root.style.getPropertyValue('--title-color') !== c) {
+                root.style.setProperty('--title-color', c);
+            }
+        }
+        sync();
+        window.addEventListener('load', sync);
+        document.addEventListener('DOMContentLoaded', sync);
+        var mo = new MutationObserver(sync);
+        mo.observe(title, { attributes: true, attributeFilter: ['style', 'class'] });
+        mo.observe(document.head, { childList: true, subtree: true, characterData: true });
+        if (document.documentElement) {
+            mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+        }
+        setInterval(sync, 1000);
+    })();
+</script>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof gsap === 'undefined') return;
         gsap.registerPlugin(typeof ScrollTrigger !== 'undefined' ? ScrollTrigger : {});
@@ -1955,7 +1775,6 @@
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const hasST = typeof ScrollTrigger !== 'undefined';
 
-        // Jika user minta motion minim, cukup pastikan semua elemen 'reveal' terlihat normal.
         if (prefersReduced || !hasST) {
             document.querySelectorAll('.reveal, .about-header .eyebrow, .about-header h1, .subtitle, .about-text p, .about-image, .about-social a, .section-heading h2, .section-heading p, .gallery-filter-btn, .gallery-card').forEach(el => {
                 el.style.opacity = 1;
@@ -1964,7 +1783,6 @@
             return;
         }
 
-        /* --- Helper: pecah judul jadi per-kata untuk efek reveal bertingkat --- */
         function splitWords(el) {
             if (!el || el.dataset.split === '1') return [];
             const text = el.textContent.trim();
@@ -1983,14 +1801,8 @@
             });
         }
 
-        // toggleActions: [onEnter] [onLeave] [onEnterBack] [onLeaveBack]
-        // "restart reverse restart reverse" = tiap kali elemen masuk viewport (dari
-        // scroll ke bawah ATAU ke atas), animasi diputar ulang dari awal; tiap kali
-        // keluar viewport, animasi dibalik (fade/keluar lagi). Jadi animasi tidak
-        // hanya jalan sekali di awal, tapi berulang terus mengikuti arah scroll.
         const TOGGLE = 'restart reverse restart reverse';
 
-        /* ===== 1. HERO (ikut terpicu ulang saat scroll naik-turun) ===== */
         const heroEyebrow = document.querySelector('.about-header .eyebrow');
         const heroTitle = document.querySelector('.about-header h1');
         const heroSubtitle = document.querySelector('.about-header .subtitle');
@@ -2010,7 +1822,6 @@
                 .fromTo(heroSubtitle, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.55');
         }
 
-        /* ===== 2. ABOUT SECTION (teks, gambar, sosial media) ===== */
         const aboutSection = document.querySelector('.about-section');
         if (aboutSection) {
             const paras = aboutSection.querySelectorAll('.about-text p');
@@ -2031,7 +1842,6 @@
             aboutTl.fromTo(socialLinks, { autoAlpha: 0, y: 18, scale: 0.5 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'back.out(2.2)' }, '-=0.4');
         }
 
-        /* ===== 3. TIM KAMI (heading + kartu tim) ===== */
         const teamSection = document.querySelector('.team-section');
         if (teamSection) {
             const teamHeading = teamSection.querySelectorAll('.section-heading h2, .section-heading p');
@@ -2045,7 +1855,6 @@
                 .fromTo(teamSlider, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8 }, '-=0.35');
         }
 
-        /* ===== 4. GALERI KEGIATAN (heading, filter, kartu galeri) ===== */
         const gallerySection = document.querySelector('.gallery-section');
         if (gallerySection) {
             const galHeading = gallerySection.querySelectorAll('.section-heading h2, .section-heading p');
@@ -2059,9 +1868,6 @@
                 .fromTo(galHeading, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.12 })
                 .fromTo(filterBtns, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.05 }, '-=0.35');
 
-            // Dibuat sebagai fungsi supaya bisa dipanggil ulang setiap kali filter kategori diganti.
-            // Tanpa ini, posisi trigger lama (dan kartu yang tadinya display:none) membuat foto
-            // hasil filter tetap tersembunyi / nyangkut di posisi y yang salah.
             let galBatch = [];
             window.__galleryReveal = function () {
                 galBatch.forEach((t) => t.kill());
@@ -2087,7 +1893,6 @@
             window.__galleryReveal();
         }
 
-        // Refresh setelah semua gambar termuat agar posisi trigger akurat
         window.addEventListener('load', () => ScrollTrigger.refresh());
         setTimeout(() => ScrollTrigger.refresh(), 800);
     });
@@ -2122,7 +1927,6 @@
         let active = { type: 'all', value: 'all' };
         let rafId = null;
 
-        // Hitung tinggi tiap kartu dari rasio foto (potret tinggi, lanskap pendek)
         function layout() {
             const cs = getComputedStyle(grid);
             const rowH = parseFloat(cs.gridAutoRows) || 4;
@@ -2163,7 +1967,7 @@
 
                 if (ok) {
                     if (animate && !window.__galleryReveal) {
-                        void card.offsetWidth; // restart animasi
+                        void card.offsetWidth; 
                         card.style.animationDelay = Math.min(shown, 12) * 35 + 'ms';
                         card.classList.add('is-entering');
                     }
@@ -2174,17 +1978,14 @@
             if (emptyEl) emptyEl.hidden = shown !== 0;
             layout();
 
-            // Setelah filter diganti: reset & pasang ulang animasi reveal untuk foto yang tampil
             if (animate && window.__galleryReveal) {
                 requestAnimationFrame(window.__galleryReveal);
             }
         }
 
-        // Rasio & orientasi foto diambil setelah foto termuat
         function onImageReady(card, img) {
             if (img.naturalWidth && img.naturalHeight) {
                 const raw = img.naturalHeight / img.naturalWidth;
-                // dibatasi supaya foto ekstrem (panorama / sangat tinggi) tetap proporsional
                 card.dataset.ratio = Math.min(1.6, Math.max(0.55, raw)).toFixed(4);
                 card.dataset.orientation = raw > 1.05 ? 'portrait' : 'landscape';
             }
@@ -2219,8 +2020,6 @@
                     b.setAttribute('aria-pressed', on ? 'true' : 'false');
                 });
 
-                // Geser hanya baris tombol filter secara horizontal (jangan scrollIntoView,
-                // karena itu bisa ikut menggeser halaman secara vertikal).
                 const track = btn.parentElement;
                 if (track) {
                     const bR = btn.getBoundingClientRect();
@@ -2240,7 +2039,7 @@
         applyFilter(false);
     });
 
-    /* ===== LIGHTBOX MODAL JS (Dengan Fitur Slide) ===== */
+    /* ===== LIGHTBOX MODAL JS ===== */
     document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById("imageModal");
         const modalImg = document.getElementById("zoomedImage");
@@ -2251,7 +2050,6 @@
         const prevBtn = document.getElementById("modalPrev");
         const nextBtn = document.getElementById("modalNext");
         
-        // Daftar foto = hanya kartu yang sedang tampil (mengikuti filter aktif)
         function getImages() {
             return Array.from(document.querySelectorAll(".gallery-card"))
                 .filter((card) => !card.classList.contains("is-hidden"))
@@ -2262,21 +2060,18 @@
         let images = [];
         let currentIndex = 0;
 
-        // Buka gambar sesuai index
         function openModal(index) {
             currentIndex = index;
             updateModalContent();
             modal.classList.add("show");
         }
 
-        // Update gambar & caption pas digeser
         function updateModalContent() {
             const img = images[currentIndex];
             if (!img) return;
             modalImg.src = img.currentSrc || img.src;
             modalImg.alt = img.alt || "";
 
-            // Judul (tebal) + kategori (polos di bawahnya)
             const title = (img.getAttribute("data-caption") || "").trim();
             const cat = (img.getAttribute("data-category-label") || "").trim();
             modalTitle.textContent = title;
@@ -2285,13 +2080,11 @@
             modalCat.hidden = !cat;
             modalInfo.hidden = !title && !cat;
 
-            // Tombol kiri/kanan disembunyikan kalau hanya ada 1 foto
             const single = images.length < 2;
             if (prevBtn) prevBtn.hidden = single;
             if (nextBtn) nextBtn.hidden = single;
         }
 
-        // Fungsi Tombol Prev & Next
         function showPrev(e) {
             if (e) e.stopPropagation();
             if (!images.length) return;
@@ -2306,7 +2099,6 @@
             updateModalContent();
         }
 
-        // Klik / Enter pada kartu galeri (delegasi event)
         const galleryGrid = document.getElementById("galleryGrid");
         if (galleryGrid) {
             const openFromCard = (card) => {
@@ -2329,12 +2121,10 @@
             });
         }
 
-        // Event Tombol Navigasi Modal
         if (prevBtn) prevBtn.addEventListener("click", showPrev);
         if (nextBtn) nextBtn.addEventListener("click", showNext);
         if (closeBtn) closeBtn.addEventListener("click", () => modal.classList.remove("show"));
 
-        // Tutup Modal kalau background luar di-klik
         if (modal) {
             modal.addEventListener("click", function(e) {
                 if (e.target === modal || e.target.classList.contains('modal-content-wrapper')) {
@@ -2343,7 +2133,6 @@
             });
         }
 
-        // Kontrol Keyboard (Kiri-Kanan) khusus Lightbox (PERBAIKAN TYPO DI SINI)
         document.addEventListener('keydown', function(e) {
             if (!modal.classList.contains('show')) return;
             
@@ -2355,16 +2144,12 @@
 </script>
 
 <script>
-    /* ===== Partikel cincin di latar galeri (CSS Houdini PaintWorklet, dari bg.html) =====
-       Posisi cincin dikunci di tengah lewat CSS (.gallery-particles), jadi di sini cukup
-       mendaftarkan worklet-nya. Browser tanpa dukungan paint() (mis. Firefox/Safari)
-       melewati blok ini; latar tetap putih polos. */
     (function () {
         if (!('paintWorklet' in CSS)) return;
 
         CSS.paintWorklet
             .addModule('https://unpkg.com/css-houdini-ringparticles/dist/ringparticles.js')
-            .catch(function () { /* worklet gagal dimuat: biarkan latar putih polos */ });
+            .catch(function () {});
     })();
 </script>
 @endpush

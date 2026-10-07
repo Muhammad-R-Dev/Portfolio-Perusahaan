@@ -4,7 +4,22 @@
 @section('page-title', 'Kelola Blog')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
+		/* ===== Modal Crop Gambar (16:9, mengikuti tampilan kartu blog) ===== */
+		.crop-modal-box { max-width: 560px; width: 92%; }
+		.crop-modal-body { margin-bottom: 4px; }
+		.crop-container {
+			width: 100%; max-height: 420px; min-height: 240px;
+			background: transparent; overflow: hidden; border-radius: 12px;
+		}
+		.crop-container img { display: block; max-width: 100%; }
+		.crop-hint { margin-top: 10px; font-size: 12px; color: var(--dark-grey); text-align: center; }
+		.crop-container.crop-circle .cropper-view-box,
+		.crop-container.crop-circle .cropper-face { border-radius: 50%; }
+		/* Pastikan modal crop selalu tampil di DEPAN modal form tambah/edit */
+		#cropModal { z-index: 6000; }
+
 		#content main .head-title .btn-download {
 			height: 36px;
 			padding: 0 16px;
@@ -208,13 +223,12 @@
 			-webkit-line-clamp: 2;
 			-webkit-box-orient: vertical;
 		}
-		#content main .table-data .order table td.col-kategori span {
-			background: var(--light-blue);
-			color: var(--blue);
-			padding: 4px 12px;
-			border-radius: 20px;
-			font-size: 12px;
+		/* Kategori: teks sederhana, sama seperti kolom Judul (tanpa badge) */
+		#content main .table-data .order table td.col-kategori {
 			font-weight: 600;
+		}
+		#content main .table-data .order table td.col-kategori span {
+			text-transform: capitalize;
 			white-space: nowrap;
 		}
 		#content main .table-data .order table td.col-aksi {
@@ -543,6 +557,17 @@
 			background: var(--blue);
 			color: var(--light);
 		}
+		/* Tombol Batal/Terapkan pada modal Crop Gambar (gambar utama) -> merah & biru, konsisten di mode terang/gelap */
+		#cropModal .btn-cancel,
+		#cropModal .btn-cancel:hover {
+			background: var(--red);
+			color: var(--light);
+		}
+		#cropModal .btn-save,
+		#cropModal .btn-save:hover {
+			background: var(--blue);
+			color: var(--light);
+		}
 
 		/* WYSIWYG EDITOR */
 		.editor-box {
@@ -660,10 +685,10 @@
 			display: none;
 			align-items: center;
 			gap: 6px;
-			padding: 8px 18px;
-			background: var(--blue);
+			background: #f59e0b;
 			color: #fff;
 		}
+		.modal-box .btn-back:hover { filter: brightness(.92); }
 		.editor-toolbar .editor-toggle {
 			margin-left: auto;
 			width: auto;
@@ -688,9 +713,10 @@
 			overflow: hidden;
 			animation: focusExpand .2s ease;
 		}
-		#blogModal .modal-box.focus-mode .btn-back { display: inline-flex; }
-		#blogModal .modal-box.focus-mode .modal-head { justify-content: flex-start; }
-		#blogModal .modal-box.focus-mode .modal-head h2 { display: none; }
+		/* Mode zoom: Batal disembunyikan, Kembali (kuning) muncul di kiri tombol Simpan, header disembunyikan */
+		#blogModal .modal-box.focus-mode .modal-actions .btn-back { display: inline-flex; }
+		#blogModal .modal-box.focus-mode .modal-actions .btn-cancel { display: none; }
+		#blogModal .modal-box.focus-mode .modal-head { display: none; }
 		#blogModal .modal-box.focus-mode .form-grid {
 			flex: 1;
 			min-height: 0;
@@ -814,9 +840,10 @@
 		}
 		.chb-yt-preview > i { font-size: 46px; color: #ef4444; }
 		.chb-yt-preview iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+		/* Tombol Batal/Terapkan pada dialog Crop & YouTube di dalam editor blog -> merah & biru, selalu tampil (sebelumnya hanya berwarna di dark mode) */
+		.chb-dialog .btn-cancel, .chb-dialog .btn-cancel:hover { background: var(--red); color: #fff; }
+		.chb-dialog .btn-save, .chb-dialog .btn-save:hover { background: var(--blue); color: #fff; }
 		.chb-dialog .btn-save:disabled { opacity: .5; cursor: not-allowed; }
-		body.dark .chb-dialog .btn-save, body.dark .chb-dialog .btn-save:hover { background: var(--blue) !important; color: #fff !important; }
-		body.dark .chb-dialog .btn-cancel, body.dark .chb-dialog .btn-cancel:hover { background: var(--red) !important; color: #fff !important; }
 
 		/* FILE UPLOADER */
 		.modal-box .uploader {
@@ -840,9 +867,21 @@
 			color: var(--dark-grey);
 			padding: 20px;
 		}
-		.modal-box .uploader-empty .bx {
-			font-size: 34px;
+		.modal-box .uploader-shape {
+			width: 150px;
+			aspect-ratio: 16 / 9;
+			margin: 0 auto 10px;
+			border: 2px dashed var(--blue);
+			border-radius: 8px;
+			background: transparent;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.modal-box .uploader-shape .bx {
+			font-size: 28px;
 			color: var(--blue);
+			margin: 0;
 		}
 		.modal-box .uploader-empty p {
 			margin: 6px 0 2px;
@@ -853,6 +892,13 @@
 		.modal-box .uploader-empty span {
 			font-size: 11px;
 			color: var(--dark-grey);
+		}
+		.modal-box .uploader-empty .uploader-size-hint {
+			display: block;
+			margin-top: 4px;
+			font-size: 11px;
+			font-weight: 600;
+			color: var(--blue);
 		}
 		.modal-box .uploader-preview {
 			position: relative;
@@ -1118,10 +1164,15 @@
 
 		/* Tombol Kembali & Minimize editor tetap biru di dark mode */
 		body.dark #blogModal .editor-toggle,
-		body.dark #blogModal .editor-toggle:hover,
+		body.dark #blogModal .editor-toggle:hover {
+			background: var(--blue) !important;
+			color: #fff !important;
+		}
+
+		/* Tombol Kembali (mode zoom) kuning di dark mode */
 		body.dark #blogModal .btn-back,
 		body.dark #blogModal .btn-back:hover {
-			background: var(--blue) !important;
+			background: #f59e0b !important;
 			color: #fff !important;
 		}
 
@@ -1185,6 +1236,122 @@
 			color: #fff !important;
 		}
 
+
+
+		/* ============================================================
+		   DARK MODE - PALET LEBIH TERANG & BERLAPIS (slate-navy)
+		   (sama seperti Kelola Proyek)
+		     halaman  #1b2538  <  kartu  #25324a  <  input/hover  #34456a
+		   Hanya berlaku di area konten & modal halaman ini (sidebar tidak diubah).
+		   ============================================================ */
+		body.dark #content,
+		body.dark #content main,
+		body.dark .modal-overlay {
+			--light: #25324a;          /* kartu, modal, header tabel */
+			--grey: #34456a;           /* input, hover baris, border */
+			--dark: #eef2f9;           /* teks utama */
+			--dark-grey: #a9b8d2;      /* teks sekunder */
+			--light-blue: #2f4a7a;     /* baris terpilih */
+			--light-orange: #4d3b33;
+			--blue: #4f8ef7;
+			--red: #ef5a5a;
+		}
+		body.dark #content {
+			background: #1b2538 !important;
+		}
+		body.dark #content main .table-data .order table tbody tr:hover {
+			background: #2d3c5a !important;
+		}
+		body.dark .modal-box {
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+		}
+		body.dark .modal-box .uploader {
+			border-color: #4a5f8a;
+		}
+		body.dark #blogModal .form-group input:focus,
+		body.dark #blogModal .form-group select:focus,
+		body.dark #blogModal .form-group textarea:focus {
+			border-color: #4f8ef7 !important;
+			box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.25);
+		}
+		body.dark #blogModal .editor-box:focus-within {
+			border-color: #4f8ef7 !important;
+			box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.25);
+		}
+
+		/* ============================================================
+		   LIGHT MODE - AREA BERLAPIS AGAR MUDAH DIBEDAKAN
+		     halaman  #e9eef5  <  kartu putih (+ border & bayangan)  <  input #f1f5f9
+		   ============================================================ */
+		body:not(.dark) #content,
+		body:not(.dark) #content main,
+		body:not(.dark) .modal-overlay {
+			--light: #ffffff;          /* kartu, modal, header tabel */
+			--grey: #e2e8f0;           /* input, border */
+			--dark: #1e293b;           /* teks utama */
+			--dark-grey: #64748b;      /* teks sekunder */
+			--light-blue: #dbeafe;     /* baris terpilih */
+			--light-orange: #fee2e2;
+		}
+		body:not(.dark) #content {
+			background: #e9eef5 !important;
+		}
+		body:not(.dark) #content main .box-info li,
+		body:not(.dark) #content main .table-data > div {
+			border: 1px solid #d5deea;
+			box-shadow: 0 2px 8px rgba(30, 41, 59, 0.07);
+		}
+		body:not(.dark) #content main .table-data .order table tbody tr:hover {
+			background: #f1f5f9;
+		}
+		body:not(.dark) .modal-box input[type="text"],
+		body:not(.dark) .modal-box select,
+		body:not(.dark) .modal-box textarea {
+			background: #f1f5f9;
+			border-color: #cbd5e1;
+		}
+		body:not(.dark) .modal-box input[type="text"]:focus,
+		body:not(.dark) .modal-box select:focus,
+		body:not(.dark) .modal-box textarea:focus {
+			background: #fff;
+			border-color: #3b82f6;
+		}
+		body:not(.dark) .modal-box .uploader {
+			background: #f1f5f9;
+			border-color: #cbd5e1;
+		}
+		body:not(.dark) .editor-toolbar {
+			background: #f1f5f9;
+			border-bottom-color: #d5deea;
+		}
+		body:not(.dark) #blogModal .modal-actions {
+			background: #f8fafc;
+		}
+
+	#content main .head-title.page-header-fixed { position: fixed; z-index: 60; padding: 10px 0; margin: 0; }
+	#content main .table-data .order { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+	#content main .table-data .order thead th { position: sticky; top: 0; z-index: 2; background: var(--light); }
+
+		/* Kartu daftar: judul & header tabel menempel di atas, baris yang lewat tersembunyi di bawahnya */
+		@media screen and (min-width: 769px) {
+			#content main .table-data .order { isolation: isolate; padding: 0 24px 24px 24px; overflow-y: auto; overflow-x: hidden; }
+			#content main .table-data .order .head {
+				position: sticky; top: 0; z-index: 5; background: var(--light, #fff) !important; background-clip: padding-box;
+				margin: 0 -24px 0 -24px; padding: 24px 24px 16px 24px;
+			}
+			#content main .table-data .order table thead th {
+				position: sticky; top: var(--head-h, 0px); z-index: 4; background: var(--light, #fff) !important;
+				background-clip: padding-box; box-shadow: 0 1px 0 var(--grey);
+			}
+		}
+
+		/* Garis pembatas antar baris daftar (seperti daftar Tim) */
+		#content main .table-data .order table thead th {
+			border-bottom: 1px solid var(--grey);
+		}
+		#content main .table-data .order table tbody tr:not(:last-child) td {
+			border-bottom: 1px solid var(--grey);
+		}
 </style>
 @endpush
 
@@ -1212,6 +1379,16 @@
 				<div class="order">
 					<div class="head">
 						<h3>Daftar Blog</h3>
+						@php
+							// Kategori bawaan + kategori buatan sendiri yang sudah dipakai di data blog
+							$kategoriBawaan = ['project', 'berita', 'kegiatan'];
+							$kategoriLain = collect($kategoriTersimpan ?? $blogs->pluck('kategori'))
+								->map(fn ($k) => trim((string) $k))
+								->filter()
+								->unique(fn ($k) => strtolower($k))
+								->reject(fn ($k) => in_array(strtolower($k), $kategoriBawaan))
+								->values();
+						@endphp
 						<div class="table-toolbar">
 							<div class="search-box">
 								<i class='bx bx-search'></i>
@@ -1222,6 +1399,9 @@
 								<option value="project">Project</option>
 								<option value="berita">Berita</option>
 								<option value="kegiatan">Kegiatan</option>
+								@foreach($kategoriLain as $kat)
+								<option value="{{ strtolower($kat) }}">{{ ucfirst($kat) }}</option>
+								@endforeach
 							</select>
 							<!-- FILTER HALAMAN / ENTRIES -->
 							<select id="blogPerPage" class="filter-select" title="Tampilkan per halaman">
@@ -1240,6 +1420,7 @@
 							</div>
 						</div>
 					</div>
+					<div class="table-scroll">
 					<table id="blogTable">
 						<thead>
 							<tr>
@@ -1283,6 +1464,7 @@
 							</tr>
 						</tbody>
 					</table>
+					</div>
 
 					<!-- Form hapus disimpan terpisah di luar tabel, supaya TIDAK ikut terhapus
 					     saat kolom Aksi diganti jadi checkbox waktu mode pilih aktif. -->
@@ -1308,7 +1490,6 @@
 				<div class="modal-box">
 					<div class="modal-head">
 						<h2 id="modalTitle">Tambah Blog</h2>
-						<button type="button" class="btn btn-back" id="btnEditorBack"><i class='bx bx-arrow-back'></i> Kembali</button>
 					</div>
 
 					@if($errors->any())
@@ -1341,16 +1522,24 @@
 										<option value="project" {{ old('kategori') === 'project' ? 'selected' : '' }}>Project</option>
 										<option value="berita" {{ old('kategori') === 'berita' ? 'selected' : '' }}>Berita</option>
 										<option value="kegiatan" {{ old('kategori') === 'kegiatan' ? 'selected' : '' }}>Kegiatan</option>
+										@foreach($kategoriLain as $kat)
+										<option value="{{ $kat }}" {{ old('kategori') === $kat ? 'selected' : '' }}>{{ ucfirst($kat) }}</option>
+										@endforeach
+										<option value="__lainnya__">Lainnya... (ketik sendiri)</option>
 									</select>
+									<input type="text" id="inputKategoriLainnya" maxlength="50" placeholder="Ketik kategori baru" autocomplete="off" style="display:none; margin-top:8px;">
 								</div>
 
 								<div class="form-group">
 									<label>Gambar Utama</label>
 									<div class="uploader" id="uploaderBox">
 										<div class="uploader-empty" id="uploaderEmpty">
-											<i class='bx bx-cloud-upload'></i>
+											<div class="uploader-shape" aria-hidden="true">
+												<i class='bx bx-image-add'></i>
+											</div>
 											<p>Klik atau seret gambar ke sini</p>
 											<span>PNG, JPG, JPEG (maks. 2MB)</span>
+											<span class="uploader-size-hint">Ukuran pas: 1280 × 720 px (rasio 16:9)</span>
 										</div>
 										<div class="uploader-preview" id="uploaderPreview" style="display:none;">
 											<img src="" alt="Preview Gambar" id="previewImage">
@@ -1472,9 +1661,30 @@
 
 						<div class="modal-actions">
 							<button type="button" class="btn btn-cancel" id="btnCancelModal">Batal</button>
+							<button type="button" class="btn btn-back" id="btnEditorBack"><i class='bx bx-arrow-back'></i> Kembali</button>
 							<button type="submit" class="btn btn-save">Simpan</button>
 						</div>
 					</form>
+				</div>
+			</div>
+
+			<!-- Modal Crop Gambar (16:9, mengikuti tampilan kartu blog di halaman depan) -->
+			<div class="modal-overlay" id="cropModal">
+				<div class="modal-box crop-modal-box">
+					<div class="modal-head">
+						<h3>Sesuaikan Gambar</h3>
+						<i class='bx bx-x' onclick="closeCropModal()"></i>
+					</div>
+					<div class="crop-modal-body">
+						<div class="crop-container" id="cropContainer">
+							<img id="cropImageEl" src="" alt="Crop gambar">
+						</div>
+						<p class="crop-hint">Geser &amp; perbesar untuk mengatur area gambar. Rasio mengikuti tampilan kartu blog (16:9).</p>
+					</div>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-cancel" onclick="closeCropModal()">Batal</button>
+						<button type="button" class="btn btn-save" id="btnApplyCrop">Terapkan</button>
+					</div>
 				</div>
 			</div>
 
@@ -1560,7 +1770,69 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 <script>
+		/* ============================================================
+		   MODAL CROP GAMBAR — pakai Cropper.js
+		   Rasio tetap 16:9 agar pas dengan tampilan kartu blog di front-end.
+		   ============================================================ */
+		(function () {
+			const cropModal     = document.getElementById('cropModal');
+			const cropContainer = document.getElementById('cropContainer');
+			const cropImageEl   = document.getElementById('cropImageEl');
+			const btnApplyCrop  = document.getElementById('btnApplyCrop');
+			let cropper = null;
+			let cropApplyCallback = null;
+			let cropTargetInput = null;
+
+			window.openCropModal = function (file, aspectRatio, inputEl, onApply, circle) {
+				cropTargetInput = inputEl;
+				cropApplyCallback = onApply;
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					cropImageEl.src = e.target.result;
+					cropModal.classList.add('show');
+					cropContainer.classList.toggle('crop-circle', !!circle);
+					if (cropper) { cropper.destroy(); cropper = null; }
+					cropper = new Cropper(cropImageEl, {
+						aspectRatio: aspectRatio,
+						viewMode: 1,
+						autoCropArea: 1,
+						background: true,
+						responsive: true,
+						dragMode: 'move'
+					});
+				};
+				reader.readAsDataURL(file);
+			};
+
+			window.closeCropModal = function () {
+				cropModal.classList.remove('show');
+				if (cropper) { cropper.destroy(); cropper = null; }
+				if (cropTargetInput) { cropTargetInput.value = ''; }
+				cropTargetInput = null;
+				cropApplyCallback = null;
+			};
+
+			btnApplyCrop.addEventListener('click', function () {
+				if (!cropper || !cropApplyCallback) return;
+				const canvas = cropper.getCroppedCanvas({ imageSmoothingQuality: 'high' });
+				canvas.toBlob(function (blob) {
+					const croppedFile = new File([blob], 'blog-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+					const cb = cropApplyCallback;
+					const inputEl = cropTargetInput;
+					cropModal.classList.remove('show');
+					if (cropper) { cropper.destroy(); cropper = null; }
+					cropTargetInput = null;
+					cropApplyCallback = null;
+					cb(croppedFile, inputEl);
+				}, 'image/jpeg', 0.92);
+			});
+
+			// Catatan: modal crop SENGAJA tidak ditutup saat klik di luar area kartu.
+			// Pengguna harus menekan tombol "Batal" atau "Terapkan" untuk menutupnya.
+		})();
+
 		// ===== State editor gambar =====
 		let chbSelectedImg = null;
 		let chbSavedRange = null;
@@ -2749,11 +3021,15 @@
 
 		inputGambar.addEventListener('change', function () {
 			const file = this.files[0];
-			if (file) {
-				showImagePreview(file);
+			if (!file) return;
+			openCropModal(file, 16 / 9, inputGambar, function (croppedFile, inputEl) {
+				const dt = new DataTransfer();
+				dt.items.add(croppedFile);
+				inputEl.files = dt.files;
+				showImagePreview(croppedFile);
 				inputHapusGambar.value = '0';
 				gambarHint.textContent = '';
-			}
+			}, false);
 		});
 
 		['dragover', 'dragleave', 'drop'].forEach(function (evt) {
@@ -2771,12 +3047,15 @@
 		uploaderBox.addEventListener('drop', function (e) {
 			uploaderBox.classList.remove('dragover');
 			const file = e.dataTransfer.files[0];
-			if (file) {
-				inputGambar.files = e.dataTransfer.files;
-				showImagePreview(file);
+			if (!file) return;
+			openCropModal(file, 16 / 9, inputGambar, function (croppedFile, inputEl) {
+				const dt = new DataTransfer();
+				dt.items.add(croppedFile);
+				inputEl.files = dt.files;
+				showImagePreview(croppedFile);
 				inputHapusGambar.value = '0';
 				gambarHint.textContent = '';
-			}
+			}, false);
 		});
 
 		btnRemoveImage.addEventListener('click', function (e) {
@@ -2810,12 +3089,48 @@
 			imageZoomOverlay.classList.add('show'); imageZoomOverlay.scrollTop = 0;
 		}
 
+		// ===== Kategori: pilihan "Lainnya..." untuk mengetik kategori sendiri =====
+		const inputKategori = document.getElementById('inputKategori');
+		const inputKategoriLainnya = document.getElementById('inputKategoriLainnya');
+
+		function toggleKategoriLainnya() {
+			const aktif = inputKategori.value === '__lainnya__';
+			inputKategoriLainnya.style.display = aktif ? '' : 'none';
+			inputKategoriLainnya.required = aktif;
+			if (!aktif) inputKategoriLainnya.value = '';
+		}
+		inputKategori.addEventListener('change', function () {
+			toggleKategoriLainnya();
+			if (inputKategori.value === '__lainnya__') inputKategoriLainnya.focus();
+		});
+
+		// Cari option kategori yang sama (tanpa membedakan huruf besar/kecil)
+		function findKategoriOption(nilai) {
+			const target = String(nilai || '').trim().toLowerCase();
+			return Array.from(inputKategori.options).find(function (o) {
+				return o.value !== '__lainnya__' && o.value !== '' && o.value.toLowerCase() === target;
+			});
+		}
+
+		// Set kategori (dipakai saat edit); kalau belum ada di daftar, ditambahkan sebagai pilihan
+		function setKategoriValue(nilai) {
+			const val = String(nilai || '').trim();
+			let opt = findKategoriOption(val);
+			if (!opt && val) {
+				opt = new Option(val.charAt(0).toUpperCase() + val.slice(1), val);
+				inputKategori.insertBefore(opt, inputKategori.querySelector('option[value="__lainnya__"]'));
+			}
+			inputKategori.value = opt ? opt.value : '';
+			toggleKategoriLainnya();
+		}
+
 		// ===== Modal open/close =====
 		function openAddModal() {
 			isEditMode = false;
 			syncModalWithContentArea();
 			modalTitle.textContent = 'Tambah Blog';
 			blogForm.reset();
+			toggleKategoriLainnya();
 			blogForm.action = "{{ route('admin.kelola-blog.store') }}";
 			methodFieldWrapper.innerHTML = '';
 
@@ -2851,7 +3166,7 @@
 			methodFieldWrapper.innerHTML = '<input type="hidden" name="_method" value="PUT">';
 
 			document.getElementById('inputJudul').value = data.judul;
-			document.getElementById('inputKategori').value = data.kategori;
+			setKategoriValue(data.kategori);
 
 			document.getElementById('inputKontenEditor').innerHTML = data.konten || '';
 			chbReviveShapes();
@@ -2992,6 +3307,22 @@
 
 		// ===== Validasi sebelum submit =====
 		blogForm.addEventListener('submit', function (e) {
+			// Kategori "Lainnya...": jadikan teks yang diketik sebagai nilai kategori yang dikirim
+			if (inputKategori.value === '__lainnya__') {
+				const teks = inputKategoriLainnya.value.trim().replace(/\s+/g, ' ');
+				if (!teks) {
+					e.preventDefault();
+					inputKategoriLainnya.focus();
+					return;
+				}
+				let opt = findKategoriOption(teks);
+				if (!opt) {
+					opt = new Option(teks.charAt(0).toUpperCase() + teks.slice(1), teks);
+					inputKategori.insertBefore(opt, inputKategori.querySelector('option[value="__lainnya__"]'));
+				}
+				inputKategori.value = opt.value;
+			}
+
 			// Salin isi editor tanpa class sementara (terpilih / preview video sedang diputar)
 			const editorClone = document.getElementById('inputKontenEditor').cloneNode(true);
 			editorClone.querySelectorAll('.is-selected, .chb-playing').forEach(function (n) { n.classList.remove('is-selected', 'chb-playing'); });
@@ -3029,5 +3360,42 @@
 			chbNormalizeMedia();
 			document.getElementById('inputKonten').value = @json(old('konten', ''));
 		@endif
+
+	/* ===== Header diam di atas; kartu daftar bisa discroll (seperti Pengaturan Halaman) ===== */
+	(function () {
+		var main = document.querySelector('#content main');
+		var header = main ? main.querySelector('.head-title') : null;
+		var card = document.querySelector('#content main .table-data .order');
+		if (!main || !header || !card) return;
+		var spacer = null;
+		function pinHeader() {
+			if (header.classList.contains('page-header-fixed')) return;
+			var r = header.getBoundingClientRect();
+			spacer = document.createElement('div');
+			spacer.style.height = r.height + 'px';
+			header.parentNode.insertBefore(spacer, header.nextSibling);
+			header.style.top = r.top + 'px';
+			header.classList.add('page-header-fixed');
+		}
+		function syncLayout() {
+			var mainTop = main.getBoundingClientRect().top;
+			main.style.height = (window.innerHeight - mainTop) + 'px';
+			main.style.overflow = 'hidden';
+			var ref = spacer || header;
+			var hr = ref.getBoundingClientRect();
+			header.style.left = hr.left + 'px';
+			header.style.width = hr.width + 'px';
+			var cardTop = card.getBoundingClientRect().top;
+			var available = window.innerHeight - cardTop - 24;
+			if (available < 200) available = 200;
+			card.style.maxHeight = available + 'px';
+			var headEl = card.querySelector('.head');
+			if (headEl) card.style.setProperty('--head-h', headEl.offsetHeight + 'px');
+		}
+		pinHeader();
+		syncLayout();
+		window.addEventListener('resize', syncLayout);
+		setTimeout(syncLayout, 300);
+	})();
 </script>
 @endpush

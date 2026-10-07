@@ -3,6 +3,28 @@
 @section('title', 'Contact Us - PT Astabrata Teknologi')
 
 @section('content')
+@php
+    $siteSetting = $siteSetting ?? \App\Models\SiteSetting::first();
+
+    // Alamat & lokasi (fallback ke data lama bila belum diisi di admin)
+    $addrName = $siteSetting->address_name ?? null;
+    $addrFull = $siteSetting->address_full ?? 'Jl.STPP karanglo, Area Sawah/Kebun, Glagahombo,Tegalrejo, Magelang, Jawa Tengah 56192';
+    $mapLink  = $siteSetting->map_link ?? null;
+    // Peta: utamakan link Google Maps dari admin, lalu alamat, lalu koordinat lama
+    $mapSrc = ($siteSetting ? $siteSetting->mapEmbedUrl() : null)
+        ?? (!empty($siteSetting->address_full)
+            ? 'https://www.google.com/maps?q=' . urlencode(trim(($addrName ? $addrName . ', ' : '') . $addrFull)) . '&output=embed'
+            : 'https://www.google.com/maps?q=-7.4661805,110.2534664&output=embed');
+
+    // Nomor WhatsApp tujuan form amplop (dari admin; format internasional tanpa "+")
+    $waNumber = !empty($siteSetting->wa_number)
+        ? '62' . ltrim(preg_replace('/\D/', '', $siteSetting->wa_number), '0')
+        : '6287762166795'; // fallback nomor lama bila belum diisi
+
+    $contactSocials = $siteSetting
+        ? $siteSetting->socialLinks(['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'github'])
+        : [];
+@endphp
 <div class="contact-page">
 
     <!-- Header: breadcrumb + judul (pita abu-abu, full lebar layar) -->
@@ -16,8 +38,10 @@
         @endunless
         <br>
         <div class="contact-inner">
-            <h1>Hubungi Kami</h1>
-            <p class="hero-sub">Ceritakan kebutuhan Anda, tim kami akan membalas langsung lewat WhatsApp.</p>
+            @php $ps = \App\Models\PageSetting::for('contact'); @endphp
+            @include('partials.page-style', ['ps' => $ps])
+            <h1>{{ $ps->titleText() }}</h1>
+            <p class="hero-sub">{{ $ps->descriptionText() }}</p>
         </div>
     </header>
 
@@ -69,8 +93,8 @@
 
                 <div class="map">
                     <iframe
-                        title="Lokasi PT Astabrata Teknologi"
-                        src="https://www.google.com/maps?q=-7.4661805,110.2534664&output=embed"
+                        title="{{ $addrName ?: 'Lokasi PT Astabrata Teknologi' }}"
+                        src="{{ $mapSrc }}"
                         allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade">
@@ -96,7 +120,13 @@
                         <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
                         <div>
                             <strong>Alamat</strong>
-                            <span>Jl.STPP karanglo, Area Sawah/Kebun, Glagahombo,Tegalrejo, Magelang, Jawa Tengah 56192</span>
+                            <span>
+                                @if($addrName)<b>{{ $addrName }}</b><br>@endif
+                                {{ $addrFull }}
+                            </span>
+                            @if($mapLink)
+                                <a href="{{ $mapLink }}" target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>
+                            @endif
                         </div>
                     </li>
                 </ul>
@@ -118,11 +148,19 @@
 </div>
 
 <!-- Sidebar ikon sosial media, mengambang di tepi kiri layar (bisa dibuka/tutup) -->
+@if(count($contactSocials))
 <div class="social-sidebar" id="socialSidebar">
-    <a href="#" class="s-facebook" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-    <a href="#" class="s-twitter" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
-    <a href="#" class="s-linkedin" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-    <a href="#" class="s-instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+    @foreach($contactSocials as $social)
+        @php
+            $__sk = $social['key'] ?? 'link';
+            $__icon = $social['icon'] ?? 'bx-link';
+            $__label = $social['label'] ?? 'Social';
+        @endphp
+        <a href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer"
+           class="s-{{ $__sk }}" aria-label="{{ $__label }}">
+            <i class="bx {{ $__icon }}"></i>
+        </a>
+    @endforeach
     <a href="#" id="socialClose" class="social-toggle" aria-label="Tutup menu sosial media">
         <i class="fa-solid fa-chevron-left"></i>
     </a>
@@ -130,11 +168,12 @@
 <a href="#" id="socialOpen" class="social-toggle social-open" aria-label="Buka menu sosial media">
     <i class="fa-solid fa-chevron-right"></i>
 </a>
+@endif
 
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     .contact-page {
         /* Warna & font mudah diubah dari sini */
@@ -146,7 +185,7 @@
         --accent: #094356;
         --gutter: clamp(20px, 6vw, 110px); /* jarak isi dari tepi layar; card & pita abu-abu tetap full lebar */
 
-        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        font-family: 'Google Sans Flex', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
         color: var(--ink);
         background: #FFFFFF;
         -webkit-font-smoothing: antialiased;
@@ -623,6 +662,8 @@
     .s-twitter   { background-color: #1DA1F2; }
     .s-linkedin  { background-color: #0A66C2; }
     .s-instagram { background: linear-gradient(45deg, #F09433 0%, #E6683C 25%, #DC2743 50%, #CC2366 75%, #BC1888 100%); }
+    .s-youtube   { background-color: #FF0000; }
+    .s-github    { background-color: #24292E; }
     .social-sidebar .social-toggle { background: #094356; font-size: 0.8rem; }
     #socialOpen {
         position: fixed;
@@ -724,7 +765,7 @@
         const submitBtn = form ? form.querySelector('.submit-card') : null;
 
         // Nomor WhatsApp tujuan (format internasional tanpa "+", spasi, atau tanda hubung)
-        const WHATSAPP_NUMBER = '6287762166795';
+        const WHATSAPP_NUMBER = @json($waNumber);
 
         // Total durasi animasi amplop menutup (delay 1.25s + durasi 0.5s = 1.75s)
         const ENVELOPE_ANIMATION_MS = 1800;

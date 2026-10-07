@@ -38,7 +38,27 @@ class LoginController extends Controller
 
             // Kalau sebelumnya user coba akses halaman admin lain tanpa login,
             // dia akan diarahkan balik ke halaman itu. Kalau tidak ada, ke dashboard.
-            return redirect()->intended(route('admin.dashboard'));
+            $redirectUrl = $request->session()->pull('url.intended', route('admin.dashboard'));
+
+            // Request dari JS (fetch) di halaman login minta JSON, supaya bisa
+            // menampilkan pop up "Berhasil Masuk" dulu sebelum redirect.
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success'  => true,
+                    'message'  => 'Berhasil masuk. Selamat datang kembali!',
+                    'redirect' => $redirectUrl,
+                ]);
+            }
+
+            // Fallback kalau JS tidak jalan: tetap redirect seperti biasa.
+            return redirect($redirectUrl);
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Username atau kata sandi yang Anda masukkan salah.',
+            ], 422);
         }
 
         return back()

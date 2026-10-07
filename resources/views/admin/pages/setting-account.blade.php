@@ -169,6 +169,15 @@
 			border: 1px solid var(--dark-grey);
 			color: var(--dark);
 		}
+		/* Tombol Batal (edit akun): diisi warna merah, tulisan putih */
+		#content main .btn-save.btn-danger-filled {
+			background: var(--red);
+			color: #fff;
+			border: none;
+		}
+		#content main .btn-save.btn-danger-filled:hover {
+			opacity: .9;
+		}
 
 		#content main .form-actions {
 			display: flex;
@@ -276,6 +285,12 @@
 			border-color: var(--dark-grey) !important;
 			color: var(--dark) !important;
 		}
+		body.dark #content main .btn-save.btn-danger-filled,
+		body.dark #content main .btn-save.btn-danger-filled:hover {
+			background: var(--red) !important;
+			color: #fff !important;
+			border: none !important;
+		}
 		body.dark .modal-box .btn-cancel,
 		body.dark .modal-box .btn-cancel:hover {
 			background: var(--grey) !important;
@@ -310,6 +325,46 @@
 				grid-column: 1 / -1 !important;
 			}
 		}
+
+			#content main .account-col-form { min-height: 420px; }
+		}
+
+		@media screen and (max-width: 900px) {
+			#content main .account-grid { grid-template-columns: 1fr; }
+		}
+	/* ============================================================
+	   DARK MODE / LIGHT MODE
+	   Warna disamakan persis dengan palet halaman KELOLA BLOG
+	   (sama seperti Kelola Proyek & Dashboard):
+	     halaman #1b2538  <  kartu #25324a  <  input/hover #34456a  (dark)
+	     halaman #e9eef5  <  kartu putih                             (light)
+	   ============================================================ */
+	body.dark #content,
+	body.dark #content main {
+		--light: #25324a;          /* kartu, modal, header tabel */
+		--grey: #34456a;           /* input, hover baris, border */
+		--dark: #eef2f9;           /* teks utama */
+		--dark-grey: #a9b8d2;      /* teks sekunder */
+		--light-blue: #2f4a7a;     /* baris/ikon terpilih */
+		--light-orange: #4d3b33;
+		--blue: #4f8ef7;
+		--red: #ef5a5a;
+	}
+	body.dark #content {
+		background: #1b2538 !important;
+	}
+	body:not(.dark) #content,
+	body:not(.dark) #content main {
+		--light: #ffffff;          /* kartu, modal, header tabel */
+		--grey: #e2e8f0;           /* input, border */
+		--dark: #1e293b;           /* teks utama */
+		--dark-grey: #64748b;      /* teks sekunder */
+		--light-blue: #dbeafe;     /* baris/ikon terpilih */
+		--light-orange: #fee2e2;
+	}
+	body:not(.dark) #content {
+		background: #e9eef5 !important;
+	}
 </style>
 @endpush
 
@@ -358,78 +413,85 @@
 						<h3>Edit Akun</h3>
 					</div>
 
-					<form id="accountForm" action="{{ route('admin.setting.username.update') }}" method="POST">
-						@csrf
+					<div class="account-grid">
+						{{-- ===== KOLOM KIRI: Username & Password ===== --}}
+						<div class="account-col-form">
+							<form id="accountForm" action="{{ route('admin.setting.username.update') }}" method="POST">
+								@csrf
 
-						<div class="form-row-2col">
-							<div class="form-group" id="usernameGroup" style="grid-column: 1 / -1;">
-								<label for="username">Username</label>
-								<input type="text" class="form-control" id="username" name="username" value="{{ old('username', auth()->user()->username) }}" placeholder="Masukkan username" disabled>
-								@error('username')
-									<small class="hint" style="color:#a13e1e;">{{ $message }}</small>
-								@enderror
-								<small class="hint">Username ini digunakan untuk masuk (login) ke halaman admin.</small>
-							</div>
+								<div class="form-row-2col">
+									<div class="form-group" id="usernameGroup" style="grid-column: 1 / -1;">
+										<label for="username">Username</label>
+										<input type="text" class="form-control" id="username" name="username" value="{{ old('username', auth()->user()->username) }}" placeholder="Masukkan username" disabled>
+										@error('username')
+											<small class="hint" style="color:#a13e1e;">{{ $message }}</small>
+										@enderror
+										<small class="hint">Username ini digunakan untuk masuk (login) ke halaman admin.</small>
+									</div>
 
-							<div class="form-group" id="passwordDisplayGroup" style="grid-column: 1 / -1;">
-								<label for="password_display">Password</label>
-								<input type="password" class="form-control" id="password_display" value="password" disabled>
-								<small class="hint">Password disembunyikan demi keamanan.</small>
+									<div class="form-group" id="passwordDisplayGroup" style="grid-column: 1 / -1;">
+										<label for="password_display">Password</label>
+										<input type="password" class="form-control" id="password_display" value="password" disabled>
+										<small class="hint">Password disembunyikan demi keamanan.</small>
 
-								<button type="button" id="btnEditAccount" class="btn-save outline" style="margin-top:12px; height:38px; padding:0 20px; font-size:13px;">
-									<i class='bx bx-edit-alt'></i>
-									Edit
-								</button>
-							</div>
+										<button type="button" id="btnEditAccount" class="btn-save" style="margin-top:12px; height:38px; padding:0 20px; font-size:13px;">
+											<i class='bx bx-edit-alt'></i>
+											Edit
+										</button>
+									</div>
 
-							<div class="form-group" id="currentPasswordGroup" style="display:none;">
-								<label for="current_password">Sandi Saat Ini</label>
-								<div class="password-field">
-									<input type="password" class="form-control" id="current_password" name="current_password" placeholder="Masukkan sandi saat ini">
-									<i class='bx bx-show toggle-password' data-target="current_password"></i>
+									<div class="form-group" id="currentPasswordGroup" style="display:none; grid-column: 1 / -1;">
+										<label for="current_password">Sandi Saat Ini</label>
+										<div class="password-field">
+											<input type="password" class="form-control" id="current_password" name="current_password" placeholder="Masukkan sandi saat ini">
+											<i class='bx bx-show toggle-password' data-target="current_password"></i>
+										</div>
+										@error('current_password')
+											<small class="hint" style="color:#a13e1e;">{{ $message }}</small>
+										@enderror
+										<small class="hint">Wajib diisi kalau kamu mau ganti username atau sandi.</small>
+									</div>
+
+									<div class="form-group" id="newPasswordGroup" style="display:none;">
+										<label for="new_password">Sandi Baru</label>
+										<div class="password-field">
+											<input type="password" class="form-control" id="new_password" name="new_password" placeholder="Masukkan sandi baru">
+											<i class='bx bx-show toggle-password' data-target="new_password"></i>
+										</div>
+										@error('new_password')
+											<small class="hint" style="color:#a13e1e;">{{ $message }}</small>
+										@enderror
+										<small class="hint">Minimal 8 karakter, kombinasi huruf & angka.</small>
+									</div>
+
+									<div class="form-group" id="confirmNewPasswordGroup" style="display:none;">
+										<label for="new_password_confirmation">Konfirmasi Sandi Baru</label>
+										<div class="password-field">
+											<input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="Ulangi sandi baru">
+											<i class='bx bx-show toggle-password' data-target="new_password_confirmation"></i>
+										</div>
+									</div>
 								</div>
-								@error('current_password')
-									<small class="hint" style="color:#a13e1e;">{{ $message }}</small>
-								@enderror
-								<small class="hint">Wajib diisi kalau kamu mau ganti username atau sandi.</small>
-							</div>
 
-							<div class="form-group" id="newPasswordGroup" style="display:none;">
-								<label for="new_password">Sandi Baru</label>
-								<div class="password-field">
-									<input type="password" class="form-control" id="new_password" name="new_password" placeholder="Masukkan sandi baru">
-									<i class='bx bx-show toggle-password' data-target="new_password"></i>
-								</div>
-								@error('new_password')
-									<small class="hint" style="color:#a13e1e;">{{ $message }}</small>
-								@enderror
-								<small class="hint">Minimal 8 karakter, kombinasi huruf & angka.</small>
-							</div>
 
-							<div class="form-group" id="confirmNewPasswordGroup" style="display:none;">
-								<label for="new_password_confirmation">Konfirmasi Sandi Baru</label>
-								<div class="password-field">
-									<input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="Ulangi sandi baru">
-									<i class='bx bx-show toggle-password' data-target="new_password_confirmation"></i>
+								<div class="form-actions">
+									<button type="button" class="btn-save" id="btnSaveAccount"
+										data-username-action="{{ route('admin.setting.username.update') }}"
+										data-password-action="{{ route('admin.setting.password.update') }}"
+										style="display:none;">
+										<i class='bx bx-save'></i>
+										Simpan
+									</button>
+									<button type="button" class="btn-save btn-danger-filled" id="btnCancelEdit" style="display:none;">
+										Batal
+									</button>
 								</div>
-							</div>
+							</form>
 						</div>
 
-
-						<div class="form-actions">
-							<button type="button" class="btn-save" id="btnSaveAccount"
-								data-username-action="{{ route('admin.setting.username.update') }}"
-								data-password-action="{{ route('admin.setting.password.update') }}"
-								style="display:none;">
-								<i class='bx bx-save'></i>
-								Simpan
-							</button>
-							<button type="button" class="btn-save outline" id="btnCancelEdit" style="display:none;">
-								Batal
-							</button>
-						</div>
-					</form>
+					</div>
 				</div>
+
 
 			</div>
 
@@ -455,6 +517,8 @@
 					</div>
 				</div>
 			</div>
+
+
 
 			<!-- Modal Notifikasi Sukses -->
 			<div class="modal-overlay" id="successModal">
@@ -555,12 +619,6 @@
 			newPasswordGroup.style.display = '';
 			confirmNewPasswordGroup.style.display = '';
 
-			// Username hanya ambil kolom kiri, Konfirmasi Sandi Baru ditaruh di kolom kanan (baris yang sama)
-			usernameGroup.style.gridColumn = '1';
-			usernameGroup.style.gridRow = '1';
-			confirmNewPasswordGroup.style.gridColumn = '2';
-			confirmNewPasswordGroup.style.gridRow = '1';
-
 			btnSaveAccount.style.display = 'inline-flex';
 			btnCancelEdit.style.display = 'inline-flex';
 			btnEditAccount.style.display = 'none';
@@ -576,12 +634,6 @@
 			currentPasswordGroup.style.display = 'none';
 			newPasswordGroup.style.display = 'none';
 			confirmNewPasswordGroup.style.display = 'none';
-
-			// Kembalikan posisi Username ke full-width dan lepaskan posisi eksplisit Konfirmasi Sandi Baru
-			usernameGroup.style.gridColumn = '1 / -1';
-			usernameGroup.style.gridRow = '';
-			confirmNewPasswordGroup.style.gridColumn = '';
-			confirmNewPasswordGroup.style.gridRow = '';
 
 			currentPasswordInputEl.value = '';
 			newPasswordInput.value = '';
@@ -709,5 +761,7 @@
 		@if(session('success'))
 			showSuccessPopup(@json(session('success')));
 		@endif
-</script>
+
+
+	</script>
 @endpush

@@ -21,9 +21,13 @@ class BlogController extends Controller
         $totalBlog   = Blog::count();
         $totalTerbit = Blog::where('status', 'publish')->count();
         $totalDraft  = Blog::where('status', 'draft')->count();
-        
+
+        // Semua kategori yang sudah dipakai (untuk dropdown form & filter), tidak terbatas halaman paginasi
+        $kategoriTersimpan = Blog::query()->distinct()->pluck('kategori');
+
         return view('admin.pages.kelola-blog', compact(
             'blogs',
+            'kategoriTersimpan',
             'totalBlog',
             'totalTerbit',
             'totalDraft'
@@ -37,7 +41,7 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'judul'    => 'required|string|max:255',
-            'kategori' => 'required|in:project,berita,kegiatan',
+            'kategori' => 'required|string|max:50',
             'konten'   => 'required|string',
             'gambar'   => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
@@ -65,7 +69,7 @@ class BlogController extends Controller
     {
         $validated = $request->validate([
             'judul'    => 'required|string|max:255',
-            'kategori' => 'required|in:project,berita,kegiatan',
+            'kategori' => 'required|string|max:50',
             'konten'   => 'required|string',
             // gambar opsional saat edit — hanya wajib diisi kalau mau diganti
             'gambar'   => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

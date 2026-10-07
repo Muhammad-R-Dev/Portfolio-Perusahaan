@@ -234,15 +234,16 @@
     .form-col-right .form-group { flex: 1; min-height: 0; }
 
     /* ========== MODE ZOOM DESKRIPSI: editor membesar penuh, input lain disembunyikan ========== */
-    .modal-full-header .btn-back {
-        display: none; align-items: center; gap: 6px; padding: 8px 18px; border: none; cursor: pointer;
-        border-radius: 36px; background: var(--blue, #3b82f6); color: #fff; font-size: 14px; font-weight: 500;
+    .chb-modal .form-actions .btn-back {
+        display: none; align-items: center; gap: 6px; padding: 10px 24px; border: none; cursor: pointer;
+        border-radius: 36px; background: #f59e0b; color: #fff; font-size: 14px; font-weight: 500;
         font-family: var(--poppins), sans-serif; transition: 0.2s;
     }
-    .modal-full-header .btn-back:hover { filter: brightness(0.92); }
+    .chb-modal .form-actions .btn-back:hover { filter: brightness(0.92); }
     .chb-modal.modal-full.focus-mode { animation: chbFocusExpand .2s ease; }
-    .chb-modal.modal-full.focus-mode .btn-back { display: inline-flex; }
-    .chb-modal.modal-full.focus-mode .modal-title-wrap { display: none; }
+    .chb-modal.modal-full.focus-mode .form-actions .btn-back { display: inline-flex; }
+    .chb-modal.modal-full.focus-mode .form-actions .btn-cancel { display: none; }
+    .chb-modal.modal-full.focus-mode .modal-full-header { display: none; }
     .chb-modal.modal-full.focus-mode .modal-full-body { overflow: hidden; }
     .chb-modal.modal-full.focus-mode .form-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 100%; min-height: 0; }
     .chb-modal.modal-full.focus-mode .form-col-left { display: none; }
@@ -686,10 +687,10 @@
         color: #fff !important;
     }
 
-    /* Tombol "Kembali" (zoom mode deskripsi) tetap biru, tulisan putih */
-    body.dark .modal-full-header .btn-back,
-    body.dark .modal-full-header .btn-back:hover {
-        background: var(--blue) !important;
+    /* Tombol "Kembali" (zoom mode deskripsi) tetap kuning, tulisan putih */
+    body.dark .form-actions .btn-back,
+    body.dark .form-actions .btn-back:hover {
+        background: #f59e0b !important;
         color: #fff !important;
     }
 
@@ -712,6 +713,95 @@
     body.dark .modal-box .btn-danger:hover {
         background: var(--red) !important;
         color: #fff !important;
+    }
+
+    /* ============================================================
+       DARK MODE - PALET LEBIH TERANG & BERLAPIS (slate-navy)
+       Halaman, kartu, dan input punya level kecerahan berbeda
+       sehingga tiap area mudah dibedakan, tapi tetap tema gelap.
+         halaman  #1b2538  <  kartu  #25324a  <  input/hover  #34456a
+       Hanya berlaku di area konten & modal halaman ini (sidebar tidak diubah).
+       ============================================================ */
+    body.dark #content,
+    body.dark #content main,
+    body.dark .chb-modal-overlay,
+    body.dark .modal-overlay {
+        --light: #25324a;          /* kartu, modal, header tabel */
+        --grey: #34456a;           /* input, hover baris, border, toolbar */
+        --dark: #eef2f9;           /* teks utama */
+        --dark-grey: #a9b8d2;      /* teks sekunder */
+        --light-blue: #2f4a7a;     /* baris terpilih, drop-zone hover */
+        --light-orange: #4d3b33;
+        --blue: #4f8ef7;
+        --red: #ef5a5a;
+    }
+    body.dark #content {
+        background: #1b2538 !important;
+    }
+    body.dark #content main .table-data .client table tbody tr:hover {
+        background: #2d3c5a !important;
+    }
+    body.dark .chb-modal .form-group input:focus,
+    body.dark .chb-modal .form-group select:focus {
+        border-color: #4f8ef7 !important;
+        box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.25);
+    }
+    body.dark .chb-modal.modal-full,
+    body.dark .modal-box {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ============================================================
+       LIGHT MODE - AREA BERLAPIS AGAR MUDAH DIBEDAKAN
+         halaman  #e9eef5  <  kartu putih (+ border & bayangan)  <  input #f1f5f9
+       ============================================================ */
+    body:not(.dark) #content,
+    body:not(.dark) #content main,
+    body:not(.dark) .chb-modal-overlay,
+    body:not(.dark) .modal-overlay {
+        --light: #ffffff;          /* kartu, modal, header tabel */
+        --grey: #e2e8f0;           /* input, border, toolbar */
+        --dark: #1e293b;           /* teks utama */
+        --dark-grey: #64748b;      /* teks sekunder */
+        --light-blue: #dbeafe;     /* baris terpilih, drop-zone hover */
+        --light-orange: #fee2e2;
+    }
+    body:not(.dark) #content {
+        background: #e9eef5 !important;
+    }
+    body:not(.dark) #content main .box-info li,
+    body:not(.dark) #content main .table-data > div {
+        border: 1px solid #d5deea;
+        box-shadow: 0 2px 8px rgba(30, 41, 59, 0.07);
+    }
+    body:not(.dark) #content main .table-data .client table tbody tr:hover {
+        background: #f1f5f9 !important;
+    }
+    body:not(.dark) .chb-modal .form-group input,
+    body:not(.dark) .chb-modal .form-group select,
+    body:not(.dark) .chb-modal .form-group textarea {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+    }
+    body:not(.dark) .chb-modal .field-card {
+        border-color: #d5deea !important;
+        background: #fff !important;
+    }
+    body:not(.dark) .chb-modal .form-group input:focus,
+    body:not(.dark) .chb-modal .form-group select:focus {
+        background: #fff !important;
+        border-color: #3b82f6 !important;
+    }
+    body:not(.dark) .editor-toolbar {
+        background: #f1f5f9 !important;
+        border-bottom-color: #d5deea !important;
+    }
+    body:not(.dark) .modal-full-header,
+    body:not(.dark) .chb-modal.modal-full .form-actions {
+        background: #f8fafc !important;
+    }
+    body:not(.dark) .chb-modal.modal-full .modal-full-body {
+        background: #eef2f7;
     }
 
     /* ---------- Modal hasil import ---------- */
@@ -749,6 +839,18 @@
         color: var(--dark-grey) !important;
     }
 
+
+
+	#content main .head-title.page-header-fixed { position: fixed; z-index: 60; padding: 10px 0; margin: 0; }
+	#content main .table-data .client { isolation: isolate; padding: 0 24px 24px 24px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+	#content main .table-data .client .head {
+		position: sticky; top: 0; z-index: 5; background: var(--light, #fff) !important; background-clip: padding-box;
+		margin: 0 -24px 0 -24px; padding: 24px 24px 16px 24px;
+	}
+	#content main .table-data .client thead th {
+		position: sticky; top: var(--head-h, 0px); z-index: 4; background: var(--light, #fff) !important; background-clip: padding-box;
+		box-shadow: 0 1px 0 var(--grey);
+	}
 </style>
 @endpush
 
@@ -840,6 +942,7 @@
                     </div>
                 </div>
             </div>
+            <div class="table-scroll">
             <table>
                 <thead>
                     <tr>
@@ -857,6 +960,7 @@
                     {{-- Diisi JavaScript --}}
                 </tbody>
             </table>
+            </div>
             <!-- Area Pagination (Halaman) -->
             <div id="clientPagination" class="pagination-container"></div>
         </div>
@@ -870,7 +974,6 @@
                     <h3 id="chbFormModalTitle">Tambah Data Client</h3>
                     <div class="modal-subtitle">Lengkapi data pokok di kiri, tulis deskripsi project di kanan.</div>
                 </div>
-                <button type="button" class="btn-back" id="chbBtnEditorBack"><i class='bx bx-arrow-back'></i> Kembali</button>
             </div>
 
             <form id="chbClientForm" onsubmit="chbProcessFormSubmit(event)">
@@ -975,6 +1078,7 @@
 
                 <div class="form-actions">
                     <button type="button" class="btn-cancel" onclick="chbCloseFormModal()">Batal</button>
+                    <button type="button" class="btn-back" id="chbBtnEditorBack"><i class='bx bx-arrow-back'></i> Kembali</button>
                     <button type="submit" class="btn-save"><i class='bx bx-save'></i> Simpan Data</button>
                 </div>
             </form>
@@ -2105,5 +2209,42 @@
             if (e.key === 'Escape') closeDbLightbox(); if (e.key === 'ArrowLeft') slideDbLightbox(-1); if (e.key === 'ArrowRight') slideDbLightbox(1);
         });
     }
+
+	/* ===== Header diam di atas; kartu daftar bisa discroll (seperti Pengaturan Halaman) ===== */
+	(function () {
+		var main = document.querySelector('#content main');
+		var header = main ? main.querySelector('.head-title') : null;
+		var card = document.querySelector('#content main .table-data .client');
+		if (!main || !header || !card) return;
+		var spacer = null;
+		function pinHeader() {
+			if (header.classList.contains('page-header-fixed')) return;
+			var r = header.getBoundingClientRect();
+			spacer = document.createElement('div');
+			spacer.style.height = r.height + 'px';
+			header.parentNode.insertBefore(spacer, header.nextSibling);
+			header.style.top = r.top + 'px';
+			header.classList.add('page-header-fixed');
+		}
+		function syncLayout() {
+			var mainTop = main.getBoundingClientRect().top;
+			main.style.height = (window.innerHeight - mainTop) + 'px';
+			main.style.overflow = 'hidden';
+			var ref = spacer || header;
+			var hr = ref.getBoundingClientRect();
+			header.style.left = hr.left + 'px';
+			header.style.width = hr.width + 'px';
+			var cardTop = card.getBoundingClientRect().top;
+			var available = window.innerHeight - cardTop - 24;
+			if (available < 200) available = 200;
+			card.style.maxHeight = available + 'px';
+			var headEl = card.querySelector('.head');
+			if (headEl) card.style.setProperty('--head-h', headEl.offsetHeight + 'px');
+		}
+		pinHeader();
+		syncLayout();
+		window.addEventListener('resize', syncLayout);
+		setTimeout(syncLayout, 300);
+	})();
 </script>
 @endpush

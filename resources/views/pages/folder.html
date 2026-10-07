@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Folder Big Icon</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #F1CC38;
+    }
+
+    .folder {
+      -webkit-perspective: 500px;
+      perspective: 500px;
+      width: 340px;
+      height: 140px;
+      background: tomato;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      border-top-right-radius: 5px;
+      cursor: pointer;
+      -webkit-transition: all 400ms ease;
+      transition: all 400ms ease;
+    }
+
+    .folder::before {
+      width: 80px;
+      height: 20px;
+      content: '';
+      background: tomato;
+      position: absolute;
+      top: -20px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    .folder::after {
+      width: 340px;
+      height: 210px;
+      position: absolute;
+      content: '';
+      background: #ff4523;
+      top: 40px;
+      box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      -webkit-transform: rotateX(-10deg);
+      transform: rotateX(-10deg);
+      -webkit-transition: all 400ms ease;
+      transition: all 400ms ease;
+    }
+
+    .folder-inside {
+      width: 320px;
+      height: 200px;
+      position: absolute;
+      background: #fff;
+      top: 20px;
+      left: 10px;
+      box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.05);
+      -webkit-transform: rotate(-1deg);
+      transform: rotate(-1deg);
+      border: 1px solid #ddd;
+      -webkit-transition: all 200ms ease;
+      transition: all 200ms ease;
+    }
+
+    .folder-inside::before {
+      content: '';
+      background: -webkit-repeating-linear-gradient(
+        145deg,
+        #fff,
+        #fff 10px,
+        #333 7px,
+        #333 20px
+      );
+
+      background: repeating-linear-gradient(
+        0deg,
+        #fff,
+        #fff 10px,
+        #333 10px,
+        #333 20px
+      );
+
+      position: absolute;
+      top: -37px;
+      left: 65px;
+      width: 200px;
+      height: 290px;
+      color: #343434;
+      font-size: 60px;
+      line-height: 30px;
+      -webkit-transform: rotate(-90deg);
+      transform: rotate(-90deg);
+      opacity: 0.15;
+    }
+
+    .folder:hover {
+      -webkit-transform: translate(-50%, -52%);
+      transform: translate(-50%, -52%);
+    }
+
+    .folder:hover::after {
+      -webkit-transform: rotateX(-15deg);
+      transform: rotateX(-15deg);
+    }
+
+    .folder:hover .folder-inside {
+      -webkit-transform: rotate(-7deg) translateY(-15%);
+      transform: rotate(-7deg) translateY(-15%);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="folder">
+      <div class="folder-inside"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+</body>
+
+</html>

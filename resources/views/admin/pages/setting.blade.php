@@ -9,7 +9,7 @@
 	#content main .settings-menu-list {
 		display: grid;
 		/* 2 kolom, 3 baris, urutan diisi turun ke bawah dulu:
-		   item 1-3 di kiri, item 4-6 di kanan */
+		   item 1-3 di kiri, item 4-5 di kanan */
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		grid-template-rows: repeat(3, auto);
 		grid-auto-flow: column;
@@ -103,6 +103,46 @@
 			font-size: 22px;
 		}
 	}
+
+	/* ============================================================
+	   DARK MODE / LIGHT MODE
+	   Warna disamakan persis dengan palet halaman KELOLA BLOG
+	   (sama seperti Kelola Proyek & Dashboard):
+	     halaman #1b2538  <  kartu #25324a  <  input/hover #34456a  (dark)
+	     halaman #e9eef5  <  kartu putih                             (light)
+	   ============================================================ */
+	body.dark #content,
+	body.dark #content main {
+		--light: #25324a;          /* kartu, modal, header tabel */
+		--grey: #34456a;           /* input, hover baris, border */
+		--dark: #eef2f9;           /* teks utama */
+		--dark-grey: #a9b8d2;      /* teks sekunder */
+		--light-blue: #2f4a7a;     /* baris/ikon terpilih */
+		--light-orange: #4d3b33;
+		--blue: #4f8ef7;
+		--red: #ef5a5a;
+	}
+	body.dark #content {
+		background: #1b2538 !important;
+	}
+	/* Halaman menu Settings isinya pendek, jadi #content perlu dipaksa
+	   setinggi layar supaya warna latar menutupi sampai ke bawah
+	   (tidak berhenti di akhir konten). */
+	#content {
+		min-height: 100vh;
+	}
+	body:not(.dark) #content,
+	body:not(.dark) #content main {
+		--light: #ffffff;          /* kartu, modal, header tabel */
+		--grey: #e2e8f0;           /* input, border */
+		--dark: #1e293b;           /* teks utama */
+		--dark-grey: #64748b;      /* teks sekunder */
+		--light-blue: #dbeafe;     /* baris/ikon terpilih */
+		--light-orange: #fee2e2;
+	}
+	body:not(.dark) #content {
+		background: #e9eef5 !important;
+	}
 </style>
 @endpush
 
@@ -137,7 +177,7 @@
 				<a href="{{ route('admin.setting.navbar') }}" class="settings-menu-item c-orange">
 					<div class="icon-wrap"><i class='bx bxs-dashboard'></i></div>
 					<div class="text-wrap">
-						<h3>Pengaturan Navbar &amp; Header</h3>
+						<h3>Pengaturan Header &amp; Footer</h3>
 						<p>Atur logo, judul situs, dan tampilan navbar/header yang muncul di halaman admin.</p>
 					</div>
 					<span class="go-link"><i class='bx bx-right-arrow-alt'></i></span>
@@ -152,30 +192,22 @@
 					<span class="go-link"><i class='bx bx-right-arrow-alt'></i></span>
 				</a>
 
-				{{-- ===== KOLOM KANAN (item 4-6) ===== --}}
-				<a href="{{ route('admin.setting.welcome') }}" class="settings-menu-item c-dark">
-					<div class="icon-wrap"><i class='bx bxs-happy-heart-eyes'></i></div>
-					<div class="text-wrap">
-						<h3>Welcome</h3>
-						<p>Ubah judul, teks, dan gambar yang dilihat pengguna di halaman welcome.</p>
-					</div>
-					<span class="go-link"><i class='bx bx-right-arrow-alt'></i></span>
-				</a>
-
-				<a href="{{ route('admin.setting.banner') }}" class="settings-menu-item c-blue">
-					<div class="icon-wrap"><i class='bx bxs-image'></i></div>
-					<div class="text-wrap">
-						<h3>Pengaturan Banner</h3>
-						<p>Ganti gambar latar hero section di halaman Blog, Layanan, dan About.</p>
-					</div>
-					<span class="go-link"><i class='bx bx-right-arrow-alt'></i></span>
-				</a>
+				{{-- ===== KOLOM KANAN (item 4-5) ===== --}}
 
 				<a href="{{ route('admin.setting.contact') }}" class="settings-menu-item c-orange">
 					<div class="icon-wrap"><i class='bx bxs-phone-call'></i></div>
 					<div class="text-wrap">
 						<h3>Kontak &amp; Lokasi</h3>
 						<p>Atur nomor WhatsApp, link sosial media, alamat kantor, dan link Google Maps.</p>
+					</div>
+					<span class="go-link"><i class='bx bx-right-arrow-alt'></i></span>
+				</a>
+
+				<a href="{{ Route::has('admin.setting.pages') ? route('admin.setting.pages') : '#' }}" class="settings-menu-item c-yellow">
+					<div class="icon-wrap"><i class='bx bxs-file-blank'></i></div>
+					<div class="text-wrap">
+						<h3>Pengaturan Halaman</h3>
+						<p>Atur judul, deskripsi, gambar Welcome, dan warna tampilan tiap halaman.</p>
 					</div>
 					<span class="go-link"><i class='bx bx-right-arrow-alt'></i></span>
 				</a>

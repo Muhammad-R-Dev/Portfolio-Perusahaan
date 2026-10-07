@@ -1,16 +1,54 @@
+@php
+    // Warna footer dari pengaturan admin (Settings > Header & Footer). Jika kosong/tidak valid, pakai warna bawaan.
+    $__footSet = $siteSetting ?? null;
+    if (class_exists(\App\Models\SiteSetting::class)) {
+        try {
+            $__footFresh = \App\Models\SiteSetting::first();
+            if ($__footFresh) { $__footSet = $__footFresh; }
+        } catch (\Throwable $e) {
+            // abaikan, pakai $siteSetting bawaan
+        }
+    }
+    $__footColor = function ($key, $default) use ($__footSet) {
+        $v = $__footSet->{$key} ?? null;
+        return (is_string($v) && preg_match('/^#[0-9a-fA-F]{6}$/', $v)) ? $v : $default;
+    };
+    $__footRgb = function ($hex) {
+        $h = ltrim($hex, '#');
+        return hexdec(substr($h, 0, 2)) . ', ' . hexdec(substr($h, 2, 2)) . ', ' . hexdec(substr($h, 4, 2));
+    };
+    $__ftBgL = $__footColor('footer_bg_light', '#094356');
+    $__ftTxL = $__footColor('footer_text_light', '#ffffff');
+    $__ftBgD = $__footColor('footer_bg_dark', '#1c2842');
+    $__ftTxD = $__footColor('footer_text_dark', '#ffffff');
+@endphp
+<style>
+    :root {
+        --ft-bg: {{ $__ftBgL }};
+        --ft-bg-rgb: {{ $__footRgb($__ftBgL) }};
+        --ft-text: {{ $__ftTxL }};
+        --ft-text-rgb: {{ $__footRgb($__ftTxL) }};
+    }
+    html[data-theme="dark"] {
+        --ft-bg: {{ $__ftBgD }};
+        --ft-bg-rgb: {{ $__footRgb($__ftBgD) }};
+        --ft-text: {{ $__ftTxD }};
+        --ft-text-rgb: {{ $__footRgb($__ftTxD) }};
+    }
+</style>
 <style>
 /* ============ FOOTER CTA BANNER ============ */
 .footer-cta {
     position: relative;
-    background-color: #094356;
+    background-color: var(--ft-bg);
     background-image:
         linear-gradient(90deg,
-            #094356 0%,
-            #094356 32%,
-            rgba(9, 67, 86, 0.92) 45%,
-            rgba(9, 67, 86, 0.55) 62%,
-            rgba(9, 67, 86, 0.15) 80%,
-            rgba(9, 67, 86, 0) 100%
+            var(--ft-bg) 0%,
+            var(--ft-bg) 32%,
+            rgba(var(--ft-bg-rgb), 0.92) 45%,
+            rgba(var(--ft-bg-rgb), 0.55) 62%,
+            rgba(var(--ft-bg-rgb), 0.15) 80%,
+            rgba(var(--ft-bg-rgb), 0) 100%
         ),
         url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
     background-repeat: no-repeat;
@@ -30,13 +68,13 @@
 }
 .footer-cta-text h3 {
     font-family: 'Sora', sans-serif;
-    color: #ffffff;
+    color: var(--ft-text);
     font-size: 1.9rem;
     font-weight: 700;
     margin: 0 0 0.6rem;
 }
 .footer-cta-text p {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(var(--ft-text-rgb), 0.75);
     font-size: 1rem;
     margin: 0;
 }
@@ -50,8 +88,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    background: #ffffff;
-    color: #094356;
+    background: var(--ft-text);
+    color: var(--ft-bg);
     font-weight: 600;
     font-size: 0.95rem;
     padding: 0.9rem 1.6rem;
@@ -69,7 +107,7 @@
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    color: #ffffff;
+    color: var(--ft-text);
     font-weight: 600;
     font-size: 1rem;
     text-decoration: none;
@@ -82,17 +120,17 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    background: rgba(var(--ft-text-rgb), 0.15);
+    color: var(--ft-text);
 }
 
 @media (max-width: 768px) {
     .footer-cta {
         background-image:
             linear-gradient(180deg,
-                rgba(9, 67, 86, 0.75) 0%,
-                rgba(9, 67, 86, 0.88) 40%,
-                #094356 75%
+                rgba(var(--ft-bg-rgb), 0.75) 0%,
+                rgba(var(--ft-bg-rgb), 0.88) 40%,
+                var(--ft-bg) 75%
             ),
             url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
         background-position: center center;
@@ -142,8 +180,8 @@
 
 /* ============ FOOTER ============ */
 .custom-footer {
-    background-color: #094356;
-    color: rgba(255, 255, 255, 0.7);
+    background-color: var(--ft-bg);
+    color: rgba(var(--ft-text-rgb), 0.7);
     padding: 3rem 2rem 2rem;
     font-family: 'Poppins', sans-serif;
     border-top: 1px solid rgba(79, 168, 181, 0.08);
@@ -182,46 +220,78 @@
     position: relative;
     z-index: 1;
 }
+.footer-brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+.footer-brand-logo img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
 .footer-brand h2 {
     font-family: 'Sora', sans-serif;
-    color: #ffffff;
+    color: var(--ft-text);
     font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 1.2rem;
+    margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+@media (max-width: 480px) {
+    .footer-brand-logo img { width: 34px; height: 34px; }
 }
 .footer-brand p {
     font-size: 0.95rem;
     line-height: 1.8;
     margin-bottom: 1.8rem;
 }
-.social-links {
+/* ===== SOSMED: sama persis dengan halaman About (lingkaran terisi warna brand, ikon putih) ===== */
+.team-card-sosmed-wrapper {
     display: flex;
-    gap: 1rem;
+    gap: 6px;
+    justify-content: flex-start;
+    margin-top: 10px;
+    flex-wrap: wrap;
 }
-.social-links a {
-    display: flex;
+.team-card-sosmed {
+    --sm-bg: var(--ft-text);
+    --sm-fg: var(--ft-bg);
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    border: 0;
+    background: var(--sm-bg);
+    color: var(--sm-fg);
     text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 1.1rem;
 }
-.social-links a:hover {
-    background: #ffffff;
-    color: #094356;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
-}
+.team-card-sosmed i { font-size: 17px; line-height: 1; color: inherit; }
+.team-card-sosmed-x { display: block; }
+
+.team-card-sosmed.brand-text-ig { --sm-fg: #fff; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.team-card-sosmed.brand-text-fb { --sm-bg: #1877F2; --sm-fg: #fff; }
+.team-card-sosmed.brand-text-in { --sm-bg: #0A66C2; --sm-fg: #fff; }
+.team-card-sosmed.brand-text-gh { --sm-bg: #24292f; --sm-fg: #fff; }
+.team-card-sosmed.brand-text-x  { --sm-bg: #000000; --sm-fg: #fff; }
+.team-card-sosmed.brand-text-yt { --sm-bg: #FF0000; --sm-fg: #fff; }
+.team-card-sosmed.brand-text-tt { --sm-bg: #000000; --sm-fg: #fff; }
+.team-card-sosmed.brand-text-wa { --sm-bg: #25D366; --sm-fg: #fff; }
+/* Link lain: ikut warna teks footer (otomatis cocok light/dark) */
+.team-card-sosmed.brand-text-link { --sm-bg: var(--ft-text); --sm-fg: var(--ft-bg); }
+
+/* Sosmed (dark mode): brand gelap dibalik jadi putih agar tetap terlihat */
+html[data-theme="dark"] .team-card-sosmed.brand-text-gh,
+html[data-theme="dark"] .team-card-sosmed.brand-text-x,
+html[data-theme="dark"] .team-card-sosmed.brand-text-tt { --sm-bg: #f2f5f4; --sm-fg: #111; }
 .footer-links h4, .footer-contact h4 {
     font-family: 'Sora', sans-serif;
-    color: #ffffff;
+    color: var(--ft-text);
     font-size: 1.1rem;
     margin-bottom: 1.4rem;
     font-weight: 600;
@@ -249,7 +319,7 @@
     margin-bottom: 1rem;
 }
 .footer-links a {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(var(--ft-text-rgb), 0.7);
     text-decoration: none;
     transition: all 0.3s ease;
     font-size: 0.95rem;
@@ -269,7 +339,7 @@
     line-height: 1.6;
 }
 .footer-contact i {
-    color: #ffffff;
+    color: var(--ft-text);
     margin-top: 4px;
     font-size: 1.1rem;
     flex-shrink: 0;
@@ -278,7 +348,7 @@
     max-width: 1100px;
     margin: 0 auto;
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid rgba(var(--ft-text-rgb), 0.06);
 }
 .footer-bottom {
     max-width: 1100px;
@@ -288,7 +358,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--ft-text-rgb), 0.4);
     position: relative;
     z-index: 1;
 }
@@ -297,7 +367,7 @@
     gap: 20px;
 }
 .footer-bottom-links a {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--ft-text-rgb), 0.4);
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -336,36 +406,7 @@
     }
 }
 
-/* ============ DARK MODE (html[data-theme="dark"]) ============
-   Warna footer disamakan dengan navbar gelap: rgb(28, 40, 66) */
-html[data-theme="dark"] .footer-cta {
-    background-color: #1c2842;
-    background-image:
-        linear-gradient(90deg,
-            #1c2842 0%,
-            #1c2842 32%,
-            rgba(28, 40, 66, 0.92) 45%,
-            rgba(28, 40, 66, 0.55) 62%,
-            rgba(28, 40, 66, 0.15) 80%,
-            rgba(28, 40, 66, 0) 100%
-        ),
-        url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
-}
-html[data-theme="dark"] .custom-footer {
-    background-color: #1c2842;
-    border-top: 1px solid rgba(143, 208, 191, 0.16);
-}
-@media (max-width: 768px) {
-    html[data-theme="dark"] .footer-cta {
-        background-image:
-            linear-gradient(180deg,
-                rgba(28, 40, 66, 0.75) 0%,
-                rgba(28, 40, 66, 0.88) 40%,
-                #1c2842 75%
-            ),
-            url('https://images.unsplash.com/photo-1587702068694-a909ef4aa346?fm=jpg&q=80&w=1600&auto=format&fit=crop');
-    }
-}
+/* Warna footer (terang/gelap) diatur dari admin lewat variabel --ft-* di atas. */
 </style>
 
 <!-- ============ CTA BANNER (with background photo + smooth gradient blend) ============ -->
@@ -383,14 +424,88 @@ html[data-theme="dark"] .custom-footer {
 <footer class="custom-footer">
     <div class="footer-container">
         <div class="footer-brand">
-            <h2>Asta Brata</h2>
-            <p>Membawa inovasi digital untuk masa depan bisnis yang lebih baik melalui teknologi yang handal dan desain yang intuitif.</p>
-            <div class="social-links">
-                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+            <div class="footer-brand-logo">
+                @php
+                    // Ambil pengaturan terbaru langsung dari database (menghindari data lama dari cache/share),
+                    // lalu cadangkan ke $siteSetting jika model tidak ditemukan.
+                    $__setting = $siteSetting ?? null;
+                    if (class_exists(\App\Models\SiteSetting::class)) {
+                        try {
+                            $__fresh = \App\Models\SiteSetting::first();
+                            if ($__fresh) { $__setting = $__fresh; }
+                        } catch (\Throwable $e) {
+                            // abaikan, pakai $siteSetting bawaan
+                        }
+                    }
+
+                    // URL logo + parameter versi agar browser tidak memakai gambar lama dari cache
+                    $__logoUrl = asset('img/logo asta.png');
+                    if ($__setting && !empty($__setting->logo)) {
+                        if (\Illuminate\Support\Str::startsWith($__setting->logo, ['http://', 'https://'])) {
+                            $__logoUrl = $__setting->logo;
+                        } else {
+                            $__logoPath = 'storage/' . ltrim($__setting->logo, '/');
+                            $__logoVer = file_exists(public_path($__logoPath))
+                                ? filemtime(public_path($__logoPath))
+                                : (optional($__setting->updated_at)->timestamp ?: time());
+                            $__logoUrl = asset($__logoPath) . '?v=' . $__logoVer;
+                        }
+                    }
+                @endphp
+                <img src="{{ $__logoUrl }}" alt="Logo {{ $__setting->brand_name ?? 'Astabrata' }}">
+                <h2>{{ $__setting->brand_name ?? 'Astabrata' }} {{ $__setting->brand_tagline ?? 'Teknologi' }}</h2>
             </div>
+            <p>{{ $__setting->footer_description ?? 'Membawa inovasi digital untuk masa depan bisnis yang lebih baik melalui teknologi yang handal dan desain yang intuitif.' }}</p>
+            @php
+                $footerSocials = isset($__setting)
+                    ? $__setting->socialLinks(['instagram', 'linkedin', 'github', 'twitter', 'facebook', 'youtube'])
+                    : [];
+            @endphp
+            @if(count($footerSocials))
+                <div class="team-card-sosmed-wrapper">
+                    @php
+                        // Ikon bawaan per brand (dipakai jika ikon dari setting kosong/tidak valid)
+                        $__iconMap = [
+                            'ig' => 'bxl-instagram', 'in' => 'bxl-linkedin-square', 'gh' => 'bxl-github',
+                            'fb' => 'bxl-facebook-circle', 'x' => 'x-logo', 'yt' => 'bxl-youtube',
+                            'tt' => 'bxl-tiktok', 'wa' => 'bxl-whatsapp', 'link' => 'bx-link',
+                        ];
+                        $__labelMap = [
+                            'ig' => 'Instagram', 'in' => 'LinkedIn', 'gh' => 'GitHub', 'fb' => 'Facebook',
+                            'x' => 'X', 'yt' => 'YouTube', 'tt' => 'TikTok', 'wa' => 'WhatsApp', 'link' => 'Link',
+                        ];
+                    @endphp
+                    @foreach($footerSocials as $social)
+                        @php
+                            $__url = trim((string) ($social['url'] ?? ''));
+                            if ($__url === '') { continue; }
+                            // Deteksi brand dari URL / label / ikon untuk menentukan warna lingkaran
+                            $__sk = strtolower($__url . ' ' . ($social['label'] ?? '') . ' ' . ($social['icon'] ?? ''));
+                            $__sb = 'link';
+                            if (str_contains($__sk, 'instagram')) { $__sb = 'ig'; }
+                            elseif (str_contains($__sk, 'linkedin')) { $__sb = 'in'; }
+                            elseif (str_contains($__sk, 'github')) { $__sb = 'gh'; }
+                            elseif (str_contains($__sk, 'facebook')) { $__sb = 'fb'; }
+                            elseif (str_contains($__sk, 'twitter') || str_contains($__sk, 'x.com') || preg_match('/\bx\b/', strtolower($social['label'] ?? ''))) { $__sb = 'x'; }
+                            elseif (str_contains($__sk, 'youtube')) { $__sb = 'yt'; }
+                            elseif (str_contains($__sk, 'tiktok')) { $__sb = 'tt'; }
+                            elseif (str_contains($__sk, 'wa.me') || str_contains($__sk, 'whatsapp')) { $__sb = 'wa'; }
+
+                            // Ikon: pakai ikon dari setting hanya jika berawalan "bx", selain itu pakai ikon bawaan brand
+                            $__customIcon = trim((string) ($social['icon'] ?? ''));
+                            $__icon = str_starts_with($__customIcon, 'bx') ? $__customIcon : ($__iconMap[$__sb] ?? 'bx-link');
+                            $__label = trim((string) ($social['label'] ?? '')) ?: ($__labelMap[$__sb] ?? 'Link');
+                        @endphp
+                        <a class="team-card-sosmed brand-text-{{ $__sb }}" href="{{ $__url }}" target="_blank" rel="noopener noreferrer" title="{{ $__label }}" aria-label="{{ $__label }}">
+                            @if($__icon === 'x-logo')
+                                <svg class="team-card-sosmed-x" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+                            @else
+                                <i class="bx {{ $__icon }}"></i>
+                            @endif
+                        </a>
+                    @endforeach
+                </div>
+            @endif
         </div>
         
         <div class="footer-links">

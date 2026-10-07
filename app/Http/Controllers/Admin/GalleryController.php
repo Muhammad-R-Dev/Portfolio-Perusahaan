@@ -22,9 +22,11 @@ class GalleryController extends Controller
 
     public function store(Request $request)
     {
+        $this->normalisasiKategori($request);
+
         $validated = $request->validate([
             'judul'    => ['required', 'string', 'max:150'],
-            'kategori' => ['required', 'in:kegiatan,fasilitas,tim,acara'],
+            'kategori' => ['required', 'string', 'max:50'],
             'foto'     => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
@@ -39,9 +41,11 @@ class GalleryController extends Controller
 
     public function update(Request $request, Gallery $galeri)
     {
+        $this->normalisasiKategori($request);
+
         $validated = $request->validate([
             'judul'    => ['required', 'string', 'max:150'],
-            'kategori' => ['required', 'in:kegiatan,fasilitas,tim,acara'],
+            'kategori' => ['required', 'string', 'max:50'],
             'foto'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
@@ -65,6 +69,17 @@ class GalleryController extends Controller
         return redirect()
             ->route('admin.kelola-galeri')
             ->with('success', 'Foto berhasil dihapus dari galeri.');
+    }
+
+    /**
+     * Kategori boleh diketik sendiri: rapikan spasi & samakan huruf kecil
+     * supaya "Seminar" dan "seminar" tidak dianggap dua kategori berbeda.
+     */
+    private function normalisasiKategori(Request $request): void
+    {
+        $request->merge([
+            'kategori' => mb_strtolower(preg_replace('/\s+/', ' ', trim((string) $request->input('kategori')))),
+        ]);
     }
 
     private function hapusFotoLama(?string $path): void

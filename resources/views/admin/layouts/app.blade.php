@@ -21,31 +21,39 @@
         :root {
             --poppins: 'Poppins', sans-serif;
             --lato: 'Lato', sans-serif;
-            --light: #F9F9F9;
-            --blue: #3C91E6;
-            --light-blue: #CFE8FF;
-            --grey: #eee;
-            --dark-grey: #AAAAAA;
-            --dark: #342E37;
-            --red: #DB504A;
+            /* ===== Palet disamakan dengan Dashboard (kelola-blog.blade.php) ===== */
+            --light: #ffffff;          /* kartu, sidebar, navbar */
+            --blue: #3b82f6;           /* aksen/tombol */
+            --light-blue: #dbeafe;     /* baris/ikon terpilih */
+            --grey: #e2e8f0;           /* input, border, hover */
+            --dark-grey: #64748b;      /* teks sekunder */
+            --dark: #1e293b;           /* teks utama */
+            --red: #ef4444;
+            --light-orange: #fee2e2;
+            --page-bg: #e9eef5;        /* background halaman */
             --yellow: #FFCE26;
             --light-yellow: #FFF2C6;
             --orange: #FD7238;
-            --light-orange: #FFE0D3;
             --brand-accent: #084154;
         }
 
         html { overflow-x: hidden; }
 
         body.dark {
-            --light: #0C0C1E;
-            --grey: #060714;
-            --dark: #FBFBFB;
+            --light: #25324a;          /* kartu, sidebar, navbar */
+            --blue: #4f8ef7;           /* aksen/tombol */
+            --light-blue: #2f4a7a;     /* baris/ikon terpilih */
+            --grey: #34456a;           /* input, border, hover */
+            --dark-grey: #a9b8d2;      /* teks sekunder */
+            --dark: #eef2f9;           /* teks utama */
+            --red: #ef5a5a;
+            --light-orange: #4d3b33;
+            --page-bg: #1b2538;        /* background halaman */
             --brand-accent: #3FA7C7;
         }
 
         body {
-            background: var(--grey);
+            background: var(--page-bg);
             overflow-x: hidden;
         }
 

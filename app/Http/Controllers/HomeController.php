@@ -5,13 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Gallery;
+use App\Models\WelcomeSection;
+use App\Models\Faq;
 
-class CompanyProfileController extends Controller
+class HomeController extends Controller
 {
     public function index()
     {
         $services = \App\Models\Service::all();
-        return view('pages.home', compact('services'));
+        $welcome  = WelcomeSection::current();
+        $faqs     = Faq::ordered()->get();
+
+        return view('pages.home', compact('services', 'welcome', 'faqs'));
     }
 
     public function blog()

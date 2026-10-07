@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
             $table->string('judul', 150);
-            $table->enum('kategori', ['kegiatan', 'fasilitas', 'tim', 'acara'])->default('kegiatan');
+            // String (bukan enum) supaya kategori bisa diketik sendiri, mis. "seminar"
+            $table->string('kategori', 50)->default('kegiatan');
             // path relatif di disk 'public', mis: galeri/xxxx.jpg
             $table->string('foto');
             $table->timestamps();

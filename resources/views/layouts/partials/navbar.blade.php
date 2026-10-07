@@ -1,3 +1,40 @@
+@php
+    // Tentukan page yang aktif berdasarkan URL.
+    $__activePage = 'beranda';
+    if (request()->is('layanan*')) $__activePage = 'layanan';
+    elseif (request()->is('blog*')) $__activePage = 'blog';
+    elseif (request()->is('about*')) $__activePage = 'about';
+    elseif (request()->is('contact*')) $__activePage = 'contact';
+
+    // Warna header diambil dari Settings > Header & Footer (tabel SiteSetting):
+    // navbar_bg_light, navbar_text_light, navbar_bg_dark, navbar_text_dark
+    $__navSetting = null;
+    try {
+        if (class_exists(\App\Models\SiteSetting::class)) {
+            $__navSetting = \App\Models\SiteSetting::first();
+        }
+    } catch (\Throwable $e) {}
+
+    // $type: 'bg' atau 'title' (title = warna teks)
+    $__navColor = function ($mode, $type, $default) use ($__navSetting) {
+        $key = 'navbar_' . ($type === 'bg' ? 'bg' : 'text') . '_' . $mode;
+        $v = $__navSetting->{$key} ?? null;
+        return (is_string($v) && preg_match('/^#[0-9a-fA-F]{6}$/', $v)) ? $v : $default;
+    };
+@endphp
+<style>
+    :root {
+        --nav-bg: {{ $__navColor('light', 'bg', '#094356') }};
+        --nav-text: {{ $__navColor('light', 'title', '#ffffff') }};
+        /* Warna untuk penanda menu aktif (Active State) */
+        --nav-active: var(--nav-bg);
+    }
+    html[data-theme="dark"] {
+        --nav-bg: {{ $__navColor('dark', 'bg', '#094356') }};
+        --nav-text: {{ $__navColor('dark', 'title', '#ffffff') }};
+        --nav-active: #8fd0bf; 
+    }
+</style>
 <style>
     /* ------- Fonts ------- */
     @font-face {
@@ -30,6 +67,8 @@
       align-items: center;
       width: 100%;
       display: flex;
+      position: relative;
+      z-index: 1;
     }
 
     .nav-logo-row {
@@ -72,12 +111,10 @@
         display: block;
         font-size: 0.7rem;
         font-weight: 400;
-        color: #094356;
+        color: var(--nav-text);
         letter-spacing: 0.08em;
         text-transform: uppercase;
     }
-
-    /* container classes removed to avoid conflicts */
 
     .nav-row__right {
       grid-column-gap: .625rem;
@@ -91,7 +128,7 @@
     .header {
       z-index: 2001;
       padding: 20px 5% 20px 5%;
-      padding-right: 28px; /* tombol menu mojok kanan, tetap ada jarak dari tepi */
+      padding-right: 28px; 
       position: fixed;
       top: 0;
       left: 0;
@@ -101,27 +138,25 @@
       box-sizing: border-box;
     }
 
-    .header.scrolled {
-        background: rgba(255, 255, 255, 0.97);
+    /* ===== GLASSMORPHISM PADA NAVBAR (warna ikut pengaturan admin) ===== */
+    .header.scrolled,
+    .header.header--pinned {
+        /* Warna solid sesuai Settings > Header & Footer, tidak transparan */
+        background: var(--nav-bg) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12);
         padding: 12px 5%;
         padding-right: 28px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
-        backdrop-filter: blur(10px);
     }
 
-    /* Saat menu dibuka, background navbar jadi transparan (override .scrolled) */
     .header.menu-open {
         background: transparent !important;
         box-shadow: none !important;
         backdrop-filter: none !important;
-    }
-
-    /* Halaman selain Beranda (About, Blog, Contact, dll): navbar putih solid dari atas,
-       tidak transparan, tampilannya sama seperti kondisi sudah discroll */
-    .header.header--pinned {
-        background: rgba(255, 255, 255, 0.97);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
-        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: none !important;
+        border-bottom: none !important;
     }
 
     /* ------- Side Navigation Menu ------- */
@@ -155,7 +190,7 @@
       flex-flow: column;
       justify-content: space-between;
       align-items: flex-start;
-      width: 23em;
+      width: 25em; /* Sedikit diperlebar untuk ruang efek kaca */
       height: 100%;
       margin-left: auto;
       position: relative;
@@ -180,6 +215,7 @@
       display: flex;
       position: relative;
       overflow: auto;
+      padding: 0 1em; /* Jarak agar kotak kaca tidak nabrak tepi */
     }
 
     .bg-panel {
@@ -191,13 +227,66 @@
       inset: 0%;
     }
 
-    .bg-panel.first {
-      background-color: var(--color-primary, #4FA8B5);
+    .bg-panel.first { background-color: var(--nav-bg); }
+    .bg-panel.second { background-color: var(--color-neutral-100, #ffffff); }
+
+    /* ===== LAYER KE-3: CLEAR GLASS (seperti gambar referensi) ===== */
+    .bg-panel--sky {
+      border-top-left-radius: 1.75em;
+      border-bottom-left-radius: 1.75em;
+      /* isi kaca bening + gradasi pantulan */
+      background: linear-gradient(135deg,
+          rgba(255, 255, 255, 0.42) 0%,
+          rgba(255, 255, 255, 0.14) 45%,
+          rgba(255, 255, 255, 0.26) 100%);
+      backdrop-filter: blur(18px) saturate(170%);
+      -webkit-backdrop-filter: blur(18px) saturate(170%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+        inset 0 0 24px rgba(255, 255, 255, 0.28),
+        -10px 0 40px rgba(0, 0, 0, 0.18);
     }
 
-    .bg-panel.second {
-      background-color: var(--color-neutral-100, #ffffff);
+    /* garis tepi putih bercahaya (terang di pojok kiri-atas & kanan-bawah) */
+    .bg-panel--sky::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(135deg,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(255, 255, 255, 0.15) 35%,
+          rgba(255, 255, 255, 0.1) 65%,
+          rgba(255, 255, 255, 0.85) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
+      pointer-events: none;
     }
+
+    /* kilau cahaya di pojok kiri-atas */
+    .bg-panel--sky::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(120% 60% at 0% 0%, rgba(255, 255, 255, 0.35), transparent 60%);
+      pointer-events: none;
+    }
+
+    html[data-theme="dark"] .bg-panel--sky {
+      background: linear-gradient(135deg,
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(255, 255, 255, 0.04) 45%,
+          rgba(255, 255, 255, 0.09) 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+        inset 0 0 24px rgba(255, 255, 255, 0.08),
+        -10px 0 40px rgba(0, 0, 0, 0.45);
+    }
+    html[data-theme="dark"] .bg-panel--sky::before { opacity: 0.7; }
 
     .menu-list {
       flex-flow: column;
@@ -210,13 +299,14 @@
 
     .menu-list-item {
       position: relative;
-      overflow: hidden;
+      overflow: hidden; /* Penting untuk animasi rolling text */
     }
 
     .menu-link {
       padding-top: .75em;
       padding-bottom: .75em;
       padding-left: var(--menu-padding);
+      padding-right: var(--menu-padding);
       grid-column-gap: .75em;
       grid-row-gap: .75em;
       width: 100%;
@@ -224,6 +314,8 @@
       display: flex;
       color: inherit;
       box-sizing: border-box;
+      border-radius: 16px;
+      transition: all 0.4s ease;
     }
 
     .menu-link-heading {
@@ -233,11 +325,16 @@
       font-size: 5.625em;
       font-weight: 700;
       line-height: .75;
-      transition: transform .55s cubic-bezier(.65, .05, 0, 1);
+      transition: transform .55s cubic-bezier(.65, .05, 0, 1), color 0.3s ease;
       position: relative;
       text-shadow: 0px 1em 0px var(--color-neutral-200, #cccccc);
       margin: 0;
       color: #131313;
+    }
+    
+    html[data-theme="dark"] .menu-link-heading {
+      color: #ffffff;
+      text-shadow: 0px 1em 0px #333333;
     }
 
     .eyebrow {
@@ -248,40 +345,83 @@
       font-weight: 400;
       position: relative;
       margin: 0;
+      transition: color 0.3s ease;
+    }
+    
+    html[data-theme="dark"] .eyebrow {
+      color: #8fd0bf;
+    }
+
+    /* ===== GLASSMORPHISM PADA ITEM MENU AKTIF ===== */
+    .menu-link.active {
+        /* Kaca bening dengan pantulan cahaya putih */
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 100%);
+        /* Garis tepi putih bercahaya (inset shadow agar tinggi layout tidak berubah) */
+        box-shadow:
+            inset 0 0 0 1.5px rgba(255, 255, 255, 0.85),
+            inset 0 0 18px rgba(255, 255, 255, 0.35),
+            0 0 14px rgba(255, 255, 255, 0.35);
+    }
+    
+    html[data-theme="dark"] .menu-link.active {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    }
+
+    /* Hilangkan background solid bawaan hover JIKA item sedang aktif */
+    .menu-link.active .menu-link-bg {
+        display: none !important;
+    }
+
+    /* Atur warna Teks dan Shadow agar saat hover, animasi gulung tetap sempurna */
+    .menu-link.active .menu-link-heading {
+        color: var(--nav-active);
+        text-shadow: 0px 1em 0px var(--nav-active); 
+    }
+    html[data-theme="dark"] .menu-link.active .menu-link-heading {
+        color: var(--nav-active);
+        text-shadow: 0px 1em 0px var(--nav-active);
+    }
+
+    .menu-link.active .eyebrow {
+        color: var(--nav-active);
     }
 
     .menu-link-bg {
       z-index: 0;
-      background-color: #094356;
+      /* warna ikut pengaturan admin (Settings > Header & Footer) */
+      background: linear-gradient(135deg,
+          color-mix(in srgb, var(--nav-bg) 82%, transparent) 0%,
+          color-mix(in srgb, var(--nav-bg) 55%, transparent) 100%);
+      box-shadow:
+        inset 0 0 0 1.5px rgba(255, 255, 255, 0.55),
+        inset 0 0 18px rgba(255, 255, 255, 0.18);
       transform-origin: 50% 100%;
       transform-style: preserve-3d;
       transition: transform .55s cubic-bezier(.65, .05, 0, 1);
       position: absolute;
       inset: 0%;
       transform: scale3d(1, 0, 1);
+      border-radius: 16px;
     }
 
-    .p-small {
-      font-size: .875em;
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 0;
-      color: #131313;
+    /* Kotak hover mode gelap: kaca tipis hijau-teal dengan tepi putih bercahaya */
+    html[data-theme="dark"] .menu-link-bg {
+      background: linear-gradient(135deg,
+          color-mix(in srgb, var(--nav-bg) 70%, transparent) 0%,
+          color-mix(in srgb, var(--nav-bg) 35%, transparent) 100%);
+      box-shadow:
+        inset 0 0 0 1.5px rgba(255, 255, 255, 0.4),
+        inset 0 0 18px rgba(255, 255, 255, 0.15);
     }
 
-    .p-large {
-      font-size: 1.125em;
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 0;
-      color: #131313;
-    }
+    .p-small { font-size: .875em; font-family: Arial, Helvetica, sans-serif; margin: 0; color: #131313; }
+    .p-large { font-size: 1.125em; font-family: Arial, Helvetica, sans-serif; margin: 0; color: #131313; }
+    html[data-theme="dark"] .p-large { color: #ffffff; }
 
-    .text-link {
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-    }
+    .text-link { text-decoration: none; color: inherit; position: relative; }
 
-    /* ------- Menu Button ------- */
+    /* ------- Menu Button (hamburger <-> X) ------- */
     .menu-button {
       grid-column-gap: .625em;
       grid-row-gap: .625em;
@@ -296,10 +436,22 @@
     }
 
     .menu-button-icon {
-      width: 1em;
-      height: 1em;
-      color: #14211b;
+      display: block;
+      width: 26px;
+      height: 26px;
+      overflow: visible;
+      color: var(--nav-text);
     }
+
+    .mb-line {
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform .45s cubic-bezier(.65, .05, 0, 1), opacity .25s ease;
+    }
+
+    .menu-button.is-open .mb-line--top { transform: translateY(5px) rotate(45deg); }
+    .menu-button.is-open .mb-line--mid { opacity: 0; transform: scaleX(0); }
+    .menu-button.is-open .mb-line--bot { transform: translateY(-5px) rotate(-45deg); }
 
     .menu-button-text {
       flex-flow: column;
@@ -311,95 +463,55 @@
     }
 
     .icon-wrap {
+      display: flex;
       transition: transform .4s cubic-bezier(.65, .05, 0, 1);
     }
 
     /* ------- Hover Effects ------- */
     @media (hover: hover) {
-      .menu-button:hover .icon-wrap {
-        transform: rotate(90deg);
-      }
+      .menu-button:hover .icon-wrap { transform: scale(1.08); }
 
       .menu-link:hover .menu-link-heading {
         transform: translate(0px, -1em);
         transition-delay: 0.1s;
       }
-      
-      .menu-link:hover .menu-link-heading {
-        text-shadow: 0px 1em 0px #ffffff;
-      }
-      .menu-link:hover .eyebrow {
-        color: #ffffff;
-      }
 
-      .menu-link:hover .menu-link-bg {
-        transform: scale(1, 1);
+      .menu-link:hover .menu-link-heading { text-shadow: 0px 1em 0px #ffffff; }
+      html[data-theme="dark"] .menu-link:hover .menu-link-heading { text-shadow: 0px 1em 0px #ffffff; }
+      
+      .menu-link:hover .eyebrow { color: #ffffff; }
+
+      .menu-link:hover .menu-link-bg { transform: scale(1, 1); }
+
+      /* Memastikan warna shadow di item aktif tetap senada dengan brand saat di-hover */
+      .menu-link.active:hover .menu-link-heading {
+          text-shadow: 0px 1em 0px var(--nav-active);
+      }
+      html[data-theme="dark"] .menu-link.active:hover .menu-link-heading {
+          text-shadow: 0px 1em 0px var(--nav-active);
       }
 
       .text-link::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 1px;
-        background: var(--color-primary, #094356);
-        transform-origin: right center;
-        transform: scale(0, 1);
-        transition: transform 0.4s cubic-bezier(.65, .05, 0, 1);
+        content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px;
+        background: var(--color-primary, #094356); transform-origin: right center;
+        transform: scale(0, 1); transition: transform 0.4s cubic-bezier(.65, .05, 0, 1);
       }
 
-      .text-link:hover::after {
-        transform-origin: left center;
-        transform: scale(1, 1);
-      }
+      .text-link:hover::after { transform-origin: left center; transform: scale(1, 1); }
     }
 
     /* ------- Responsive Styles ------- */
     @media screen and (max-width: 768px) {
-      .header,
-      .header.scrolled { padding-right: 18px; }
-
-      .nav {
-        --menu-padding: 1em;
-      }
-
-      .nav-logo-row {
-        grid-column-gap: 2.5em;
-        grid-row-gap: 2.5em;
-        width: auto;
-      }
-
-      .nav-row__right {
-        grid-column-gap: 0rem;
-        grid-row-gap: 0rem;
-      }
-
-      .menu {
-        padding-top: calc(6 * var(--menu-padding));
-        padding-bottom: calc(3 * var(--menu-padding));
-        width: 60%;
-      }
-
-
-      .bg-panel {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
-
-      .menu-list-item {
-        height: 4.5em;
-      }
-
-      .menu-link-heading {
-        font-size: 4em;
-      }
-
-
-      .p-large.text-link {
-        font-size: 1em;
-      }
-
+      .header, .header.scrolled { padding-right: 18px; }
+      .nav { --menu-padding: 1em; }
+      .nav-logo-row { grid-column-gap: 2.5em; grid-row-gap: 2.5em; width: auto; }
+      .nav-row__right { grid-column-gap: 0rem; grid-row-gap: 0rem; }
+      .menu { padding-top: calc(6 * var(--menu-padding)); padding-bottom: calc(3 * var(--menu-padding)); width: 75%; }
+      .bg-panel { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+      .menu-list-item { height: auto; }
+      .menu-link-heading { font-size: 3.5em; }
+      .p-large.text-link { font-size: 1em; }
+      .menu-button-icon { width: 24px; height: 24px; }
       .nav-brand { gap: 9px; }
       .nav-brand img { width: 32px; height: 32px; }
       .nav-brand-text { font-size: 1rem; margin-left: -2px; }
@@ -407,66 +519,27 @@
     }
 
     @media screen and (max-width: 479px) {
-      .menu {
-        padding-top: calc(7 * var(--menu-padding));
-        padding-bottom: calc(4 * var(--menu-padding));
-      }
+      .menu { padding-top: calc(7 * var(--menu-padding)); padding-bottom: calc(4 * var(--menu-padding)); width: 85%; }
+      .menu-link-heading { font-size: 2.8em; }
     }
 
     /* ------- Back Button ------- */
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 26px;
-      pointer-events: auto;
-    }
-
-    /* Logo + nama hilang saat sidebar menu terbuka */
-    .nav-left {
-      transition: opacity 0.35s ease, visibility 0.35s ease;
-    }
-    .header.menu-open .nav-left {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
+    .nav-left { display: flex; align-items: center; gap: 26px; pointer-events: auto; transition: opacity 0.35s ease, visibility 0.35s ease; }
+    .header.menu-open .nav-left { opacity: 0; visibility: hidden; pointer-events: none; }
+    
     .back-button {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(9, 67, 86, 0.18);
-      background: linear-gradient(135deg, #eaf6ef 0%, #ffffff 100%);
-      color: #094356;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 3px 12px rgba(20, 33, 27, 0.07);
-      transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease,
-                  box-shadow 0.3s ease, transform 0.2s ease;
-      flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
+      width: 42px; height: 42px; border-radius: 14px; border: 1px solid color-mix(in srgb, var(--nav-bg) 18%, transparent);
+      background: linear-gradient(135deg, #eaf6ef 0%, #ffffff 100%); color: var(--nav-bg);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      box-shadow: 0 3px 12px rgba(20, 33, 27, 0.07); transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      flex-shrink: 0; position: relative; overflow: hidden;
     }
-    .back-button svg {
-      position: relative;
-      z-index: 1;
-      transition: transform 0.35s cubic-bezier(.65, .05, 0, 1);
-    }
+    .back-button svg { position: relative; z-index: 1; transition: transform 0.35s cubic-bezier(.65, .05, 0, 1); }
     .back-button::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: #094356;
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(.65, .05, 0, 1);
+      content: ''; position: absolute; inset: 0; background: var(--nav-bg);
+      transform: translateY(100%); transition: transform 0.35s cubic-bezier(.65, .05, 0, 1);
     }
-    .back-button:hover {
-      color: #ffffff;
-      border-color: #094356;
-      box-shadow: 0 8px 20px rgba(9, 67, 86, 0.3);
-    }
+    .back-button:hover { color: var(--nav-text); border-color: var(--nav-bg); box-shadow: 0 8px 20px color-mix(in srgb, var(--nav-bg) 30%, transparent); }
     .back-button:hover::before { transform: translateY(0); }
     .back-button:hover svg { transform: translateX(-3px); }
     .back-button:active { transform: scale(0.9); }
@@ -474,342 +547,53 @@
 
     @media screen and (max-width: 768px) {
       .nav-left { gap: 12px; }
-      .back-button {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.55);
-        backdrop-filter: blur(6px);
-        border-color: rgba(9, 67, 86, 0.12);
-        box-shadow: none;
-      }
+      .back-button { width: 32px; height: 32px; border-radius: 10px; background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(6px); border-color: rgba(9, 67, 86, 0.12); box-shadow: none; }
       .back-button svg { width: 14px; height: 14px; }
       .back-button:hover { box-shadow: 0 4px 12px rgba(9, 67, 86, 0.25); }
     }
-    /* ------- Tombol Dark / Light Mode: HANYA matahari & bulan (ringkas) ------- */
-    /* Dibuat 100x100px (font-size 10px, satuan em) lalu diperkecil dengan scale. */
-    .theme-toggle-wrap {
-      --tt-scale: 0.28;
-      position: relative;
-      z-index: 2; /* di atas .nav-sky, tidak pernah ketutup background */
-      flex-shrink: 0;
-      width: calc(100px * var(--tt-scale));
-      height: calc(100px * var(--tt-scale));
-      margin-right: 0.9rem;
-    }
+
+    /* ------- Tombol Dark / Light Mode ------- */
+    .theme-toggle-wrap { position: relative; z-index: 2; flex-shrink: 0; margin-right: 1.1rem; }
     .theme-toggle {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 10em;
-      height: 10em;
-      font-size: 10px;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      overflow: visible;
-      isolation: isolate;
-      cursor: pointer;
-      transform: scale(var(--tt-scale));
-      transform-origin: 0 0;
-      -webkit-tap-highlight-color: transparent;
-      --tt-ease: cubic-bezier(.65, .05, 0, 1);
-      transition: background 0.6s var(--tt-ease);
+      position: relative; width: 34px; height: 34px; padding: 0; border: none; background: transparent;
+      color: var(--nav-text); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.25s ease, opacity 0.25s ease;
     }
-    .theme-toggle *, .theme-toggle *::before, .theme-toggle *::after { box-sizing: border-box; }
-    .theme-toggle:focus-visible { outline: 3px solid #094356; outline-offset: 5px; }
-    /* bayangan cekung di dalam, seperti tombol aslinya */
-    .theme-toggle:active .tt-sun,
-    .theme-toggle:active .tt-moon { filter: brightness(0.92); }
+    .header.menu-open .theme-toggle-wrap, #navHeader.menu-open .theme-toggle-wrap, .menu-open .theme-toggle-wrap { display: none !important; }
+    .theme-toggle:hover { transform: scale(1.08); }
+    .theme-toggle:active { transform: scale(0.94); }
+    .theme-toggle:focus-visible { outline: 2px solid var(--nav-text); outline-offset: 4px; border-radius: 6px; }
+    .tt-icon {
+      position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; margin: -12px 0 0 -12px;
+      transition: transform 0.5s cubic-bezier(.65, .05, 0, 1), opacity 0.35s ease;
+    }
+    .tt-icon--moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+    .theme-toggle[data-theme="dark"] .tt-icon--sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+    .theme-toggle[data-theme="dark"] .tt-icon--moon { opacity: 1; transform: rotate(0) scale(1); }
 
-    /* Matahari & bulan: satu-satunya isi tombol, saling berganti dengan memutar + memudar */
-    .tt-sun, .tt-moon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 6.4em;
-      height: 6.4em;
-      margin: -3.2em 0 0 -3.2em;
-      border-radius: 50%;
-      transition: transform 0.6s var(--tt-ease), opacity 0.45s ease;
-      z-index: 2;
-    }
-    .tt-sun {
-      background: #fbc72d;
-      box-shadow: inset 0.2em 0.2em 0.4em rgba(255, 255, 255, 0.5),
-                  inset -0.3em -0.3em 0.5em rgba(0, 0, 0, 0.2);
-    }
-    /* Sinar matahari: bintang bergerigi 12 sinar di belakang lingkaran matahari */
-    .tt-rays {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 9em;
-      height: 9em;
-      margin: -4.5em 0 0 -4.5em;
-      z-index: 1;
-      transition: transform 0.6s var(--tt-ease), opacity 0.45s ease;
-    }
-    .tt-rays::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(145deg, #ffd84d 0%, #f9b81c 100%);
-      -webkit-clip-path: polygon(50.00% 0.00%, 59.84% 13.29%, 75.00% 6.70%, 76.87% 23.13%, 93.30% 25.00%, 86.71% 40.16%, 100.00% 50.00%, 86.71% 59.84%, 93.30% 75.00%, 76.87% 76.87%, 75.00% 93.30%, 59.84% 86.71%, 50.00% 100.00%, 40.16% 86.71%, 25.00% 93.30%, 23.13% 76.87%, 6.70% 75.00%, 13.29% 59.84%, 0.00% 50.00%, 13.29% 40.16%, 6.70% 25.00%, 23.13% 23.13%, 25.00% 6.70%, 40.16% 13.29%);
-      clip-path: polygon(50.00% 0.00%, 59.84% 13.29%, 75.00% 6.70%, 76.87% 23.13%, 93.30% 25.00%, 86.71% 40.16%, 100.00% 50.00%, 86.71% 59.84%, 93.30% 75.00%, 76.87% 76.87%, 75.00% 93.30%, 59.84% 86.71%, 50.00% 100.00%, 40.16% 86.71%, 25.00% 93.30%, 23.13% 76.87%, 6.70% 75.00%, 13.29% 59.84%, 0.00% 50.00%, 13.29% 40.16%, 6.70% 25.00%, 23.13% 23.13%, 25.00% 6.70%, 40.16% 13.29%);
-    }
-    .theme-toggle[data-theme="dark"] .tt-rays { opacity: 0; transform: rotate(120deg) scale(0.3); }
-    .tt-moon {
-      background: #cccfd9;
-      box-shadow: inset 0.2em 0.2em 0.4em rgba(255, 255, 255, 0.55), inset -0.3em -0.3em 0.5em rgba(0, 0, 0, 0.3);
-      opacity: 0;
-      transform: rotate(-120deg) scale(0.3);
-    }
-    .theme-toggle[data-theme="dark"] .tt-sun { opacity: 0; transform: rotate(120deg) scale(0.3); }
-    .theme-toggle[data-theme="dark"] .tt-moon { opacity: 1; transform: rotate(0) scale(1); }
-    /* Kawah bulan: tetap bagian dari "bulan", bukan elemen langit terpisah */
-    .tt-dot {
-      position: absolute;
-      border-radius: 50%;
-      background: #9da8bc;
-    }
-    /* Detail di dalam matahari (bintik hangat, seperti kawah di bulan) */
-    .tt-spot {
-      position: absolute;
-      border-radius: 50%;
-      background: #f2a516;
-      box-shadow: inset 0.08em 0.08em 0.15em rgba(0, 0, 0, 0.18);
-    }
-    .tt-spot1 { width: 1.1em; height: 1.1em; top: 1.1em; left: 2.7em; }
-    .tt-spot2 { width: 1.7em; height: 1.7em; top: 3.1em; left: 1.1em; }
-    .tt-spot3 { width: 1.2em; height: 1.2em; top: 3.8em; left: 3.9em; }
-    .tt-dot1 { width: 1.1em; height: 1.1em; top: 1.1em; left: 2.7em; }
-    .tt-dot2 { width: 1.7em; height: 1.7em; top: 3.1em; left: 1.1em; }
-    .tt-dot3 { width: 1.2em; height: 1.2em; top: 3.8em; left: 3.9em; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .tt-sun, .tt-moon, .tt-rays { transition-duration: 0.01s; }
-    }
+    @media (prefers-reduced-motion: reduce) { .tt-icon, .theme-toggle { transition-duration: 0.01s; } }
     @media screen and (max-width: 768px) {
-      .theme-toggle-wrap { --tt-scale: 0.26; margin-right: 0.7rem; }
+      .theme-toggle-wrap { margin-right: 0.6rem; }
+      .theme-toggle { width: 30px; height: 30px; }
+      .tt-icon { width: 20px; height: 20px; margin: -10px 0 0 -10px; }
     }
 
-    /* ------- Background langit di navbar: awan + langit biru (terang), bintang (gelap) -------
-       Lapisan ini murni dekoratif, diletakkan paling belakang di dalam .header (z-index 0),
-       sedangkan logo & tombol-tombol ada di .nav-row (z-index 1) sehingga tidak pernah
-       tertutup / mengganggu tombol menu maupun tombol dark-light. Otomatis disembunyikan
-       saat navbar sudah solid (scrolled/pinned/menu dibuka) supaya tidak dobel dengan background putih/gelap. ------- */
-    .nav-row {
-      position: relative;
-      z-index: 1;
-    }
-    .header { --sky-w: 270px; } /* lebar langit di sisi kanan (mencakup ikon matahari/bulan + tombol menu) */
-    .nav-sky {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      width: var(--sky-w);
-      /* sisi kiri memudar halus jadi transparan (bukan potongan melengkung) */
-      -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 18%, #000 45%);
-      mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 18%, #000 45%);
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-      opacity: 1;
-      background: linear-gradient(180deg, #bfe0f7 0%, #eef7fd 100%);
-      transition: background 0.6s ease, opacity 0.4s ease;
-    }
-    html[data-theme="dark"] .nav-sky {
-      background: linear-gradient(180deg, #171b2e 0%, #0f1222 100%);
-    }
-    .header.menu-open .nav-sky {
-      opacity: 0;
-    }
-    .nav-sky-clouds {
-      position: absolute;
-      inset: 0;
-      transition: opacity 0.5s ease, transform 0.6s cubic-bezier(.65, .05, 0, 1);
-    }
-    .nav-sky-clouds span {
-      position: absolute;
-      bottom: -1.8rem;
-      aspect-ratio: 1;
-      width: 2.8rem;
-      border-radius: 50%;
-      background: #ffffff;
-      opacity: 0.95;
-      animation: nsky-drift 22s ease-in-out infinite;
-    }
-    .nav-sky-clouds span::before {
-      content: '';
-      position: absolute;
-      width: 75%;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: #ffffff;
-      left: 55%;
-      top: 22%;
-    }
-    .nav-sky-clouds span:nth-child(1) { left: 4%;  bottom: -1.9rem; animation-delay: 0s; }
-    .nav-sky-clouds span:nth-child(2) { left: 24%; bottom: -1.7rem; width: 2.3rem; animation-delay: 3s; animation-duration: 18s; }
-    .nav-sky-clouds span:nth-child(3) { left: 46%; bottom: -1.8rem; width: 2.9rem; animation-delay: 1.5s; }
-    .nav-sky-clouds span:nth-child(4) { left: 68%; bottom: -1.6rem; width: 2.2rem; animation-delay: 4s; animation-duration: 20s; }
-    .nav-sky-clouds span:nth-child(5) { left: 86%; bottom: -1.7rem; width: 2.4rem; animation-delay: 2s; }
-    @keyframes nsky-drift {
-      0%, 100% { transform: translateX(-0.8rem); }
-      50% { transform: translateX(0.8rem); }
-    }
-    .nav-sky-stars {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      transform: scale(0.95);
-      transition: opacity 0.6s ease 0.1s, transform 0.6s cubic-bezier(.65, .05, 0, 1);
-    }
-    .nav-sky-star {
-      position: absolute;
-      left: var(--x);
-      top: var(--y);
-      width: 0.5rem;
-      height: 0.5rem;
-      background: #f8fcff;
-      clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
-      transform: scale(var(--s));
-      animation: nsky-twinkle 3s ease-in-out var(--d) infinite;
-    }
-    @keyframes nsky-twinkle {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-    html[data-theme="dark"] .nav-sky-clouds { opacity: 0; }
-    html[data-theme="dark"] .nav-sky-stars { opacity: 1; transform: scale(1); }
-    @media (prefers-reduced-motion: reduce) {
-      .nav-sky-clouds span, .nav-sky-star { animation: none; }
-    }
-    @media screen and (max-width: 768px) {
-      .header { --sky-w: 240px; }
-    }
-
-    /* ------- Tema gelap untuk navbar (aktif via html[data-theme="dark"]) ------- */
-    /* Navbar sengaja dibuat lebih terang (slate kebiruan) dari latar halaman (#0a0f1a) supaya terlihat terpisah */
-    html[data-theme="dark"] .header.scrolled,
-    html[data-theme="dark"] .header.header--pinned {
-      background: rgba(28, 40, 66, 0.94);
-      border-bottom: 1px solid rgba(143, 208, 191, 0.16);
-      box-shadow: 0 6px 28px rgba(0, 0, 0, 0.55);
-    }
-    html[data-theme="dark"] .header .nav-brand-text,
-    html[data-theme="dark"] .header .menu-button .p-large,
-    html[data-theme="dark"] .header .menu-button-icon {
-      color: #e8f1ee;
-    }
-    html[data-theme="dark"] .header .nav-brand-text span {
-      color: #8fd0bf;
-    }
-
-    /* ------- Sidebar (panel menu): langit berawan saat terang, langit berbintang saat gelap ------- */
-    .bg-panel--sky {
-      overflow: hidden;
-      background: linear-gradient(180deg, #cfe6f8 0%, #e9f4fb 60%, #f4f9fd 100%);
-      transition: background 0.6s ease;
-    }
-    .menu-sky { position: absolute; inset: 0; pointer-events: none; }
-
-    /* Awan (mode terang) */
-    .ms-clouds { position: absolute; inset: 0; transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.65, .05, 0, 1); }
-    .ms-layer { position: absolute; left: -4rem; right: -4rem; bottom: 0; height: 0; }
-    .ms-layer span { position: absolute; aspect-ratio: 1; border-radius: 50%; }
-    .ms-layer--back { animation: ms-drift 26s ease-in-out infinite; }
-    .ms-layer--front { animation: ms-drift 19s ease-in-out infinite reverse; }
-    .ms-layer--back span { background: #bcd9ef; }
-    .ms-layer--front span { background: #ffffff; box-shadow: 0 -0.4rem 1.4rem rgba(120, 165, 205, 0.25); }
-    .ms-layer--back span:nth-child(1) { width: 36%; left: -4%; bottom: -5rem; }
-    .ms-layer--back span:nth-child(2) { width: 40%; left: 16%; bottom: -7rem; }
-    .ms-layer--back span:nth-child(3) { width: 38%; left: 38%; bottom: -4.5rem; }
-    .ms-layer--back span:nth-child(4) { width: 42%; left: 58%; bottom: -7rem; }
-    .ms-layer--back span:nth-child(5) { width: 36%; left: 80%; bottom: -5rem; }
-    .ms-layer--front span:nth-child(1) { width: 30%; left: 2%; bottom: -8rem; }
-    .ms-layer--front span:nth-child(2) { width: 36%; left: 20%; bottom: -10rem; }
-    .ms-layer--front span:nth-child(3) { width: 32%; left: 42%; bottom: -7.5rem; }
-    .ms-layer--front span:nth-child(4) { width: 38%; left: 60%; bottom: -10rem; }
-    .ms-layer--front span:nth-child(5) { width: 30%; left: 84%; bottom: -8rem; }
-    @keyframes ms-drift {
-      0%, 100% { transform: translateX(-1.5rem); }
-      50% { transform: translateX(1.5rem); }
-    }
-
-    /* Bintang (mode gelap) */
-    .ms-stars { position: absolute; inset: 0; opacity: 0; transform: scale(0.96); transition: opacity 0.6s ease 0.1s, transform 0.6s cubic-bezier(.65, .05, 0, 1); }
-    .ms-star {
-      position: absolute;
-      left: var(--x);
-      top: var(--y);
-      width: 1.6rem;
-      height: 1.6rem;
-      background: #f8fcff;
-      -webkit-clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
-      clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
-      transform: scale(var(--s));
-      animation: ms-twinkle 3.2s ease-in-out var(--d) infinite;
-    }
-    @keyframes ms-twinkle {
-      0%, 100% { opacity: 0.35; }
-      50% { opacity: 1; }
-    }
-
-    html[data-theme="dark"] .bg-panel--sky { background: linear-gradient(180deg, #1f2234 0%, #191c2d 55%, #14172a 100%); }
-    html[data-theme="dark"] .bg-panel.first { background-color: #0d4257; }
-    html[data-theme="dark"] .bg-panel.second { background-color: #171b2e; }
-    html[data-theme="dark"] .ms-clouds { opacity: 0; transform: scale(0.9); }
-    html[data-theme="dark"] .ms-stars { opacity: 1; transform: scale(1); }
-    html[data-theme="dark"] .overlay { background-color: #000000aa; }
-
-    /* Teks & ikon di dalam sidebar saat gelap */
-    html[data-theme="dark"] .menu-link-heading { color: #eef3f1; text-shadow: 0px 1em 0px #2c3352; }
-    html[data-theme="dark"] .menu .eyebrow { color: #8fd0bf; }
-    html[data-theme="dark"] .menu .p-small,
-    html[data-theme="dark"] .menu .p-large { color: #c9d4d1; }
-    @media (hover: hover) {
-      html[data-theme="dark"] .menu-link:hover .menu-link-heading { text-shadow: 0px 1em 0px #ffffff; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .ms-layer, .ms-star { animation: none; }
-    }
+    .header:not(.menu-open) { background: var(--nav-bg); }
+    .header .nav-brand-text, .header .menu-button .p-large, .header .menu-button-icon { color: var(--nav-text); }
+    .header .nav-brand-text span { color: var(--nav-text); opacity: 0.75; }
+    .header.menu-open .menu-button .p-large, .header.menu-open .menu-button-icon { color: #131313; }
+    html[data-theme="dark"] .header.menu-open .menu-button .p-large, html[data-theme="dark"] .header.menu-open .menu-button-icon { color: #ffffff; }
 
     /* ============================================================
-       TEMA GLOBAL: latar penuh sampai pojok kiri & kanan layar
-       Terang  = putih  (#ffffff)
-       Gelap   = hitam  (#0a0f1a)
-       Berganti lewat tombol di navbar (html[data-theme]).
+       TEMA GLOBAL
        ============================================================ */
-    :root {
-      --site-bg: #ffffff;
-      --site-fg: #14211b;
-      color-scheme: light;
-    }
-    html[data-theme="dark"] {
-      --site-bg: #0a0f1a;
-      --site-fg: #e8f1ee;
-      color-scheme: dark;
-    }
-    html,
-    html body {
-      margin: 0;
-      width: 100%;
-      min-height: 100%;
-      background-color: var(--site-bg) !important;
-      transition: background-color 0.4s ease;
-    }
+    :root { --site-bg: #ffffff; --site-fg: #14211b; color-scheme: light; }
+    html[data-theme="dark"] { --site-bg: #0a0f1a; --site-fg: #e8f1ee; color-scheme: dark; }
+    html, html body { margin: 0; width: 100%; min-height: 100%; background-color: var(--site-bg) !important; transition: background-color 0.4s ease; }
     html[data-theme="dark"] body { color: var(--site-fg); }
-    @media (prefers-reduced-motion: reduce) {
-      html, html body { transition: none; }
-    }
+    @media (prefers-reduced-motion: reduce) { html, html body { transition: none; } }
 </style>
 
 <script>
-  // Terapkan tema tersimpan sedini mungkin supaya halaman tidak "berkedip"
   (function () {
     try {
       var t = localStorage.getItem('theme');
@@ -820,59 +604,62 @@
 
 <div class="osmo-ui">
   <header class="header @unless (request()->routeIs('home')) header--pinned @endunless" id="navHeader">
-      <div class="nav-sky" aria-hidden="true">
-        <div class="nav-sky-clouds">
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div class="nav-sky-stars">
-          <span class="nav-sky-star" style="--x:6%;--y:30%;--s:0.8;--d:0.0s"></span>
-          <span class="nav-sky-star" style="--x:18%;--y:55%;--s:0.6;--d:0.5s"></span>
-          <span class="nav-sky-star" style="--x:34%;--y:20%;--s:0.9;--d:1.0s"></span>
-          <span class="nav-sky-star" style="--x:50%;--y:60%;--s:0.5;--d:1.5s"></span>
-          <span class="nav-sky-star" style="--x:66%;--y:25%;--s:0.7;--d:2.0s"></span>
-          <span class="nav-sky-star" style="--x:80%;--y:50%;--s:0.6;--d:0.3s"></span>
-          <span class="nav-sky-star" style="--x:92%;--y:30%;--s:0.8;--d:0.8s"></span>
-        </div>
-      </div>
       <nav class="nav-row">
         <div class="nav-left">
           <a href="{{ url('/') }}" class="nav-brand nav-logo-row">
-              <img src="{{ asset('img/logo asta.png') }}" alt="Logo Astabrata">
+              @php
+                  $__setting = $siteSetting ?? null;
+                  if (class_exists(\App\Models\SiteSetting::class)) {
+                      try {
+                          $__fresh = \App\Models\SiteSetting::first();
+                          if ($__fresh) { $__setting = $__fresh; }
+                      } catch (\Throwable $e) {}
+                  }
+
+                  $__logoUrl = asset('img/logo asta.png');
+                  if ($__setting && !empty($__setting->logo)) {
+                      if (\Illuminate\Support\Str::startsWith($__setting->logo, ['http://', 'https://'])) {
+                          $__logoUrl = $__setting->logo;
+                      } else {
+                          $__logoPath = 'storage/' . ltrim($__setting->logo, '/');
+                          $__logoVer = file_exists(public_path($__logoPath))
+                              ? filemtime(public_path($__logoPath))
+                              : (optional($__setting->updated_at)->timestamp ?: time());
+                          $__logoUrl = asset($__logoPath) . '?v=' . $__logoVer;
+                      }
+                  }
+              @endphp
+              <img src="{{ $__logoUrl }}" alt="Logo {{ $__setting->brand_name ?? 'Astabrata' }}">
               <div class="nav-brand-text">
-                  Astabrata
-                  <span>Teknologi</span>
+                  {{ $__setting->brand_name ?? 'Astabrata' }}
+                  @if (!empty($__setting->brand_tagline ?? 'Teknologi'))
+                      <span>{{ $__setting->brand_tagline ?? 'Teknologi' }}</span>
+                  @endif
               </div>
           </a>
         </div>
         <div class="nav-row__right">
           <div class="theme-toggle-wrap">
             <button type="button" id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Ganti mode gelap / terang" data-theme="light">
-              <span class="tt-rays"></span>
-              <span class="tt-sun">
-                <span class="tt-spot tt-spot1"></span>
-                <span class="tt-spot tt-spot2"></span>
-                <span class="tt-spot tt-spot3"></span>
-              </span>
-              <span class="tt-moon">
-                <span class="tt-dot tt-dot1"></span>
-                <span class="tt-dot tt-dot2"></span>
-                <span class="tt-dot tt-dot3"></span>
-              </span>
+              <svg class="tt-icon tt-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/>
+              </svg>
+              <svg class="tt-icon tt-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/>
+              </svg>
             </button>
           </div>
-          <button role="button" data-menu-toggle="" class="menu-button">
+          <button role="button" data-menu-toggle="" class="menu-button" aria-label="Buka menu">
             <div class="menu-button-text">
               <p class="p-large">Menu</p>
               <p class="p-large">Close</p>
             </div>
             <div class="icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="menu-button-icon">
-                <path d="M7.33333 16L7.33333 -3.2055e-07L8.66667 -3.78832e-07L8.66667 16L7.33333 16Z" fill="currentColor"></path>
-                <path d="M16 8.66667L-2.62269e-07 8.66667L-3.78832e-07 7.33333L16 7.33333L16 8.66667Z" fill="currentColor"></path>
-                <path d="M6 7.33333L7.33333 7.33333L7.33333 6C7.33333 6.73637 6.73638 7.33333 6 7.33333Z" fill="currentColor"></path>
-                <path d="M10 7.33333L8.66667 7.33333L8.66667 6C8.66667 6.73638 9.26362 7.33333 10 7.33333Z" fill="currentColor"></path>
-                <path d="M6 8.66667L7.33333 8.66667L7.33333 10C7.33333 9.26362 6.73638 8.66667 6 8.66667Z" fill="currentColor"></path>
-                <path d="M10 8.66667L8.66667 8.66667L8.66667 10C8.66667 9.26362 9.26362 8.66667 10 8.66667Z" fill="currentColor"></path>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" class="menu-button-icon" aria-hidden="true">
+                <line class="mb-line mb-line--top" x1="4" y1="7" x2="20" y2="7"></line>
+                <line class="mb-line mb-line--mid" x1="4" y1="12" x2="20" y2="12"></line>
+                <line class="mb-line mb-line--bot" x1="4" y1="17" x2="20" y2="17"></line>
               </svg>
             </div>
           </button>
@@ -887,69 +674,37 @@
     <div class="menu-bg">
       <div class="bg-panel first"></div>
       <div class="bg-panel second"></div>
-      <div class="bg-panel bg-panel--sky">
-        <div class="menu-sky" aria-hidden="true">
-          <div class="ms-stars">
-          <span class="ms-star" style="--x:8%;--y:6%;--s:1;--d:0.00s"></span>
-          <span class="ms-star" style="--x:22%;--y:14%;--s:0.6;--d:0.45s"></span>
-          <span class="ms-star" style="--x:40%;--y:5%;--s:0.8;--d:0.90s"></span>
-          <span class="ms-star" style="--x:63%;--y:10%;--s:1.1;--d:1.35s"></span>
-          <span class="ms-star" style="--x:84%;--y:7%;--s:0.7;--d:1.80s"></span>
-          <span class="ms-star" style="--x:12%;--y:28%;--s:0.7;--d:2.25s"></span>
-          <span class="ms-star" style="--x:33%;--y:34%;--s:0.5;--d:2.70s"></span>
-          <span class="ms-star" style="--x:55%;--y:26%;--s:0.6;--d:0.15s"></span>
-          <span class="ms-star" style="--x:76%;--y:31%;--s:1;--d:0.60s"></span>
-          <span class="ms-star" style="--x:92%;--y:24%;--s:0.5;--d:1.05s"></span>
-          <span class="ms-star" style="--x:6%;--y:52%;--s:0.5;--d:1.50s"></span>
-          <span class="ms-star" style="--x:28%;--y:60%;--s:0.7;--d:1.95s"></span>
-          <span class="ms-star" style="--x:88%;--y:48%;--s:0.6;--d:2.40s"></span>
-          <span class="ms-star" style="--x:70%;--y:55%;--s:0.5;--d:2.85s"></span>
-          </div>
-          <div class="ms-clouds">
-            <div class="ms-layer ms-layer--back">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <div class="ms-layer ms-layer--front">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="bg-panel bg-panel--sky"></div>
     </div>
     <div class="menu-inner">
       <ul class="menu-list">
         <li class="menu-list-item">
-          <a href="{{ url('/') }}" class="menu-link w-inline-block">
+          <a href="{{ url('/') }}" class="menu-link w-inline-block {{ request()->is('/') ? 'active' : '' }}">
             <p class="menu-link-heading">Beranda</p>
-            <p class="eyebrow">01</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
         <li class="menu-list-item">
-          <a href="{{ url('/layanan') }}" class="menu-link w-inline-block">
+          <a href="{{ url('/layanan') }}" class="menu-link w-inline-block {{ request()->is('layanan*') ? 'active' : '' }}">
             <p class="menu-link-heading">Layanan</p>
-            <p class="eyebrow">02</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
         <li class="menu-list-item">
-          <a href="{{ url('/blog') }}" class="menu-link w-inline-block">
+          <a href="{{ url('/blog') }}" class="menu-link w-inline-block {{ request()->is('blog*') ? 'active' : '' }}">
             <p class="menu-link-heading">Blog</p>
-            <p class="eyebrow">03</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
         <li class="menu-list-item">
-          <a href="{{ url('/about') }}" class="menu-link w-inline-block">
+          <a href="{{ url('/about') }}" class="menu-link w-inline-block {{ request()->is('about*') ? 'active' : '' }}">
             <p class="menu-link-heading">About</p>
-            <p class="eyebrow">04</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
         <li class="menu-list-item">
-          <a href="{{ url('/contact') }}" class="menu-link w-inline-block">
+          <a href="{{ url('/contact') }}" class="menu-link w-inline-block {{ request()->is('contact*') ? 'active' : '' }}">
             <p class="menu-link-heading">Contact</p>
-            <p class="eyebrow">05</p>
             <div class="menu-link-bg"></div>
           </a>
         </li>
@@ -979,12 +734,13 @@
             let overlay = navWrap.querySelector(".overlay");
             let menu = navWrap.querySelector(".menu");
             let bgPanels = navWrap.querySelectorAll(".bg-panel");
+            // Panel solid (teal & putih) disembunyikan setelah animasi masuk supaya panel kaca terlihat bening
+            let solidPanels = navWrap.querySelectorAll(".bg-panel.first, .bg-panel.second");
             let menuToggles = document.querySelectorAll("[data-menu-toggle]");
             let menuLinks = navWrap.querySelectorAll(".menu-link");
             let fadeTargets = navWrap.querySelectorAll("[data-menu-fade]");
             let menuButton = document.querySelector(".menu-button");
             let menuButtonTexts = menuButton.querySelectorAll("p");
-            let menuButtonIcon = menuButton.querySelector(".menu-button-icon");
             let navHeader = document.getElementById("navHeader");
 
             let tl = gsap.timeline();
@@ -993,32 +749,37 @@
                 navWrap.setAttribute("data-nav", "open");
                 document.body.style.overflow = 'hidden';
                 navHeader.classList.add('menu-open');
+                document.querySelectorAll('.theme-toggle-wrap').forEach(el => el.style.display = 'none');
+                menuButton.classList.add('is-open');
+                menuButton.setAttribute('aria-label', 'Tutup menu');
 
                 tl.clear()
                 .set(navWrap, { display: "block" })
                 .set(menu, { xPercent: 0 }, "<")
+                .set(solidPanels, { autoAlpha: 1 }, "<")
                 .fromTo(menuButtonTexts, { yPercent: 0 }, { yPercent: -100, stagger: 0.2 })
-                .fromTo(menuButtonIcon, { rotate: 0 }, { rotate: 315 }, "<")
                 .fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1 }, "<")
                 .fromTo(bgPanels, { xPercent: 101 }, { xPercent: 0, stagger: 0.12, duration: 0.575 }, "<")
                 .fromTo(menuLinks, { yPercent: 140, rotate: 10 }, { yPercent: 0, rotate: 0, stagger: 0.05 }, "<+=0.35")
-                .fromTo(fadeTargets, { autoAlpha: 0, yPercent: 50 }, { autoAlpha: 1, yPercent: 0, stagger: 0.04 }, "<+=0.2");
+                .fromTo(fadeTargets, { autoAlpha: 0, yPercent: 50 }, { autoAlpha: 1, yPercent: 0, stagger: 0.04 }, "<+=0.2")
+                .to(solidPanels, { autoAlpha: 0, duration: 0.3 }, 0.9);
             };
 
             const closeNav = () => {
                 navWrap.setAttribute("data-nav", "closed");
                 document.body.style.overflow = '';
                 navHeader.classList.remove('menu-open');
+                document.querySelectorAll('.theme-toggle-wrap').forEach(el => el.style.display = '');
+                menuButton.classList.remove('is-open');
+                menuButton.setAttribute('aria-label', 'Buka menu');
 
                 tl.clear()
                 .to(overlay, { autoAlpha: 0 })
                 .to(menu, { xPercent: 120 }, "<")
                 .to(menuButtonTexts, { yPercent: 0 }, "<")
-                .to(menuButtonIcon, { rotate: 0 }, "<")
                 .set(navWrap, { display: "none" });
             };
 
-            // Toggle menu open / close
             menuToggles.forEach((toggle) => {
                 toggle.addEventListener("click", () => {
                     state = navWrap.getAttribute("data-nav");
@@ -1030,14 +791,12 @@
                 });
             });
 
-            // Escape key handler
             document.addEventListener("keydown", (e) => {
                 if (e.key === "Escape" && navWrap.getAttribute("data-nav") === "open") {
                     closeNav();
                 }
             });
 
-            // Scroll: transparent → white
             window.addEventListener('scroll', () => {
                 if (window.scrollY > 50) {
                     navHeader.classList.add('scrolled');
@@ -1049,7 +808,6 @@
 
         initMenu();
 
-        // Tombol Dark / Light Mode
         const themeToggle = document.getElementById('themeToggle');
         if (themeToggle) {
             const applyTheme = (theme) => {
@@ -1069,8 +827,6 @@
             });
         }
 
-        // Tombol Back: kembali ke halaman sebelumnya kalau ada riwayatnya
-        // dari situs ini, kalau tidak (misal dibuka langsung dari link luar) balik ke Beranda
         const backButton = document.getElementById('backButton');
         if (backButton) {
             backButton.addEventListener('click', () => {

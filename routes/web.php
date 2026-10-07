@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CompanyProfileController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Admin\ClientExcelController;
@@ -10,16 +10,20 @@ use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\FaqSettingController;
+use App\Http\Controllers\Admin\NavbarSettingController;
+use App\Http\Controllers\Admin\ContactSettingController;
+use App\Http\Controllers\Admin\PageSettingController;
 
 // ================= FRONTEND ROUTES =================
-Route::get('/', [CompanyProfileController::class, 'index'])->name('home');
-Route::get('/about', [CompanyProfileController::class, 'about'])->name('about');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/layanan', function () {
-    // NOTE: samakan query/urutan ini dengan yang dipakai di CompanyProfileController@index (halaman home)
+    // NOTE: samakan query/urutan ini dengan yang dipakai di HomeController@index (halaman home)
     $services = \App\Models\Service::latest()->get();
     return view('pages.layanan', compact('services'));
 })->name('layanan');
-Route::get('/contact', [CompanyProfileController::class, 'contact'])->name('contact');
+Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{blog:slug}', [BlogController::class, 'show'])->name('blog.show');
 
@@ -130,40 +134,38 @@ Route::middleware('auth')->group(function () {
                 return view('admin.pages.setting-account');
             })->name('account');
 
-            // 7.3 Pengaturan Navbar & Header
-            // NOTE: masih mockup tampilan, belum ada SettingController khusus.
-            // Nanti kalau sudah siap backend-nya, ganti closure ini dengan
-            // [NavbarSettingController::class, 'edit'] (atau sejenisnya).
-            Route::get('/navbar', function () {
-                return view('admin.pages.setting-navbar');
-            })->name('navbar');
+            // 7.3 Pengaturan Navbar & Header (CRUD asli: logo + nama perusahaan + deskripsi footer)
+            Route::get('/navbar', [NavbarSettingController::class, 'edit'])->name('navbar');
+            Route::put('/navbar', [NavbarSettingController::class, 'update'])->name('navbar.update');
 
-            // 7.4 Edit FAQ
-            // NOTE: masih mockup tampilan, belum ada FaqController.
-            Route::get('/faq', function () {
-                return view('admin.pages.setting-faq');
-            })->name('faq');
+            // 7.4 Edit FAQ (CRUD asli, lihat FaqSettingController di bawah grup setting ini)
+            Route::get('/faq', [FaqSettingController::class, 'index'])->name('faq');
+            Route::post('/faq', [FaqSettingController::class, 'store'])->name('faq.store');
+            Route::put('/faq/{faq}', [FaqSettingController::class, 'update'])->name('faq.update');
+            Route::delete('/faq/{faq}', [FaqSettingController::class, 'destroy'])->name('faq.destroy');
 
-            // 7.5 Edit Welcome
-            // NOTE: masih mockup tampilan, belum ada WelcomeController.
-            Route::get('/welcome', function () {
-                return view('admin.pages.setting-welcome');
-            })->name('welcome');
+            // 7.5 Welcome sekarang digabung ke Pengaturan Halaman (tab Beranda). URL lama diarahkan ke sana.
+            Route::redirect('/welcome', '/admin/setting/pages')->name('welcome');
 
-            // 7.5.2 Pengaturan Kontak & Lokasi
-            // NOTE: masih mockup tampilan, belum ada ContactController.
-            Route::get('/contact', function () {
-                return view('admin.pages.setting-contact');
-            })->name('contact');
+          // 7.5.2 Pengaturan Kontak & Lokasi (sosial media + alamat)
+            Route::get('/contact', [ContactSettingController::class, 'edit'])->name('contact');
+            Route::put('/contact', [ContactSettingController::class, 'update'])->name('contact.update');
 
             // 7.6 Banner
             Route::get('/banner', function () {
                 return view('admin.pages.setting-banner');
             })->name('banner');
 
+            // 7.7 Pengaturan Halaman (judul, deskripsi, warna background & teks per halaman)
+            Route::get('/pages', [PageSettingController::class, 'edit'])->name('pages');
+            Route::put('/pages', [PageSettingController::class, 'update'])->name('pages.update');
+
             // 7.6 Kelola Setting (Username & Password) - proses submit form Edit Akun
             Route::post('/username', [SettingController::class, 'updateUsername'])->name('username.update');
             Route::post('/password', [SettingController::class, 'updatePassword'])->name('password.update');
+
+            // 7.8 Background halaman login (diatur dari Edit Akun)
+
         });
 
         // PENTING: route spesifik (bulk-delete, delete-all) HARUS didaftarkan
@@ -172,4 +174,5 @@ Route::middleware('auth')->group(function () {
         Route::delete('clients/delete-all', [ClientController::class, 'destroyAll'])->name('clients.destroyAll');
         Route::resource('clients', ClientController::class)->except(['create', 'edit', 'show']);
     });
+
 });

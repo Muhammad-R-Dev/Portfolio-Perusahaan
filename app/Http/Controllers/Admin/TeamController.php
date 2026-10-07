@@ -64,11 +64,43 @@ class TeamController extends Controller
 
     private function validasi(Request $request): array
     {
+        // Tangkap input sosial media (sekarang bentuknya Array dari HTML)
+        $links = $request->input('sosial_media', []);
+        $cleanLinks = [];
+
+        if (is_array($links)) {
+            foreach ($links as $link) {
+                $link = trim((string) $link);
+                // Hanya proses kotak input yang benar-benar diisi admin
+                if (!empty($link)) {
+                    // Kalau diisi tapi belum pakai http/https, otomatis tambahkan
+                    if (!preg_match('#^https?://#i', $link)) {
+                        $link = 'https://' . $link;
+                    }
+                    $cleanLinks[] = $link;
+                }
+            }
+        }
+        
+        // Simpan kembali array yang sudah dibersihkan ke request
+        // Jika kosong (admin tidak mengisi sosmed sama sekali), jadikan null
+        $request->merge(['sosial_media' => count($cleanLinks) > 0 ? $cleanLinks : null]);
+
+        // Validasi Utama
         return $request->validate([
-            'nama'    => ['required', 'string', 'max:100'],
-            'jabatan' => ['required', 'string', 'max:100'],
-            'divisi'  => ['required', 'string', 'max:100'],
-            'foto'    => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'nama'             => ['required', 'string', 'max:100'],
+            'jabatan'          => ['required', 'string', 'max:100'],
+            // Field utama boleh kosong, tapi HARUS berupa array kalau ada
+            'sosial_media'     => ['nullable', 'array'],
+            // Validasi link di dalam array satu per satu
+            'sosial_media.*'   => ['url', 'max:255'], 
+            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'nama.required'      => 'Nama anggota tim wajib diisi.',
+            'jabatan.required'   => 'Jabatan wajib dipilih atau diisi.',
+            'sosial_media.*.url' => 'Salah satu format link sosial media yang Anda masukkan tidak valid.',
+            'foto.image'         => 'File yang diupload harus berupa gambar.',
+            'foto.max'           => 'Ukuran foto maksimal adalah 2MB.',
         ]);
     }
 

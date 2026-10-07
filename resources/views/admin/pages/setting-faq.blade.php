@@ -139,21 +139,33 @@
 		grid-gap: 8px;
 	}
 	#content main .faq-item .faq-actions button {
-		width: 36px;
 		height: 36px;
+		padding: 0 16px;
 		border: none;
 		border-radius: 10px;
-		background: var(--grey);
 		cursor: pointer;
-		font-size: 18px;
-		color: var(--dark-grey);
+		font-family: var(--poppins);
+		font-size: 13px;
+		font-weight: 600;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition: .2s ease;
 	}
-	#content main .faq-item .faq-actions button.edit:hover { color: var(--blue); background: var(--light-blue); }
-	#content main .faq-item .faq-actions button.delete:hover { color: var(--red); background: var(--light-orange); }
+	#content main .faq-item .faq-actions button.edit { background: var(--blue); color: #fff; }
+	#content main .faq-item .faq-actions button.edit:hover { opacity: .9; }
+	#content main .faq-item .faq-actions button.delete { background: var(--red); color: #fff; }
+	#content main .faq-item .faq-actions button.delete:hover { opacity: .9; }
+	body.dark #content main .faq-item .faq-actions button.edit,
+	body.dark #content main .faq-item .faq-actions button.edit:hover {
+		background: var(--blue) !important;
+		color: #fff !important;
+	}
+	body.dark #content main .faq-item .faq-actions button.delete,
+	body.dark #content main .faq-item .faq-actions button.delete:hover {
+		background: var(--red) !important;
+		color: #fff !important;
+	}
 
 	#content main .faq-empty {
 		text-align: center;
@@ -340,6 +352,44 @@
 		#content main .faq-item .faq-actions { margin-left: auto; }
 		#content main .settings-card .head .btn-add { margin-left: 0; }
 	}
+
+	/* ===== Header diam di atas; kartu pengaturan bisa discroll (seperti Pengaturan Halaman) ===== */
+	#content main .head-title.page-header-fixed { position: fixed; z-index: 60; padding: 10px 0; margin: 0; }
+	#content main .settings-card { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+	#content main .settings-card > .head.card-head-fixed { position: sticky; top: 0; z-index: 5; background: var(--light, #fff); background-clip: padding-box; }
+	/* ============================================================
+	   DARK MODE / LIGHT MODE
+	   Warna disamakan persis dengan palet halaman KELOLA BLOG
+	   (sama seperti Kelola Proyek & Dashboard):
+	     halaman #1b2538  <  kartu #25324a  <  input/hover #34456a  (dark)
+	     halaman #e9eef5  <  kartu putih                             (light)
+	   ============================================================ */
+	body.dark #content,
+	body.dark #content main {
+		--light: #25324a;          /* kartu, modal, header tabel */
+		--grey: #34456a;           /* input, hover baris, border */
+		--dark: #eef2f9;           /* teks utama */
+		--dark-grey: #a9b8d2;      /* teks sekunder */
+		--light-blue: #2f4a7a;     /* baris/ikon terpilih */
+		--light-orange: #4d3b33;
+		--blue: #4f8ef7;
+		--red: #ef5a5a;
+	}
+	body.dark #content {
+		background: #1b2538 !important;
+	}
+	body:not(.dark) #content,
+	body:not(.dark) #content main {
+		--light: #ffffff;          /* kartu, modal, header tabel */
+		--grey: #e2e8f0;           /* input, border */
+		--dark: #1e293b;           /* teks utama */
+		--dark-grey: #64748b;      /* teks sekunder */
+		--light-blue: #dbeafe;     /* baris/ikon terpilih */
+		--light-orange: #fee2e2;
+	}
+	body:not(.dark) #content {
+		background: #e9eef5 !important;
+	}
 </style>
 @endpush
 
@@ -421,14 +471,42 @@
 
 @push('scripts')
 <script>
-	// ===== Data contoh (mockup, hanya di memori browser) =====
-	const MAX_FAQ = 5;
-	let faqs = [
-		{ q: 'Berapa lama proses pengerjaan proyek?', a: 'Durasi pengerjaan tergantung kompleksitas proyek, umumnya berkisar 2-8 minggu setelah kebutuhan disepakati.' },
-		{ q: 'Apakah ada garansi setelah proyek selesai?', a: 'Ya, kami memberikan masa garansi perbaikan bug selama 30 hari setelah serah terima proyek.' }
-	];
+	// ===== Data asli dari server (tabel faqs) =====
+	const MAX_FAQ = {{ \App\Models\Faq::MAX_FAQ }};
+	const CSRF_TOKEN = '{{ csrf_token() }}';
+	// Pakai helper route() Laravel dengan placeholder __ID__ supaya tidak menebak pola URL
+	const STORE_URL   = @json(route('admin.setting.faq.store'));
+	const UPDATE_URL  = @json(route('admin.setting.faq.update', ['faq' => '__ID__']));
+	const DESTROY_URL = @json(route('admin.setting.faq.destroy', ['faq' => '__ID__']));
+	const ROUTES = {
+		store: STORE_URL,
+		update: (id) => UPDATE_URL.replace('__ID__', id),
+		destroy: (id) => DESTROY_URL.replace('__ID__', id),
+	};
+
+	let faqs = @json($faqs->map(fn ($f) => ['id' => $f->id, 'q' => $f->question, 'a' => $f->answer]));
 	let editIndex = null;   // null = mode tambah
 	let deleteIndex = null;
+	let isSubmitting = false;
+
+	async function apiRequest(url, method, body) {
+		const res = await fetch(url, {
+			method: method,
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'X-CSRF-TOKEN': CSRF_TOKEN,
+			},
+			body: body ? JSON.stringify(body) : undefined,
+		});
+		const data = await res.json().catch(() => ({}));
+		if (!res.ok) {
+			const err = new Error(data.message || 'Terjadi kesalahan.');
+			err.data = data;
+			throw err;
+		}
+		return data;
+	}
 
 	const faqList   = document.getElementById('faqList');
 	const faqCount  = document.getElementById('faqCount');
@@ -486,14 +564,14 @@
 			btnEdit.type = 'button';
 			btnEdit.className = 'edit';
 			btnEdit.title = 'Edit';
-			btnEdit.innerHTML = "<i class='bx bx-edit-alt'></i>";
+			btnEdit.textContent = 'Edit';
 			btnEdit.addEventListener('click', () => openFaqModal(i));
 
 			const btnDel = document.createElement('button');
 			btnDel.type = 'button';
 			btnDel.className = 'delete';
 			btnDel.title = 'Hapus';
-			btnDel.innerHTML = "<i class='bx bx-trash'></i>";
+			btnDel.textContent = 'Hapus';
 			btnDel.addEventListener('click', () => openDeleteModal(i));
 
 			actions.append(btnEdit, btnDel);
@@ -568,8 +646,9 @@
 	});
 	inA.addEventListener('input', updateCounters);
 
-	faqForm.addEventListener('submit', function (e) {
+	faqForm.addEventListener('submit', async function (e) {
 		e.preventDefault();
+		if (isSubmitting) return;
 		clearErrors();
 
 		const q = inQ.value.trim();
@@ -580,15 +659,31 @@
 		if (!a) { aError.classList.add('show'); inA.classList.add('invalid'); valid = false; }
 		if (!valid) return;
 
-		if (editIndex === null) {
-			if (faqs.length >= MAX_FAQ) { closeFaqModal(); return; }
-			faqs.push({ q: q, a: a });
-		} else {
-			faqs[editIndex] = { q: q, a: a };
-		}
+		isSubmitting = true;
+		const btnSubmit = document.getElementById('btnSubmitFaq');
+		btnSubmit.disabled = true;
 
-		closeFaqModal();
-		renderFaqs();
+		try {
+			if (editIndex === null) {
+				if (faqs.length >= MAX_FAQ) { closeFaqModal(); return; }
+				const res = await apiRequest(ROUTES.store, 'POST', { question: q, answer: a });
+				faqs.push({ id: res.faq.id, q: res.faq.question, a: res.faq.answer });
+			} else {
+				const id = faqs[editIndex].id;
+				const res = await apiRequest(ROUTES.update(id), 'PUT', { question: q, answer: a });
+				faqs[editIndex] = { id: res.faq.id, q: res.faq.question, a: res.faq.answer };
+			}
+			closeFaqModal();
+			renderFaqs();
+		} catch (err) {
+			const serverErrors = (err.data && err.data.errors) || {};
+			if (serverErrors.question) { qError.textContent = serverErrors.question[0]; qError.classList.add('show'); inQ.classList.add('invalid'); }
+			if (serverErrors.answer) { aError.textContent = serverErrors.answer[0]; aError.classList.add('show'); inA.classList.add('invalid'); }
+			if (!serverErrors.question && !serverErrors.answer) { alert(err.message); }
+		} finally {
+			isSubmitting = false;
+			btnSubmit.disabled = false;
+		}
 	});
 
 	// ===== Modal Hapus =====
@@ -606,12 +701,21 @@
 
 	document.getElementById('btnCancelDelete').addEventListener('click', closeDeleteModal);
 	deleteModal.addEventListener('click', e => { if (e.target === deleteModal) closeDeleteModal(); });
-	document.getElementById('btnYesDelete').addEventListener('click', function () {
-		if (deleteIndex !== null) {
+	document.getElementById('btnYesDelete').addEventListener('click', async function () {
+		if (deleteIndex === null) { closeDeleteModal(); return; }
+		const btnYes = this;
+		btnYes.disabled = true;
+		try {
+			const id = faqs[deleteIndex].id;
+			await apiRequest(ROUTES.destroy(id), 'DELETE');
 			faqs.splice(deleteIndex, 1);
 			renderFaqs();
+		} catch (err) {
+			alert(err.message);
+		} finally {
+			btnYes.disabled = false;
+			closeDeleteModal();
 		}
-		closeDeleteModal();
 	});
 
 	// Tutup modal hapus dengan tombol Esc
@@ -622,5 +726,53 @@
 	});
 
 	renderFaqs();
+
+	/* ===== Header diam di atas; kartu pengaturan bisa discroll ===== */
+	(function () {
+		var main = document.querySelector('#content main');
+		var header = main ? main.querySelector('.head-title') : null;
+		var card = document.querySelector('#content main .settings-card');
+		if (!main || !header || !card) return;
+		var spacer = null;
+		var cardHead = card.querySelector(':scope > .head');
+		function pinHeader() {
+			if (header.classList.contains('page-header-fixed')) return;
+			var r = header.getBoundingClientRect();
+			spacer = document.createElement('div');
+			spacer.style.height = r.height + 'px';
+			header.parentNode.insertBefore(spacer, header.nextSibling);
+			header.style.top = r.top + 'px';
+			header.classList.add('page-header-fixed');
+		}
+		function pinCardHead() {
+			if (!cardHead || cardHead.classList.contains('card-head-fixed')) return;
+			var cs = getComputedStyle(card);
+			var pt = parseFloat(cs.paddingTop) || 0, pl = parseFloat(cs.paddingLeft) || 0, pr = parseFloat(cs.paddingRight) || 0;
+			card.style.paddingTop = '0px';
+			cardHead.style.margin = '0 -' + pr + 'px 0 -' + pl + 'px';
+			cardHead.style.padding = pt + 'px ' + pr + 'px 16px ' + pl + 'px';
+			cardHead.classList.add('card-head-fixed');
+		}
+		function syncLayout() {
+			var mainTop = main.getBoundingClientRect().top;
+			main.style.height = (window.innerHeight - mainTop) + 'px';
+			main.style.overflow = 'hidden';
+			var ref = spacer || header;
+			var hr = ref.getBoundingClientRect();
+			header.style.left = hr.left + 'px';
+			header.style.width = hr.width + 'px';
+			var cardTop = card.getBoundingClientRect().top;
+			var bar = document.querySelector('.form-actions');
+			var barH = (bar && getComputedStyle(bar).position === 'fixed') ? bar.getBoundingClientRect().height : 0;
+			var available = window.innerHeight - cardTop - barH - 16;
+			if (available < 200) available = 200;
+			card.style.maxHeight = available + 'px';
+		}
+		pinHeader();
+		pinCardHead();
+		syncLayout();
+		window.addEventListener('resize', syncLayout);
+		setTimeout(syncLayout, 300);
+	})();
 </script>
 @endpush

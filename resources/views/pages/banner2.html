@@ -18,6 +18,15 @@
       --ink: #14161a;
       --muted: #5d636e;
       --line: #e6e8ec;
+      /* diisi otomatis oleh JavaScript di bawah (path gambar kantor) */
+      --tower-url: none;
+      /* lebar gambar kantor = lebar teks ASTABRATA (dihitung otomatis oleh JS).
+         --tower-extra: tambah/kurangi manual, mis. 3cqw (lebih lebar) atau -3cqw (lebih sempit) */
+      --tower-w: 60cqw;
+      --tower-extra: 0cqw;
+      /* seberapa turun gambar: 0 = normal, 0.5 = turun setengah tinggi gambar, 1 = turun penuh */
+      --tower-drop-ratio: 0.2;
+      --tower-drop: 0px; /* dihitung otomatis oleh JS */
     }
 
     html { color-scheme: light only; }
@@ -79,6 +88,10 @@
     }
 
     .assets > img.tower {
+      top: auto;
+      bottom: calc(var(--tower-drop) * -1);
+      height: auto;
+      width: calc(var(--tower-w) + var(--tower-extra));
       translate: calc(-50% + (var(--x) * 5cqw)) calc(var(--y) * -20px);
     }
 
@@ -107,11 +120,11 @@
       font-size: 4.6cqw;
       line-height: 1;
       letter-spacing: 0.9em;
-      margin-right: -0.9em; /* balance trailing letter-spacing */
+      margin-right: -0.9em;
       margin-top: -0.9cqw;
     }
 
-    /* Solid text: behind the tower, moves down on scroll */
+    /* Teks solid: berada di belakang gedung, turun saat scroll */
     .title.solid {
       color: #fff;
       translate:
@@ -119,25 +132,22 @@
         calc((var(--y) * -20px) + (var(--scroll) * 0.55px));
     }
 
-    /* Outline: only for the subtitle, only visible where the tower covers it.
-       Exact same position as the solid text (no offset). */
+    /* Outline: hanya subtitle, hanya terlihat di area gedung */
     .tower-mask {
       translate: calc(-50% + (var(--x) * 5cqw)) calc(var(--y) * -20px);
       pointer-events: none;
-      -webkit-mask-image: url('https://assets.codepen.io/605876/do-not-copy-osaka-tower.png');
-      mask-image: url('https://assets.codepen.io/605876/do-not-copy-osaka-tower.png');
-      -webkit-mask-size: cover;
-      mask-size: cover;
-      -webkit-mask-position: 50% 43%;
-      mask-position: 50% 43%;
+      -webkit-mask-image: var(--tower-url);
+      mask-image: var(--tower-url);
+      -webkit-mask-size: calc(var(--tower-w) + var(--tower-extra)) auto;
+      mask-size: calc(var(--tower-w) + var(--tower-extra)) auto;
+      -webkit-mask-position: 50% calc(100% + var(--tower-drop));
+      mask-position: 50% calc(100% + var(--tower-drop));
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
     }
 
     .tower-mask .title {
       color: transparent;
-      /* box already moves with the tower (+5cqw*x); cancel it so the text
-         lands exactly where the solid one is */
       translate:
         calc(-50% + (var(--x) * -11cqw))
         calc(var(--scroll) * 0.55px);
@@ -149,7 +159,7 @@
       -webkit-text-stroke: 1px rgba(255, 255, 255, 0.95);
     }
 
-    /* Mobile / portrait: landscape card, cropped like desktop */
+    /* Mobile / portrait */
     @media (orientation: portrait), (max-width: 700px) {
       article {
         height: auto;
@@ -229,9 +239,7 @@
       border-top: 1px solid var(--line);
     }
 
-    .fact {
-      padding: 1.5rem 0;
-    }
+    .fact { padding: 1.5rem 0; }
 
     .fact b {
       display: block;
@@ -265,13 +273,12 @@
       <div class="assets">
         <img class="sky"
              src="https://assets.codepen.io/605876/do-not-copy-osaka-sky.jpeg"
-             alt="Osaka sky" />
+             alt="Langit" />
 
         <h3 class="title solid"><span class="name">Astabrata</span><span class="sub">Teknologi</span></h3>
 
-        <img class="tower"
-             src="https://assets.codepen.io/605876/do-not-copy-osaka-tower.png"
-             alt="Osaka Tower" />
+        <!-- src diisi otomatis oleh JavaScript (lihat bagian script) -->
+        <img class="tower" id="towerImg" alt="Kantor Astabrata" />
 
         <div class="tower-mask" aria-hidden="true">
           <h3 class="title"><span class="name">Astabrata</span><span class="sub">Teknologi</span></h3>
@@ -316,6 +323,63 @@
 
   <footer>Osaka · Jepang</footer>
 
+  <!-- ====== LOADER GAMBAR KANTOR (otomatis cari path yang benar) ====== -->
+  <script>
+    (function () {
+      var FILE = 'asta%20kantor.png';
+
+      // Daftar kemungkinan lokasi, dicoba berurutan sampai ada yang berhasil.
+      var candidates = [
+        '/image/' + FILE,                   // Laravel: public/image  (php artisan serve / route)
+        '/public/image/' + FILE,            // Live Server dibuka dari root project
+        '../../../public/image/' + FILE,    // dibuka langsung dari resources/views/pages/
+        'image/' + FILE,                    // folder image sejajar dengan file html
+        '../image/' + FILE,
+        '../../image/' + FILE
+      ];
+
+      var root = document.documentElement;
+      var imgEl = document.getElementById('towerImg');
+
+      function tryNext(i) {
+        if (i >= candidates.length) {
+          console.error('[banner] Gambar kantor tidak ditemukan. Path yang dicoba:', candidates);
+          return;
+        }
+        var test = new Image();
+        test.onload = function () {
+          var url = new URL(candidates[i], document.baseURI).href;
+          imgEl.src = url;
+          root.style.setProperty('--tower-url', 'url("' + url + '")');
+          console.log('[banner] Gambar kantor dimuat dari:', url);
+        };
+        test.onerror = function () { tryNext(i + 1); };
+        test.src = candidates[i];
+      }
+
+      tryNext(0);
+
+      // Samakan lebar gambar kantor dengan lebar teks "ASTABRATA"
+      // (tepi kiri gambar = huruf A pertama, tepi kanan = huruf A terakhir)
+      var article = document.querySelector('article');
+      var nameEl = document.querySelector('.title.solid .name');
+      function fitWidth() {
+        var w = nameEl.offsetWidth;
+        var a = article.clientWidth;
+        if (w && a) root.style.setProperty('--tower-w', (w / a * 100) + 'cqw');
+        // turunkan gambar sesuai rasio x tinggi gambar
+        var ratio = parseFloat(getComputedStyle(root).getPropertyValue('--tower-drop-ratio')) || 0;
+        var h = imgEl.offsetHeight;
+        if (h) root.style.setProperty('--tower-drop', (h * ratio) + 'px');
+      }
+      imgEl.addEventListener('load', fitWidth);
+      fitWidth();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitWidth);
+      window.addEventListener('load', fitWidth);
+      window.addEventListener('resize', fitWidth);
+    })();
+  </script>
+
   <script type="module">
     import gsap from 'https://esm.sh/gsap@3.12.0';
 
@@ -329,12 +393,12 @@
       });
     });
 
-    // Swipe / drag left & right (touch + pen), both directions
+    // Swipe / drag kiri-kanan (touch + pen)
     const card = document.querySelector('article');
     let dragging = false, startX = 0, startVal = 0;
 
     card.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'mouse') return; // mouse already follows hover
+      if (e.pointerType === 'mouse') return;
       dragging = true;
       startX = e.clientX;
       startVal = parseFloat(getComputedStyle(root).getPropertyValue('--x')) || 0;
@@ -349,7 +413,7 @@
     window.addEventListener('pointerup', end);
     window.addEventListener('pointercancel', end);
 
-    // Scroll parallax: title moves down
+    // Scroll parallax: judul turun
     const onScroll = () => {
       const s = Math.min(window.scrollY, window.innerHeight * 1.2);
       root.style.setProperty('--scroll', s);

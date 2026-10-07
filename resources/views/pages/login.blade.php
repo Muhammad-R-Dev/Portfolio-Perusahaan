@@ -5,16 +5,14 @@
 @section('content')
 <div class="login-page">
     <div class="login-shell reveal">
-        <!-- Panel kiri: foto kantor full-bleed dengan teks overlay (disembunyikan di mobile) -->
+        <!-- Panel kiri: foto kantor full-bleed (disembunyikan di mobile) -->
         <div class="login-photo">
-            <img src="{{ asset('image/kantor.jpeg') }}" alt="Kantor PT Astabrata Teknologi" class="login-photo-img">
-            <div class="login-photo-overlay"></div>
-
-            <div class="login-photo-content">
-                <span class="login-welcome">Selamat Datang</span>
-                <p class="login-photo-eyebrow">Portal Internal</p>
-                <h1>Delapan Unsur,<br>Satu Arah Kerja.</h1>
-            </div>
+            @php
+                // Background login bisa diganti dari Settings > Pengaturan Halaman > Login
+                $loginBgRaw = \App\Models\PageSetting::for('login')->bgUrl();
+                $loginBgSrc = $loginBgRaw ?: asset('image/kantor.jpeg');
+            @endphp
+            <img src="{{ $loginBgSrc }}" alt="Kantor PT Astabrata Teknologi" class="login-photo-img">
         </div>
 
         <!-- Panel kanan: form login -->
@@ -105,6 +103,16 @@
     </div>
 </div>
 
+<!-- Pop up "Berhasil Masuk": muncul di tengah layar setelah login sukses, lalu auto redirect -->
+<div class="login-success-overlay" id="loginSuccessOverlay" role="status" aria-live="polite">
+    <div class="login-success-card">
+        <div class="login-success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3>Berhasil Masuk</h3>
+        <p id="loginSuccessMessage">Selamat datang kembali! Mengalihkan Anda ke dashboard...</p>
+        <div class="login-success-spinner"></div>
+    </div>
+</div>
+
 @push('styles')
 <style>
     .login-page {
@@ -160,46 +168,6 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-    }
-    .login-photo-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(9, 67, 86, 0.15) 0%, rgba(9, 67, 86, 0.35) 55%, rgba(6, 32, 41, 0.92) 100%);
-    }
-    .login-photo-content {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 2.75rem 2.5rem;
-        color: #FFFFFF;
-    }
-    .login-welcome {
-        display: inline-block;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 500;
-        font-size: 0.75rem;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: #7FD8C4;
-        padding-bottom: 0.5rem;
-        border-bottom: 1.5px solid #7FD8C4;
-        margin-bottom: 1.1rem;
-    }
-    .login-photo-eyebrow {
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.95rem;
-        font-weight: 400;
-        color: rgba(255, 255, 255, 0.75);
-        margin-bottom: 0.3rem;
-    }
-    .login-photo-content h1 {
-        font-family: 'Sora', sans-serif;
-        font-size: 1.75rem;
-        font-weight: 600;
-        line-height: 1.35;
-        letter-spacing: -0.01em;
-        color: #FFFFFF;
     }
 
     /* ===== Panel kanan: form (diperkecil) ===== */
@@ -427,6 +395,67 @@
         .login-shell { border-radius: 16px; }
         .login-form-inner h2 { font-size: 1.3rem; }
     }
+
+    /* ===== Pop up "Berhasil Masuk" (tengah layar, lalu auto redirect) ===== */
+    .login-success-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(9, 67, 86, 0.38);
+        backdrop-filter: blur(2px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .login-success-overlay.show { display: flex; }
+    .login-success-overlay.in { opacity: 1; }
+
+    .login-success-card {
+        background: #FFFFFF;
+        width: 100%;
+        max-width: 320px;
+        border-radius: 20px;
+        padding: 2.4rem 2.2rem 2rem;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(9, 67, 86, 0.25);
+        transform: scale(0.85);
+        opacity: 0;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+    .login-success-overlay.in .login-success-card { transform: scale(1); opacity: 1; }
+
+    .login-success-icon { font-size: 3.2rem; color: #2f6e4e; margin-bottom: 0.9rem; }
+    .login-success-card h3 {
+        font-family: 'Sora', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #1F2933;
+        margin-bottom: 0.5rem;
+    }
+    .login-success-card p {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        color: #6B7A80;
+        line-height: 1.6;
+        margin-bottom: 1.3rem;
+    }
+    .login-success-spinner {
+        width: 26px;
+        height: 26px;
+        border: 3px solid #E1E4E5;
+        border-top-color: #094356;
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: loginSuccessSpin 0.7s linear infinite;
+    }
+    @keyframes loginSuccessSpin { to { transform: rotate(360deg); } }
+
+    /* Tombol submit: state loading saat menunggu respons server */
+    .login-submit[disabled] { opacity: 0.75; cursor: default; }
+    .login-submit[disabled]:hover { background: #094356; transform: none; }
 </style>
 @endpush
 
@@ -459,6 +488,84 @@
 
             btn.setAttribute('aria-label', isHidden ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
         });
+
+        /* ===== Submit login via AJAX: kalau sukses, tampilkan pop up
+           "Berhasil Masuk" di tengah layar dulu, baru redirect ke dashboard ===== */
+        const loginForm = document.querySelector('.login-form');
+        const overlay = document.getElementById('loginSuccessOverlay');
+        const overlayMessage = document.getElementById('loginSuccessMessage');
+
+        if (loginForm && overlay) {
+            const submitBtn = loginForm.querySelector('.login-submit');
+            const submitDefaultText = submitBtn ? submitBtn.textContent : 'Masuk';
+
+            function setLoading(isLoading) {
+                if (!submitBtn) return;
+                submitBtn.disabled = isLoading;
+                submitBtn.textContent = isLoading ? 'Memproses...' : submitDefaultText;
+            }
+
+            function showFormError(message) {
+                let alertBox = loginForm.parentElement.querySelector('.login-alert:not(.login-alert-success)');
+                if (!alertBox) {
+                    alertBox = document.createElement('div');
+                    alertBox.className = 'login-alert';
+                    alertBox.setAttribute('role', 'alert');
+                    alertBox.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i><span></span>';
+                    loginForm.parentElement.insertBefore(alertBox, loginForm);
+                }
+                alertBox.querySelector('span').textContent = message;
+            }
+
+            function showSuccessPopup(message, redirectUrl) {
+                if (message && overlayMessage) overlayMessage.textContent = message;
+                overlay.classList.add('show');
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () { overlay.classList.add('in'); });
+                });
+                setTimeout(function () {
+                    window.location.href = redirectUrl;
+                }, 1800);
+            }
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                setLoading(true);
+
+                fetch(loginForm.getAttribute('action'), {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: new FormData(loginForm),
+                })
+                    .then(function (res) {
+                        return res.json().then(function (data) {
+                            return { ok: res.ok, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        if (result.ok && result.data && result.data.success) {
+                            showSuccessPopup(result.data.message, result.data.redirect);
+                            return;
+                        }
+
+                        setLoading(false);
+
+                        let message = 'Username atau kata sandi yang Anda masukkan salah.';
+                        if (result.data && result.data.errors) {
+                            const firstField = Object.keys(result.data.errors)[0];
+                            if (firstField) message = result.data.errors[firstField][0];
+                        } else if (result.data && result.data.message) {
+                            message = result.data.message;
+                        }
+                        showFormError(message);
+                    })
+                    .catch(function () {
+                        setLoading(false);
+                        // JS/jaringan bermasalah: jatuhkan ke submit biasa (fallback)
+                        loginForm.submit();
+                    });
+            });
+        }
     });
 </script>
 @endpush

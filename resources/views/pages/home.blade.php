@@ -3,7 +3,7 @@
 @push('styles')
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ===== RESET & VARIABEL GLOBAL ===== */
 *, *::before, *::after { padding: 0; margin: 0; box-sizing: border-box; }
@@ -15,7 +15,10 @@
   --gold: #C4A574; --gold-soft: #D4BC8E;
   --cream: #F7F3EC; --cream-warm: #EFE8DC; --ivory: #FBFAF7; --stone: #E8E2D8;
   --muted: #6B736E; --text: #1C2421; --text-soft: rgba(28, 36, 33, 0.72);
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Jarak kiri & kanan halaman: dipakai hero, Tentang Kami, dan FAQ agar tepinya sejajar.
+     5vw = sama dengan jarak logo di navbar; minimal 24px. Ubah di sini untuk mengatur semuanya sekaligus. */
+  --side-gap: max(24px, 5vw);
+  --font-sans: 'Google Sans Flex', 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 html { background-color: var(--ivory); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -40,27 +43,37 @@ button, input, textarea, select { font-family: var(--font-sans); }
 
 /* ===== HERO SECTION ===== */
 html #navHeader { opacity: 1; visibility: visible; pointer-events: auto; }
-.hero-frame { padding: 22px 22px 0; background: #FFFFFF; position: relative; }
-main.hero-bg { position: relative; width: 100%; height: clamp(440px, 78vh, 720px); min-height: 0; max-height: none; overflow: hidden; border-radius: 8px; background: #0B1412; }
+/* --hero-p = progres scroll hero (0 = penuh layar, 1 = sejajar dengan teks di bawahnya). Diisi oleh JS di bawah. */
+.hero-frame { --hero-p: 0; padding: 0; background: #FFFFFF; position: relative; }
+main.hero-bg { position: relative; width: 100%; height: clamp(440px, 78vh, 720px); min-height: 0; max-height: none; overflow: hidden; border-radius: 0; background: #0B1412;
+  /* kiri-kanan dipotong (crop) seiring scroll sampai selebar konten di bawahnya, sudut ikut membulat */
+  clip-path: inset(0 calc(var(--side-gap) * var(--hero-p)) round calc(var(--hero-p) * 10px)); }
 .hero-bg__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; z-index: 1; }
 main.hero-bg .hero-gradient { z-index: 2; height: 70%; position: absolute; width: 100%; bottom: 0; left: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0.62) 100%); pointer-events: none; }
 main.hero-bg .text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9; width: 100%; padding: 0 1rem; text-align: center; text-transform: uppercase; color: #FEFEFE; pointer-events: auto; }
 main.hero-bg .text h1 { font-weight: 800; font-size: clamp(2.8rem, 7vw, 6.4rem); line-height: 0.95; letter-spacing: -0.01em; margin: 0; }
 main.hero-bg .text h2 { font-weight: 300; font-size: clamp(2.1rem, 5.2vw, 4.8rem); line-height: 1; margin-top: 0.15em; letter-spacing: 0.02em; }
-.scroll-hint { position: absolute; z-index: 998; bottom: 1rem; right: 1.5rem; color: rgba(255, 255, 255, 0.75); font-size: 0.7rem; letter-spacing: 0.05em; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.scroll-hint { opacity: calc(1 - var(--hero-p) * 2.5); position: absolute; z-index: 998; bottom: 1rem; right: 1.5rem; color: rgba(255, 255, 255, 0.75); font-size: 0.7rem; letter-spacing: 0.05em; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
 .scroll-hint i { animation: bounce 1.8s infinite; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
+/* Desktop & tablet: hero memenuhi satu layar penuh (tinggi layar dikurangi navbar + jarak atas) */
+@media (min-width: 726px) {
+  main.hero-bg { height: calc(100vh - var(--hero-top, 96px)); height: calc(100svh - var(--hero-top, 96px)); min-height: 440px; }
+}
+
 @media (max-width: 725px) {
-  .hero-frame { padding: 14px 14px 0; }
-  main.hero-bg { height: clamp(340px, 60vh, 460px); aspect-ratio: auto; border-radius: 8px; }
+  .hero-frame { padding: 14px 0 0; }
+  main.hero-bg { height: auto; aspect-ratio: 16 / 9; min-height: 200px; }
+  main.hero-bg .text h1 { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+  main.hero-bg .text h2 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); }
   main.hero-bg .text { top: 50%; }
   .scroll-hint { display: none; }
 }
 
 /* ===== TENTANG KAMI ===== */
 .tentang-kami-cloneable {
-  padding: 0.8rem 22px 5.5rem; /* Padding 22px mengimbangi padding bingkai Hero */
+  padding: 0.8rem var(--side-gap) 5.5rem; /* jarak kiri-kanan sama dengan bingkai Hero */
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   position: relative; font-size: 1.1vw; background: #ffffff; color: #131313; overflow: hidden;
 }
@@ -108,7 +121,7 @@ main.hero-bg .text h2 { font-weight: 300; font-size: clamp(2.1rem, 5.2vw, 4.8rem
 .tab-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 
 @media (max-width: 991px) {
-  .tentang-kami-cloneable { padding: 1.5em 22px 3.5em; font-size: 14px; }
+  .tentang-kami-cloneable { padding: 1.5em var(--side-gap) 3.5em; font-size: 14px; }
   .tab-layout { flex-direction: column; gap: 1.5em; }
   .tab-layout-col { width: 100%; }
   .tab-container { padding-right: 0; }
@@ -119,7 +132,8 @@ main.hero-bg .text h2 { font-weight: 300; font-size: clamp(2.1rem, 5.2vw, 4.8rem
 }
 
 /* ===== FAQ SECTION ===== */
-.project { position: relative; z-index: 1; background: #FFFFFF; color: #111111; padding: 5rem 22px 6.5rem; border-top: 1px solid rgba(0, 0, 0, 0.06); }
+.project { position: relative; z-index: 1; background: #FFFFFF; color: #111111; padding: 5rem var(--side-gap) 6.5rem; border-top: 1px solid rgba(0, 0, 0, 0.06); }
+.project .container-global { max-width: none; }
 .faq-layout { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 620px); grid-template-rows: auto 1fr; grid-template-areas: "text list" "cta list"; justify-content: space-between; align-items: start; column-gap: 3.5rem; row-gap: 2.25rem; }
 .faq-text { grid-area: text; display: flex; flex-direction: column; }
 .faq-eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; width: fit-content; font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #0a6b86; background: rgba(8, 75, 95, 0.06); border: 1px solid rgba(8, 75, 95, 0.18); padding: 0.4rem 0.9rem; border-radius: 999px; margin-bottom: 1rem; }
@@ -195,9 +209,10 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
 @endpush
 
 @section('content')
+@php $ps = \App\Models\PageSetting::for('beranda'); @endphp
 <div class="hero-frame">
   <main class="hero-bg">
-    <img src="img/bg.webp" loading="eager" alt="" class="hero-bg__img">
+    <img src="{{ $ps->bgUrl() ?? asset('image/asta 3.jpg') }}" loading="eager" alt="" class="hero-bg__img">
     <div class="hero-gradient"></div>
     <div class="text">
       <h1>Astabrata </h1>
@@ -221,17 +236,14 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
       <div class="tab-layout-container">
         <div class="tab-container">
           <div class="tab-container-top">
-            <h1 class="tab-layout-heading reveal reveal-delay-1">PT Astabrata Teknologi</h1>
+            <h1 class="tab-layout-heading reveal reveal-delay-1">{{ $welcome->title ?? 'PT Astabrata Teknologi' }}</h1>
           </div>
           <div class="tab-container-bottom">
             <div data-tabs="content-wrap" class="tab-content-wrap">
               <div data-tabs="content-item" class="tab-content-item active">
-                <h2 data-tabs-fade="" class="tab-content__heading reveal">Solusi Digital Terpadu</h2>
+                <h2 data-tabs-fade="" class="tab-content__heading reveal">{{ $welcome->subtitle ?? 'Solusi Digital Terpadu' }}</h2>
                 <p data-tabs-fade="" class="content-p reveal reveal-delay-1">
-                  PT Astabrata Teknologi adalah perusahaan teknologi yang berfokus pada perancangan dan
-                  pengembangan solusi digital untuk membantu bisnis tumbuh di era yang serba terhubung.
-                  Kami memadukan strategi, desain, dan rekayasa perangkat lunak untuk menghadirkan produk
-                  digital yang berkesan bagi penggunanya.
+                  {{ $welcome->description ?? 'PT Astabrata Teknologi adalah perusahaan teknologi yang berfokus pada perancangan dan pengembangan solusi digital untuk membantu bisnis tumbuh di era yang serba terhubung. Kami memadukan strategi, desain, dan rekayasa perangkat lunak untuk menghadirkan produk digital yang berkesan bagi penggunanya.' }}
                 </p>
               </div>
             </div>
@@ -244,7 +256,7 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
     <div class="tab-layout-col">
       <div data-tabs="visual-wrap" class="tab-visual-wrap reveal reveal-scale reveal-delay-2">
         <div data-tabs="visual-item" class="tab-visual-item active">
-          <img src="{{ asset('image/beranda.jpeg') }}" loading="lazy" alt="Tim PT Astabrata Teknologi berkolaborasi" class="tab-image">
+          <img src="{{ isset($welcome) && $welcome->image ? (\Illuminate\Support\Str::startsWith($welcome->image, ['http://', 'https://']) ? $welcome->image : asset('storage/' . $welcome->image)) : asset('image/beranda.jpeg') }}" loading="lazy" alt="Tim PT Astabrata Teknologi berkolaborasi" class="tab-image">
         </div>
       </div>
     </div>
@@ -256,16 +268,18 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
     <div class="faq-layout">
       <div class="faq-text">
         <span class="faq-eyebrow reveal">FAQ</span>
-        <h3 class="reveal reveal-delay-1">Pertanyaan Umum</h3>
+        @include('partials.page-style', ['ps' => $ps])
+        <h3 class="reveal reveal-delay-1">{{ $ps->titleText() }}</h3>
         <p class="section-subtitle reveal reveal-delay-2 faq-desc">
-          Beberapa hal yang paling sering ditanyakan calon klien sebelum memulai proyek bersama kami.
+          {{ $ps->descriptionText() }}
         </p>
       </div>
 
       <div class="faq-list">
-        <div class="faq-item active reveal">
-          <button class="faq-question" type="button" aria-expanded="true">
-            <span>Berapa lama estimasi waktu pengerjaan proyek?</span>
+        @forelse (($faqs ?? []) as $faq)
+        <div class="faq-item {{ $loop->first ? 'active' : '' }} reveal">
+          <button class="faq-question" type="button" aria-expanded="{{ $loop->first ? 'true' : 'false' }}">
+            <span>{{ $faq->question }}</span>
             <span class="faq-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -275,78 +289,17 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
           </button>
           <div class="faq-answer">
             <div class="faq-answer-inner">
-              <p>Tergantung kompleksitas dan scope pekerjaan, umumnya proyek website atau aplikasi selesai dalam 2–6 minggu. Kami akan memberikan timeline yang jelas setelah kebutuhan Anda dibahas di awal.</p>
+              <p>{{ $faq->answer }}</p>
             </div>
           </div>
         </div>
-
+        @empty
         <div class="faq-item reveal">
-          <button class="faq-question" type="button" aria-expanded="false">
-            <span>Bagaimana sistem pembayarannya?</span>
-            <span class="faq-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">
-              <p>Pembayaran dilakukan secara bertahap, biasanya 50% di awal sebagai DP untuk memulai pengerjaan dan 50% sisanya setelah proyek selesai dan disetujui. Untuk proyek besar, tahapan pembayaran bisa disesuaikan.</p>
-            </div>
+          <div class="faq-answer-inner">
+            <p>Belum ada FAQ yang ditambahkan.</p>
           </div>
         </div>
-
-        <div class="faq-item reveal">
-          <button class="faq-question" type="button" aria-expanded="false">
-            <span>Apakah tersedia revisi setelah pengerjaan?</span>
-            <span class="faq-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">
-              <p>Ya, setiap paket sudah termasuk sejumlah revisi gratis selama masa pengerjaan agar hasil akhir sesuai dengan kebutuhan Anda. Revisi tambahan di luar ketentuan dapat didiskusikan lebih lanjut.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item reveal">
-          <button class="faq-question" type="button" aria-expanded="false">
-            <span>Apakah ada garansi atau dukungan setelah proyek selesai?</span>
-            <span class="faq-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">
-              <p>Tentu. Kami menyediakan dukungan purna jual untuk perbaikan bug dan pendampingan setelah website atau aplikasi Anda live, sehingga Anda tidak dibiarkan berjalan sendiri.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="faq-item reveal">
-          <button class="faq-question" type="button" aria-expanded="false">
-            <span>Bagaimana cara memulai proyek dengan kami?</span>
-            <span class="faq-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </span>
-          </button>
-          <div class="faq-answer">
-            <div class="faq-answer-inner">
-              <p>Cukup hubungi kami melalui email atau form kontak dengan kebutuhan proyek Anda. Tim kami akan menjadwalkan diskusi awal untuk memahami kebutuhan dan memberikan penawaran yang sesuai.</p>
-            </div>
-          </div>
-        </div>
+        @endforelse
       </div>
 
       <div class="faq-cta reveal">
@@ -375,10 +328,115 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
     const frame = document.querySelector('.hero-frame');
     const pos = getComputedStyle(nav).position;
     if (frame && (pos === 'fixed' || pos === 'absolute')) {
-      const setPad = () => { frame.style.paddingTop = nav.offsetHeight + 'px'; };
-      setPad(); window.addEventListener('resize', setPad);
+      // Letakkan hero PERSIS di bawah navbar (desktop: menempel, mobile: jarak 14px).
+      // Dihitung dari posisi asli di dokumen, jadi spasi/padding lain di atasnya (layout, dll.) ikut dikoreksi.
+      const setPad = () => {
+        const gap = window.innerWidth <= 725 ? 14 : 0;
+        const navH = nav.getBoundingClientRect().height;
+        frame.style.paddingTop = '0px';
+        frame.style.marginTop = '0px';
+        const offset = frame.getBoundingClientRect().top + window.scrollY; // posisi hero tanpa koreksi
+        const need = navH + gap - offset;
+        if (need >= 0) { frame.style.paddingTop = need + 'px'; }
+        else { frame.style.marginTop = need + 'px'; }                      // ada spasi berlebih di atas: tarik naik
+        frame.style.setProperty('--hero-top', (navH + gap) + 'px');        // dipakai CSS untuk tinggi hero satu layar
+      };
+      setPad();
+      window.addEventListener('resize', setPad);
+      window.addEventListener('load', setPad);
+      nav.addEventListener('transitionend', setPad);                       // navbar mengecil saat 'scrolled' (ada transisi)
+      if ('ResizeObserver' in window) new ResizeObserver(setPad).observe(nav);
     }
   }
+
+  // Hero: full layar di awal, lalu di-crop kiri-kanan sampai sejajar dengan teks di bawahnya.
+  //  - Desktop/tablet: scroll halaman DITAHAN dulu; gerakan scroll hanya menjalankan animasi crop.
+  //    Setelah crop selesai, scroll ke bawah berjalan normal. Scroll naik di paling atas membalik animasinya.
+  //  - Mobile: animasi crop mengikuti posisi scroll biasa.
+  (function () {
+    const frame = document.querySelector('.hero-frame');
+    if (!frame) return;
+    const desktop = window.matchMedia('(min-width: 726px)');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const DIST = 420;                       // jumlah gerakan scroll (px) untuk satu animasi crop penuh
+    const ease = (t) => t * t * (3 - 2 * t);
+    let target = 0, shown = 0, raf = null, ticking = false;
+
+    const locked = () => desktop.matches && !reduce.matches;
+    const atTop = () => window.scrollY <= 0;
+    const menuOpen = () => document.body.style.overflow === 'hidden';
+    const render = (p) => frame.style.setProperty('--hero-p', p.toFixed(3));
+
+    // --- Mode scroll biasa (mobile) ---
+    const updateLinked = () => {
+      ticking = false;
+      if (reduce.matches) { render(0); return; }
+      const dist = Math.max(220, frame.offsetHeight * 0.55);
+      const t = Math.min(1, Math.max(0, window.scrollY / dist));
+      render(ease(t));
+    };
+
+    // --- Mode tahan scroll (desktop) ---
+    const step = () => {
+      shown += (target - shown) * 0.14;
+      if (Math.abs(target - shown) < 0.002) shown = target;
+      render(ease(shown));
+      raf = (shown !== target) ? requestAnimationFrame(step) : null;
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
+    const canScrollDown = () => target < 1 || shown < 1;   // masih menunggu animasi crop selesai
+    const canScrollUp = () => target > 0 || shown > 0;
+
+    const nudge = (dy, e) => {
+      if (dy > 0 && canScrollDown()) { e.preventDefault(); target = Math.min(1, target + dy / DIST); kick(); }
+      else if (dy < 0 && canScrollUp()) { e.preventDefault(); target = Math.max(0, target + dy / DIST); kick(); }
+    };
+
+    window.addEventListener('wheel', (e) => {
+      if (!locked() || !atTop() || menuOpen() || e.ctrlKey) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= window.innerHeight;
+      nudge(dy, e);
+    }, { passive: false });
+
+    let touchY = null;
+    window.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (touchY === null || !locked() || !atTop() || menuOpen()) return;
+      const y = e.touches[0].clientY;
+      const dy = touchY - y;
+      touchY = y;
+      nudge(dy, e);
+    }, { passive: false });
+
+    window.addEventListener('keydown', (e) => {
+      if (!locked() || !atTop() || menuOpen() || e.altKey || e.ctrlKey || e.metaKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (/^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(tag) || (e.target && e.target.isContentEditable)) return;
+      const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'End' || (e.key === ' ' && !e.shiftKey);
+      const up = e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home' || (e.key === ' ' && e.shiftKey);
+      if (down && canScrollDown()) { e.preventDefault(); target = 1; kick(); }
+      else if (up && canScrollUp()) { e.preventDefault(); target = 0; kick(); }
+    });
+
+    const sync = () => {
+      if (locked()) {
+        // Kalau halaman sudah turun (mis. klik link #faq atau scroll lewat scrollbar), langsung selesaikan crop
+        if (!atTop() && target < 1) { target = 1; kick(); }
+      } else if (!ticking) {
+        ticking = true; requestAnimationFrame(updateLinked);
+      }
+    };
+    window.addEventListener('scroll', sync, { passive: true });
+
+    const init = () => {
+      if (locked()) { target = shown = atTop() ? 0 : 1; render(ease(shown)); }
+      else updateLinked();
+    };
+    window.addEventListener('resize', init);
+    init();
+  })();
 
   if (typeof gsap !== "undefined") {
     gsap.from(".hero-bg .text h1", { y: 60, opacity: 0, duration: 1.2, ease: "power3.out" });
@@ -388,23 +446,7 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
   // 2. Efek Partikel Tentang Kami (Houdini)
   if ('paintWorklet' in CSS) {
     CSS.paintWorklet.addModule('https://unpkg.com/css-houdini-ringparticles/dist/ringparticles.js');
-    let tentangKamiInteractive = false;
-    const $tentangKami = document.querySelector('.tentang-kami-cloneable');
-    if ($tentangKami) {
-      $tentangKami.addEventListener('pointermove', (e) => {
-        const rect = $tentangKami.getBoundingClientRect();
-        if (!tentangKamiInteractive) { $tentangKami.classList.add('interactive'); tentangKamiInteractive = true; }
-        $tentangKami.style.setProperty('--ring-x', ((e.clientX - rect.left) / rect.width) * 100);
-        $tentangKami.style.setProperty('--ring-y', ((e.clientY - rect.top) / rect.height) * 100);
-        $tentangKami.style.setProperty('--ring-interactive', 1);
-      });
-      $tentangKami.addEventListener('pointerleave', () => {
-        $tentangKami.classList.remove('interactive'); tentangKamiInteractive = false;
-        $tentangKami.style.setProperty('--ring-x', 50);
-        $tentangKami.style.setProperty('--ring-y', 50);
-        $tentangKami.style.setProperty('--ring-interactive', 0);
-      });
-    }
+    // Posisi cincin partikel dikunci di tengah section (--ring-x/--ring-y = 50), tidak mengikuti kursor
   }
 
   // 3. Reveal Animation (Elemen Muncul Halus)
