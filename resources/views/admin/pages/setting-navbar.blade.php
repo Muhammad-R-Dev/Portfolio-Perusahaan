@@ -10,7 +10,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		grid-gap: 24px;
-		margin-top: 36px;
+		margin-top: 4px;
 		width: 100%;
 		color: var(--dark);
 	}
@@ -499,7 +499,6 @@
 	#content main #resetColorsBtn:disabled { opacity: .5; cursor: not-allowed; }
 
 	/* ===== Header diam di atas; kartu pengaturan bisa discroll (seperti Pengaturan Halaman) ===== */
-	#content main .head-title.page-header-fixed { position: fixed; z-index: 60; padding: 10px 0; margin: 0; }
 	#content main .settings-card { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 	#content main .settings-card > .head.card-head-fixed { position: sticky; top: 0; z-index: 5; background: var(--light, #fff); background-clip: padding-box; }
 	/* ============================================================
@@ -682,19 +681,6 @@
 @endpush
 
 @section('content')
-			<div class="head-title">
-				<div class="left">
-					<h1>Pengaturan Header &amp; Footer</h1>
-					<ul class="breadcrumb">
-						<li><a href="#">Dashboard</a></li>
-						<li><i class='bx bx-chevron-right'></i></li>
-						<li><a href="{{ route('admin.setting.index') }}">Settings</a></li>
-						<li><i class='bx bx-chevron-right'></i></li>
-						<li><a class="active" href="#">Header &amp; Footer</a></li>
-					</ul>
-				</div>
-			</div>
-
 			<div class="settings-wrapper">
 				<div class="settings-card" style="flex-basis: 100%;">
 					<div class="head">
@@ -702,7 +688,7 @@
 							<i class='bx bx-arrow-back'></i>
 						</a>
 						<i class='bx bxs-dashboard'></i>
-						<h3>Header &amp; Footer</h3>
+						<h3> Edit Header &amp; Footer</h3>
 					</div>
 
 					@if (session('success'))
@@ -721,13 +707,13 @@
 						<div class="settings-main-row">
 							<div class="settings-fields">
 								<div class="form-group">
-									<label for="brand_name">Nama Perusahaan</label>
+									<label for="brand_name">Nama Logo</label>
 									<input type="text" class="form-control" id="brand_name" name="brand_name" value="{{ old('brand_name', $setting->brand_name) }}" placeholder="Contoh: Astabrata" disabled>
 									<small class="hint">Muncul di sebelah logo pada header & footer.</small>
 								</div>
 
 								<div class="form-group">
-									<label for="brand_tagline">Tagline / Baris Kedua</label>
+									<label for="brand_tagline">Baris Kedua Nama Logo</label>
 									<input type="text" class="form-control" id="brand_tagline" name="brand_tagline" value="{{ old('brand_tagline', $setting->brand_tagline) }}" placeholder="Contoh: Teknologi" disabled>
 									<small class="hint">Tampil di bawah nama perusahaan pada header (boleh dikosongkan).</small>
 								</div>
@@ -1101,7 +1087,8 @@
 		document.getElementById('cropApplyBtn').addEventListener('click', applyCrop);
 		document.getElementById('cropCancelBtn').addEventListener('click', cancelCrop);
 		document.getElementById('cropCloseBtn').addEventListener('click', cancelCrop);
-		cropOverlay.addEventListener('click', function (e) { if (e.target === cropOverlay) cancelCrop(); });
+		// Klik di luar crop-box (area overlay gelap) sengaja TIDAK menutup modal,
+		// supaya proses crop tidak batal tidak sengaja. Tutup hanya lewat tombol X, Batal, atau Esc.
 		document.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape' && cropOverlay.classList.contains('is-open')) cancelCrop();
 		});
@@ -1474,20 +1461,9 @@
 	/* ===== Header diam di atas; kartu pengaturan bisa discroll ===== */
 	(function () {
 		var main = document.querySelector('#content main');
-		var header = main ? main.querySelector('.head-title') : null;
 		var card = document.querySelector('#content main .settings-card');
-		if (!main || !header || !card) return;
-		var spacer = null;
+		if (!main || !card) return;
 		var cardHead = card.querySelector(':scope > .head');
-		function pinHeader() {
-			if (header.classList.contains('page-header-fixed')) return;
-			var r = header.getBoundingClientRect();
-			spacer = document.createElement('div');
-			spacer.style.height = r.height + 'px';
-			header.parentNode.insertBefore(spacer, header.nextSibling);
-			header.style.top = r.top + 'px';
-			header.classList.add('page-header-fixed');
-		}
 		function pinCardHead() {
 			if (!cardHead || cardHead.classList.contains('card-head-fixed')) return;
 			var cs = getComputedStyle(card);
@@ -1501,10 +1477,6 @@
 			var mainTop = main.getBoundingClientRect().top;
 			main.style.height = (window.innerHeight - mainTop) + 'px';
 			main.style.overflow = 'hidden';
-			var ref = spacer || header;
-			var hr = ref.getBoundingClientRect();
-			header.style.left = hr.left + 'px';
-			header.style.width = hr.width + 'px';
 			var cardRect = card.getBoundingClientRect();
 			var bar = document.querySelector('.form-actions');
 			if (bar) {
@@ -1512,11 +1484,10 @@
 				bar.style.width = cardRect.width + 'px';
 			}
 			var barH = (bar && getComputedStyle(bar).position === 'fixed') ? bar.getBoundingClientRect().height : 0;
-			var available = window.innerHeight - cardRect.top - barH - 16;
+			var available = window.innerHeight - cardRect.top - barH - 4;
 			if (available < 200) available = 200;
 			card.style.maxHeight = available + 'px';
 		}
-		pinHeader();
 		pinCardHead();
 		syncLayout();
 		window.addEventListener('resize', syncLayout);

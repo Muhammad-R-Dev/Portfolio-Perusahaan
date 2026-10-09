@@ -9,7 +9,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		grid-gap: 24px;
-		margin-top: 36px;
+		margin-top: 4px;
 		width: 100%;
 		color: var(--dark);
 	}
@@ -568,8 +568,6 @@
 		#content main .settings-wrapper > div { flex-basis: 100%; }
 	}
 
-	/* ===== Header diam di atas; kartu pengaturan bisa discroll (seperti Pengaturan Halaman) ===== */
-	#content main .head-title.page-header-fixed { position: fixed; z-index: 60; padding: 10px 0; margin: 0; }
 	/* Card Kontak & Lokasi: sudut bawah kiri & kanan lancip */
 	#content main .settings-wrapper > .settings-card {
 		border-bottom-left-radius: 0;
@@ -617,19 +615,6 @@
 			@php
 				$setting = $setting ?? \App\Models\SiteSetting::first();
 			@endphp
-			<div class="head-title">
-				<div class="left">
-					<h1>Pengaturan Kontak &amp; Lokasi</h1>
-					<ul class="breadcrumb">
-						<li><a href="#">Dashboard</a></li>
-						<li><i class='bx bx-chevron-right'></i></li>
-						<li><a href="{{ route('admin.setting.index') }}">Settings</a></li>
-						<li><i class='bx bx-chevron-right'></i></li>
-						<li><a class="active" href="#">Kontak &amp; Lokasi</a></li>
-					</ul>
-				</div>
-			</div>
-
 			@if(session('success'))
 				<div class="success-modal-overlay" id="successModal">
 					<div class="success-modal-box">
@@ -662,7 +647,7 @@
 								<i class='bx bx-arrow-back'></i>
 							</a>
 							<i class='bx bxs-contact'></i>
-							<h3>Kontak &amp; Lokasi</h3>
+							<h3>Edit Kontak &amp; Lokasi</h3>
 							<p>Nomor WhatsApp, sosial media, dan alamat kantor perusahaan.</p>
 						</div>
 
@@ -687,6 +672,15 @@
 										<a href="#" target="_blank" rel="noopener" class="wa-check" id="waCheck">
 											<i class='bx bxl-whatsapp'></i> Tes buka chat WhatsApp
 										</a>
+									</div>
+
+									<div class="form-group">
+										<label for="email">Alamat Email</label>
+										<div class="input-prefix">
+											<span class="prefix"><i class='bx bx-envelope'></i></span>
+											<input type="email" class="form-control" id="email" disabled name="email" value="{{ old('email', $setting->email ?? '') }}" placeholder="nama@email.com" autocomplete="off">
+										</div>
+										<small class="hint">Email ini akan tampil di halaman Contact.</small>
 									</div>
 								</section>
 
@@ -1207,20 +1201,9 @@
 	/* ===== Header diam di atas; kartu pengaturan bisa discroll ===== */
 	(function () {
 		var main = document.querySelector('#content main');
-		var header = main ? main.querySelector('.head-title') : null;
 		var card = document.querySelector('#content main .settings-card');
-		if (!main || !header || !card) return;
-		var spacer = null;
+		if (!main || !card) return;
 		var cardHead = card.querySelector(':scope > .head');
-		function pinHeader() {
-			if (header.classList.contains('page-header-fixed')) return;
-			var r = header.getBoundingClientRect();
-			spacer = document.createElement('div');
-			spacer.style.height = r.height + 'px';
-			header.parentNode.insertBefore(spacer, header.nextSibling);
-			header.style.top = r.top + 'px';
-			header.classList.add('page-header-fixed');
-		}
 		function pinCardHead() {
 			if (!cardHead || cardHead.classList.contains('card-head-fixed')) return;
 			var cs = getComputedStyle(card);
@@ -1234,10 +1217,6 @@
 			var mainTop = main.getBoundingClientRect().top;
 			main.style.height = (window.innerHeight - mainTop) + 'px';
 			main.style.overflow = 'hidden';
-			var ref = spacer || header;
-			var hr = ref.getBoundingClientRect();
-			header.style.left = hr.left + 'px';
-			header.style.width = hr.width + 'px';
 			var cardRect = card.getBoundingClientRect();
 			var bar = document.querySelector('.form-actions');
 
@@ -1248,11 +1227,10 @@
 			}
 
 			var barH = (bar && getComputedStyle(bar).position === 'fixed') ? bar.getBoundingClientRect().height : 0;
-			var available = window.innerHeight - cardRect.top - barH - 16;
+			var available = window.innerHeight - cardRect.top - barH - 4;
 			if (available < 200) available = 200;
 			card.style.maxHeight = available + 'px';
 		}
-		pinHeader();
 		pinCardHead();
 		syncLayout();
 		window.addEventListener('resize', syncLayout);

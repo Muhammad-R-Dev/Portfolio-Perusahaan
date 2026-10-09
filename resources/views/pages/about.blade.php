@@ -81,6 +81,8 @@
                 <h2>Tim Kami</h2>
             </div>
 
+            {{-- ===== Desktop / tablet: grid biasa (maks 3 kolom) ===== --}}
+            {{-- ===== Desktop / tablet: grid biasa (maks 3 kolom) ===== --}}
             <div class="team-grid">
                 @forelse($teams as $team)
                     @php
@@ -158,6 +160,94 @@
                             <p class="team-card-role">Segera hadir</p>
                         </div>
                     </article>
+                @endforelse
+            </div>
+
+            {{-- ===== Mobile: 2 baris, masing-masing berisi 3 card, scroll ke samping ===== --}}
+            @php $teamMobileRows = collect($teams)->chunk(3); @endphp
+            <div class="team-mobile-rows">
+                @forelse($teamMobileRows as $teamRow)
+                    <div class="team-row">
+                        @foreach($teamRow as $team)
+                            @php
+                                $sosmedData = [];
+                                if (is_array($team->sosial_media)) {
+                                    $sosmedData = $team->sosial_media;
+                                } elseif (!empty($team->sosial_media) && $team->sosial_media !== 'null') {
+                                    $decoded = json_decode($team->sosial_media, true);
+                                    $sosmedData = is_array($decoded) ? $decoded : [$team->sosial_media];
+                                }
+                                $sosmedData = array_slice($sosmedData, 0, 3);
+                            @endphp
+
+                            <article class="team-card">
+                                <div class="team-card-image-content">
+                                    <span class="team-card-overlay" aria-hidden="true"></span>
+
+                                    <div class="team-card-image">
+                                        <img src="{{ $team->foto_url }}" alt="{{ $team->nama }}" class="team-card-img" loading="lazy">
+                                    </div>
+                                </div>
+
+                                <div class="team-card-content">
+                                    <h3 class="team-card-name">{{ $team->nama }}</h3>
+                                    <p class="team-card-role">{{ $team->jabatan }}</p>
+
+                                    @if(count($sosmedData) > 0)
+                                        <div class="team-card-sosmed-wrapper" aria-label="Sosial media {{ $team->nama }}">
+                                            @foreach($sosmedData as $link)
+                                                @php
+                                                    $iconClass = 'bx-link';
+                                                    $textClass = 'brand-text-link';
+                                                    $label = 'Link';
+                                                    $lLink = strtolower($link);
+
+                                                    if (str_contains($lLink, 'instagram.com')) { $iconClass = 'bxl-instagram'; $textClass = 'brand-text-ig'; $label = 'Instagram'; }
+                                                    elseif (str_contains($lLink, 'linkedin.com')) { $iconClass = 'bxl-linkedin-square'; $textClass = 'brand-text-in'; $label = 'LinkedIn'; }
+                                                    elseif (str_contains($lLink, 'github.com')) { $iconClass = 'bxl-github'; $textClass = 'brand-text-gh'; $label = 'GitHub'; }
+                                                    elseif (str_contains($lLink, 'facebook.com')) { $iconClass = 'bxl-facebook-circle'; $textClass = 'brand-text-fb'; $label = 'Facebook'; }
+                                                    elseif (str_contains($lLink, 'twitter.com') || str_contains($lLink, 'x.com')) { $iconClass = 'x-logo'; $textClass = 'brand-text-x'; $label = 'X'; }
+                                                    elseif (str_contains($lLink, 'youtube.com')) { $iconClass = 'bxl-youtube'; $textClass = 'brand-text-yt'; $label = 'YouTube'; }
+                                                    elseif (str_contains($lLink, 'tiktok.com')) { $iconClass = 'bxl-tiktok'; $textClass = 'brand-text-tt'; $label = 'TikTok'; }
+                                                    elseif (str_contains($lLink, 'wa.me') || str_contains($lLink, 'whatsapp')) { $iconClass = 'bxl-whatsapp'; $textClass = 'brand-text-wa'; $label = 'WhatsApp'; }
+                                                @endphp
+
+                                                <a class="team-card-sosmed {{ $textClass }}"
+                                                   href="{{ $link }}"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer"
+                                                   title="{{ $label }}"
+                                                   aria-label="{{ $label }} {{ $team->nama }}">
+                                                    @if($iconClass === 'x-logo')
+                                                        <svg class="team-card-sosmed-x" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                                                            <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+                                                        </svg>
+                                                    @else
+                                                        <i class='bx {{ $iconClass }}'></i>
+                                                    @endif
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                @empty
+                    <div class="team-row">
+                        <article class="team-card">
+                            <div class="team-card-image-content">
+                                <span class="team-card-overlay" aria-hidden="true"></span>
+                                <div class="team-card-image">
+                                    <img src="{{ asset('image/profile.png') }}" alt="Tim Astabrata" class="team-card-img">
+                                </div>
+                            </div>
+                            <div class="team-card-content">
+                                <h3 class="team-card-name">Tim Astabrata</h3>
+                                <p class="team-card-role">Segera hadir</p>
+                            </div>
+                        </article>
+                    </div>
                 @endforelse
             </div>
         </div>
@@ -968,15 +1058,69 @@
         }
     }
 
-    @media (max-width: 560px) {
-        .team-grid {
-            grid-template-columns: 1fr;
-            max-width: 330px;
-            gap: 20px;
+    /* ===== Tim Kami (mobile): 2 baris, tiap baris 3 card, scroll ke samping ===== */
+    .team-mobile-rows {
+        display: none;
+        position: relative; /* penting: tanpa ini, layer partikel di belakang (z-index:1)
+                                malah tampil DI ATAS kartu, kelihatan seperti "ngeblur" */
+        z-index: 5;
+    }
+
+    .team-row {
+        position: relative;
+        z-index: 5;
+    }
+
+    @media (max-width: 600px) {
+        /* Sembunyikan grid biasa, pakai baris scroll horizontal */
+        .team-grid { display: none; }
+
+        .team-mobile-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
         }
 
-        .team-card {
+        .team-row {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: stretch;
             width: 100%;
+            max-width: 100%;
+            gap: 14px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            overscroll-behavior-x: contain;
+            scroll-snap-type: x proximity;
+            scroll-behavior: smooth;
+            touch-action: pan-x;
+            -webkit-user-select: none;
+            user-select: none;
+            scrollbar-width: none;
+            padding: 4px 6px 14px;
+            margin: 0 -6px;
+            box-sizing: border-box;
+        }
+
+        .team-row::-webkit-scrollbar { display: none; }
+
+        .team-row .team-card {
+            flex: 0 0 78%;
+            width: 78%;
+            max-width: 280px;
+            scroll-snap-align: start;
+            touch-action: pan-x;
+            margin: 0;
+            /* Jangan pakai -webkit-overflow-scrolling:touch di parent + box-shadow/overflow:hidden
+               di sini: kombinasi itu yang bikin background lingkaran foto kelihatan blur/ngeblur
+               (bug rendering Safari iOS saat momentum scroll). */
+        }
+
+        /* Card pertama & terakhir tetap bisa "mentok" rapi saat snap */
+        .team-row .team-card:first-child { scroll-snap-align: start; }
+        .team-row .team-card:last-child { scroll-snap-align: end; }
+
+        .team-card {
             min-height: 370px;
         }
 
@@ -984,6 +1128,10 @@
             width: 124px;
             height: 124px;
         }
+    }
+
+    @media (max-width: 380px) {
+        .team-row .team-card { flex-basis: 84%; width: 84%; }
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -31,15 +31,20 @@
     <!-- GRID CARD LAYANAN -->
     <!-- ========================================== -->
     <section class="ly-services" id="daftar-layanan">
+        <!-- Background Aurora (pure CSS, tanpa teks) -->
+        <div class="ly-aurora-bg" aria-hidden="true">
+            <div class="ly-aurora"></div>
+        </div>
+
         <div class="ly-inner">
             <div class="ly-section-head">
                 <h2>{{ $pageSetting->titleText() }}</h2>
                 <p>{{ $pageSetting->descriptionText() }}</p>
             </div>
 
-            <div class="ly-grid">
+            <div class="ly-grid" id="lyGrid">
                 @forelse($slides as $slide)
-                    <div class="ly-card">
+                    <div class="ly-card" data-index="{{ $loop->index }}">
                         <div class="ly-card-img-wrapper">
                             <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] }}" loading="lazy">
                         </div>
@@ -72,6 +77,22 @@
                     </div>
                 @endforelse
             </div>
+
+            {{-- Keterangan nomor card, hanya tampil & aktif di versi mobile (scroll ke samping) --}}
+            @if(count($slides) > 1)
+                <div class="ly-grid-nav" id="lyGridNav" role="tablist" aria-label="Pilih layanan">
+                    @foreach($slides as $slide)
+                        <button type="button"
+                                class="ly-grid-dot @if($loop->first) is-active @endif"
+                                data-index="{{ $loop->index }}"
+                                role="tab"
+                                aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                                aria-label="Layanan nomor {{ $loop->iteration }}: {{ $slide['title'] }}">
+                            {{ $loop->iteration }}
+                        </button>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </section>
 
@@ -131,7 +152,7 @@
     p { margin: 0; }
     a { text-decoration: none; }
 
-    .ly-inner { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .ly-inner { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
     .text-center { text-align: center; }
 
     /* ===== SERVICES GRID ===== */
@@ -140,12 +161,100 @@
         position: relative;
         padding: 72px 0 90px;
         background: var(--color-bg-light);
+        overflow: hidden;
+        isolation: isolate;
     }
 
     @media (max-width: 768px) {
         /* Beri ruang dari navbar fixed agar judul tidak tertutup */
         .ly-services { padding: 76px 0 56px; }
     }
+
+    /* ===== BACKGROUND AURORA (pure CSS, tanpa teks, adaptasi dari CSS Aurora Boreal) ===== */
+    .ly-aurora-bg {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .ly-aurora {
+        --stripes: repeating-linear-gradient(
+            100deg,
+            #fff 0%,
+            #fff 7%,
+            transparent 10%,
+            transparent 12%,
+            #fff 16%
+        );
+        --stripesDark: repeating-linear-gradient(
+            100deg,
+            #000 0%,
+            #000 7%,
+            transparent 10%,
+            transparent 12%,
+            #000 16%
+        );
+        --rainbow: repeating-linear-gradient(
+            100deg,
+            #60a5fa 10%,
+            #e879f9 15%,
+            #60a5fa 20%,
+            #5eead4 25%,
+            #60a5fa 30%
+        );
+
+        position: absolute;
+        inset: -10px;
+        opacity: 0.5;
+
+        background-image: var(--stripes), var(--rainbow);
+        background-size: 300%, 200%;
+        background-position: 50% 50%, 50% 50%;
+
+        filter: blur(10px) invert(100%);
+
+        mask-image: radial-gradient(ellipse at 100% 0%, black 40%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse at 100% 0%, black 40%, transparent 70%);
+
+        pointer-events: none;
+    }
+
+    .ly-aurora::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: var(--stripes), var(--rainbow);
+        background-size: 200%, 100%;
+        animation: ly-aurora-shift 60s linear infinite;
+        background-attachment: fixed;
+        mix-blend-mode: difference;
+    }
+
+    @keyframes ly-aurora-shift {
+        from {
+            background-position: 50% 50%, 50% 50%;
+        }
+        to {
+            background-position: 350% 50%, 350% 50%;
+        }
+    }
+
+    /* Mode terang/gelap mengikuti atribut data-theme yang sudah dipakai halaman ini */
+    html[data-theme="dark"] .ly-aurora {
+        background-image: var(--stripesDark), var(--rainbow);
+        filter: blur(10px) opacity(50%) saturate(200%);
+    }
+    html[data-theme="dark"] .ly-aurora::after {
+        background-image: var(--stripesDark), var(--rainbow);
+    }
+
+    /* Hormati preferensi pengguna yang mengurangi gerakan */
+    @media (prefers-reduced-motion: reduce) {
+        .ly-aurora::after { animation: none; }
+    }
+
 
     .ly-section-head {
         text-align: center; max-width: 620px; margin: 28px auto 56px;
@@ -164,12 +273,20 @@
         overflow: hidden;
         display: flex; flex-direction: column;
         box-shadow: 0 2px 10px -4px rgba(15, 23, 42, 0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        cursor: pointer;
+        will-change: transform;
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                    border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .ly-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 18px 34px -14px rgba(9, 67, 86, 0.25);
+        transform: translateY(-8px);
+        box-shadow: 0 22px 40px -14px rgba(9, 67, 86, 0.28);
         border-color: rgba(9, 67, 86, 0.2);
+    }
+    .ly-card:active {
+        transform: translateY(-4px);
+        transition-duration: 0.15s;
     }
 
     .ly-card-img-wrapper {
@@ -177,7 +294,7 @@
     }
     .ly-card-img-wrapper img {
         width: 100%; height: 100%; object-fit: cover; display: block;
-        transition: transform 0.5s ease;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .ly-card:hover .ly-card-img-wrapper img { transform: scale(1.06); }
 
@@ -268,26 +385,40 @@
             text-align: center;
         }
 
-        /* Grid ikut lebar .ly-inner yang sudah punya gutter, jadi card otomatis lebih kecil */
+        /* Grid jadi baris yang bisa digeser ke kanan/kiri (1 card per layar, peek sedikit) */
         .ly-grid {
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: stretch;
             gap: 16px;
             width: 100%;
             max-width: none;
-            margin: 0;
-            padding: 0;
+            margin: 0 -18px;
+            padding: 4px 18px 10px;
             box-sizing: border-box;
-            overflow: visible;
+            overflow-x: auto;
+            overflow-y: hidden;
+            overscroll-behavior-x: contain;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            touch-action: pan-x;
+            -webkit-user-select: none;
+            user-select: none;
+            scrollbar-width: none;
         }
 
+        .ly-grid::-webkit-scrollbar { display: none; }
+
         .ly-card {
-            width: 100%;
+            flex: 0 0 86%;
+            width: 86%;
             min-width: 0;
-            max-width: none;
+            max-width: 360px;
             margin: 0;
             border-radius: 12px;
             box-sizing: border-box;
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
         }
 
         /* Gambar dipersingkat sedikit supaya card terasa lebih kecil/ringkas */
@@ -315,6 +446,52 @@
         .ly-card-actions {
             padding-top: 12px;
         }
+
+        /* ===== Keterangan nomor card (indikator di bawah grid) ===== */
+        .ly-grid-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 18px auto 0;
+            max-width: 100%;
+        }
+
+        /* Mode terang: lingkaran hitam, tulisan putih. Mode gelap: kebalikannya (diatur di blok dark mode). */
+        .ly-grid-dot {
+            flex: 0 0 auto;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #000000;
+            background: #000000;
+            color: #FFFFFF;
+            font-family: 'Google Sans Flex', 'Inter', system-ui, sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            cursor: pointer;
+            opacity: 0.45;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .ly-grid-dot:hover {
+            opacity: 0.7;
+        }
+
+        .ly-grid-dot.is-active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    /* Nomor indikator hanya untuk mobile; di layar lebar grid-nya grid biasa, jadi sembunyikan */
+    @media (min-width: 769px) {
+        .ly-grid-nav { display: none; }
     }
     /* ===== POPUP DETAIL LAYANAN (modal dipindah ke <body> oleh JS, jadi variabel warna didefinisikan di sini) ===== */
     .ly-modal-overlay {
@@ -410,6 +587,13 @@
     html[data-theme="dark"] .ly-card-wa { color: #25D366; }
     html[data-theme="dark"] .ly-card-wa:hover { color: #128C7E; }
 
+    /* Dark mode: kebalikan dari light mode -> lingkaran putih, tulisan hitam */
+    html[data-theme="dark"] .ly-grid-dot {
+        background: #FFFFFF;
+        border-color: #FFFFFF;
+        color: #000000;
+    }
+
     /* Dark Mode Modal */
     html[data-theme="dark"] .ly-modal-close { background: rgba(15, 23, 42, 0.7); color: #F8FAFC; }
     html[data-theme="dark"] .ly-modal-close:hover { background: rgba(15, 23, 42, 0.9); }
@@ -436,16 +620,32 @@
         // Memilih semua tombol Detail di tiap card untuk memicu popup
         const detailTriggers = document.querySelectorAll('.ly-btn-detail');
 
+        const openServiceModal = (trigger) => {
+            modalTitle.textContent = trigger.dataset.title;
+            modalDesc.textContent = trigger.dataset.desc;
+            modalImg.src = trigger.dataset.image;
+            modalWa.href = trigger.dataset.wa;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
         detailTriggers.forEach(trigger => {
             trigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                modalTitle.textContent = trigger.dataset.title;
-                modalDesc.textContent = trigger.dataset.desc;
-                modalImg.src = trigger.dataset.image;
-                modalWa.href = trigger.dataset.wa;
+                openServiceModal(trigger);
+            });
+        });
 
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+        // Klik di mana saja pada card (selain tombol WhatsApp) -> buka modal detail yang sama
+        document.querySelectorAll('.ly-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Biarkan tombol WhatsApp & tombol Detail bekerja seperti biasa (tidak ditimpa)
+                if (e.target.closest('.ly-card-wa') || e.target.closest('.ly-btn-detail')) return;
+
+                e.preventDefault();
+                const detailBtn = card.querySelector('.ly-btn-detail');
+                if (detailBtn) openServiceModal(detailBtn);
             });
         });
 
@@ -460,6 +660,74 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
         });
+
+        /* ===== 2. KETERANGAN NOMOR CARD (sinkron dengan scroll kartu di mobile) ===== */
+        const lyGrid = document.getElementById('lyGrid');
+        const lyGridNav = document.getElementById('lyGridNav');
+
+        if (lyGrid && lyGridNav) {
+            const lyCards = Array.from(lyGrid.querySelectorAll('.ly-card'));
+            const lyDots = Array.from(lyGridNav.querySelectorAll('.ly-grid-dot'));
+
+            const setActiveDot = (index) => {
+                lyDots.forEach((dot) => {
+                    const isActive = Number(dot.dataset.index) === index;
+                    dot.classList.toggle('is-active', isActive);
+                    dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+            };
+
+            // Tap nomor -> geser ke kartu yang sesuai
+            lyDots.forEach((dot) => {
+                dot.addEventListener('click', () => {
+                    const idx = Number(dot.dataset.index);
+                    const target = lyCards[idx];
+                    if (!target) return;
+                    target.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    setActiveDot(idx);
+                });
+            });
+
+            // Geser kartu -> nomor yang aktif ikut berubah
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    let best = null;
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting && (!best || entry.intersectionRatio > best.intersectionRatio)) {
+                            best = entry;
+                        }
+                    });
+                    if (best) {
+                        setActiveDot(Number(best.target.dataset.index));
+                    }
+                }, {
+                    root: lyGrid,
+                    threshold: [0.5, 0.75, 1]
+                });
+
+                lyCards.forEach((card) => observer.observe(card));
+            } else {
+                // Fallback sederhana tanpa IntersectionObserver
+                let scrollTimeout;
+                lyGrid.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        const gridCenter = lyGrid.scrollLeft + lyGrid.clientWidth / 2;
+                        let closest = 0;
+                        let closestDist = Infinity;
+                        lyCards.forEach((card, i) => {
+                            const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                            const dist = Math.abs(cardCenter - gridCenter);
+                            if (dist < closestDist) {
+                                closestDist = dist;
+                                closest = i;
+                            }
+                        });
+                        setActiveDot(closest);
+                    }, 100);
+                }, { passive: true });
+            }
+        }
     });
 </script>
 @endpush

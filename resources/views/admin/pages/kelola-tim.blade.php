@@ -579,8 +579,8 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="selectJabatan">Jabatan</label>
-                                    <select id="selectJabatan" onchange="handleJabatanChange(this)">
+                                    <label for="selectJabatan">Jabatan <span style="color:var(--red);">*</span></label>
+                                    <select id="selectJabatan" required onchange="handleJabatanChange(this)">
                                         <option value="" disabled selected>Pilih Jabatan</option>
                                         <option value="Project Manager">Project Manager</option>
                                         <option value="Fullstack Developer">Fullstack Developer</option>
@@ -606,7 +606,7 @@
                             </div>
 
                             <div class="tim-media-card">
-                                <div class="media-title">Media Foto</div>
+                                <div class="media-title">Media Foto <span id="fotoRequiredMark" style="color:var(--red);">*</span></div>
                                 <div class="tim-media-preview upload-clickable" id="timMediaPreview" title="Klik untuk memilih foto">
                                     <div class="tim-media-empty" id="timMediaEmpty">
                                         <div class="tim-media-shape" aria-hidden="true">
@@ -907,6 +907,7 @@
         const timMediaActions = document.getElementById('timMediaActions');
         const btnZoomMedia = document.getElementById('btnZoomMedia');
         const btnRemoveMedia = document.getElementById('btnRemoveMedia');
+        const fotoRequiredMark = document.getElementById('fotoRequiredMark');
         const teamNama = document.getElementById('teamNama');
         const selectJabatan = document.getElementById('selectJabatan');
         const inputJabatanManual = document.getElementById('inputJabatanManual');
@@ -1007,7 +1008,14 @@
             }
         }
 
-        function removeTimMedia() { teamFoto.value = ''; setTimMediaPreview('', ''); }
+        function removeTimMedia() {
+            teamFoto.value = '';
+            setTimMediaPreview('', '');
+            // Setelah foto dihapus, tidak ada foto sama sekali (baik mode tambah maupun edit),
+            // jadi upload foto baru wajib sebelum form bisa disimpan.
+            teamFoto.required = true;
+            if (fotoRequiredMark) fotoRequiredMark.style.display = '';
+        }
 
         window.openModal = function(mode, el) {
             timForm.reset();
@@ -1021,8 +1029,17 @@
                 timForm.action = el.dataset.url; formMethod.value = 'PUT';
                 teamNama.value = el.dataset.nama;
                 
-                if (el.dataset.foto) setTimMediaPreview(el.dataset.foto, 'Ganti Foto');
-                else setTimMediaPreview('', '');
+                if (el.dataset.foto) {
+                    setTimMediaPreview(el.dataset.foto, 'Ganti Foto');
+                    // Foto lama sudah ada sehingga tidak wajib diganti...
+                    teamFoto.required = false;
+                    if (fotoRequiredMark) fotoRequiredMark.style.display = 'none';
+                } else {
+                    setTimMediaPreview('', '');
+                    // ...tapi kalau memang belum ada foto sama sekali, tetap wajib upload.
+                    teamFoto.required = true;
+                    if (fotoRequiredMark) fotoRequiredMark.style.display = '';
+                }
 
                 const valJabatan = el.dataset.jabatan; let optionJabatanExists = false;
                 for (let opt of selectJabatan.options) {
@@ -1054,7 +1071,11 @@
                 modalTitle.textContent = 'Tambah Tim';
                 timForm.action = STORE_URL; formMethod.value = '';
                 selectJabatan.value = '';
-                addSosmedInput(''); 
+                addSosmedInput('');
+
+                // Saat tambah baru, jabatan & foto wajib diisi
+                teamFoto.required = true;
+                if (fotoRequiredMark) fotoRequiredMark.style.display = '';
             }
 
             syncModalWithContentArea();

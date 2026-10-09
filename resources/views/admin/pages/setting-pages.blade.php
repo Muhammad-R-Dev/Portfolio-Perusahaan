@@ -11,18 +11,11 @@
 		background: var(--light);
 		border-radius: 24px;
 		padding: 36px 40px 28px;
-		margin-top: 36px;
+		margin-top: 0px;
 		width: 100%;
 		box-sizing: border-box;
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
-	}
-	/* Header halaman dibuat diam di atas (tidak ikut scroll); JS yang menentukan posisi fixed-nya */
-	#content main .head-title.page-header-fixed {
-		position: fixed;
-		z-index: 60;
-		padding: 10px 0;
-		margin: 0;
 	}
 	#content main .pages-card h3 {
 		font-size: 24px;
@@ -767,25 +760,6 @@
 @endpush
 
 @section('content')
-			<div class="head-title" id="pageHeader">
-				<div class="left">
-					<h1>Pengaturan Halaman</h1>
-					<ul class="breadcrumb">
-						<li>
-							<a href="#">Dashboard</a>
-						</li>
-						<li><i class='bx bx-chevron-right' ></i></li>
-						<li>
-							<a href="{{ route('admin.setting.index') }}">Settings</a>
-						</li>
-						<li><i class='bx bx-chevron-right' ></i></li>
-						<li>
-							<a class="active" href="#">Pengaturan Halaman</a>
-						</li>
-					</ul>
-				</div>
-			</div>
-
 			@if(session('success'))
 				<div id="successFlash" style="display:none;" data-message="{{ session('success') }}"></div>
 			@endif
@@ -1249,7 +1223,7 @@
 		});
 		document.getElementById('pgCropCancel').addEventListener('click', cancelCrop);
 		document.getElementById('pgCropClose').addEventListener('click', cancelCrop);
-		overlay.addEventListener('click', function (e) { if (e.target === overlay) cancelCrop(); });
+		// Klik di luar card crop TIDAK menutup modal (hanya tombol Batal/X/Esc yang menutup)
 		document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay.classList.contains('is-open')) cancelCrop(); });
 		document.getElementById('pgCropZoomIn').addEventListener('click', function () { if (cropper) cropper.zoom(0.1); });
 		document.getElementById('pgCropZoomOut').addEventListener('click', function () { if (cropper) cropper.zoom(-0.1); });
@@ -1806,37 +1780,15 @@
 	/* ===== Header "Pengaturan Halaman" diam di atas, hanya kartu "Edit Tampilan Halaman" yang bisa discroll ===== */
 	(function () {
 		var main = document.querySelector('#content main');
-		var header = document.getElementById('pageHeader');
 		var card = document.querySelector('.pages-card');
 		var actionsBar = document.querySelector('.form-actions');
-		if (!main || !header || !card) return;
-
-		var spacer = null;
-
-		function pinHeader() {
-			if (header.classList.contains('page-header-fixed')) return;
-			var rect = header.getBoundingClientRect();
-			spacer = document.createElement('div');
-			spacer.style.height = rect.height + 'px';
-			header.parentNode.insertBefore(spacer, header.nextSibling);
-			header.style.top = rect.top + 'px';
-			header.classList.add('page-header-fixed');
-		}
-
-		function syncHeaderWidth() {
-			var ref = spacer || header;
-			var r = ref.getBoundingClientRect();
-			header.style.left = r.left + 'px';
-			header.style.width = r.width + 'px';
-		}
+		if (!main || !card) return;
 
 		function syncLayout() {
 			// Kunci tinggi area konten utama sesuai sisa tinggi layar, lalu matikan scroll di situ
 			var mainTop = main.getBoundingClientRect().top;
 			main.style.height = (window.innerHeight - mainTop) + 'px';
 			main.style.overflow = 'hidden';
-
-			syncHeaderWidth();
 
 			// Sisakan ruang untuk kartu agar bisa discroll sendiri tanpa tertutup bar tombol fixed di bawah
 			var cardRect = card.getBoundingClientRect();
@@ -1845,7 +1797,7 @@
 				actionsBar.style.width = cardRect.width + 'px';
 			}
 			var barHeight = actionsBar ? actionsBar.getBoundingClientRect().height : 0;
-			var available = window.innerHeight - cardRect.top - barHeight - 16;
+			var available = window.innerHeight - cardRect.top - barHeight - 4;
 			if (available < 200) available = 200; // jaga-jaga di layar sangat pendek
 			card.style.maxHeight = available + 'px';
 
@@ -1854,7 +1806,6 @@
 			if (fixedHead) card.style.setProperty('--pages-head-h', fixedHead.offsetHeight + 'px');
 		}
 
-		pinHeader();
 		syncLayout();
 		window.addEventListener('resize', syncLayout);
 		setTimeout(syncLayout, 300); // jaga-jaga kalau layout admin (sidebar dll) baru selesai render

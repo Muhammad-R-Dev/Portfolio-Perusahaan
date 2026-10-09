@@ -1114,6 +1114,10 @@
 			}
 		}
 
+		/* Tanda wajib isi & status error pada field Kategori */
+		#galleryModal .required-mark { color: var(--red); }
+		#galleryModal #photoCategory.is-invalid { border-color: var(--red) !important; }
+
 		/* Input kategori manual ("Lainnya...") */
 		#galleryModal .gallery-form-left .form-group input#photoCategoryLainnya {
 			margin-top: 10px;
@@ -1235,30 +1239,6 @@
 					<span class="text">Tambah Foto</span>
 				</button>
 			</div>
-
-			<ul class="box-info">
-				<li>
-					<i class='bx bxs-image' ></i>
-					<span class="text">
-						<h3 id="statTotal">{{ $totalFoto }}</h3>
-						<p>Total Foto</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bxs-category' ></i>
-					<span class="text">
-						<h3>{{ $totalKategori }}</h3>
-						<p>Kategori</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bxs-cloud-upload' ></i>
-					<span class="text">
-						<h3>{{ $bulanIni }}</h3>
-						<p>Diunggah Bulan Ini</p>
-					</span>
-				</li>
-			</ul>
 
 			<!-- Form hapus tersembunyi (dipakai tombol Hapus pada tabel) -->
 			<div style="display:none;">
@@ -1398,8 +1378,9 @@
 								</div>
 
 								<div class="form-group">
-									<label for="photoCategory">Kategori</label>
+									<label for="photoCategory">Kategori <span class="required-mark">*</span></label>
 									<select name="kategori" id="photoCategory" required>
+										<option value="" disabled selected hidden>-- Pilih Kategori --</option>
 										<option value="kegiatan">Kegiatan</option>
 										<option value="fasilitas">Fasilitas</option>
 										<option value="tim">Tim</option>
@@ -1410,6 +1391,7 @@
 										<option value="__lainnya__">Lainnya... (ketik sendiri)</option>
 									</select>
 									<input type="text" id="photoCategoryLainnya" maxlength="50" placeholder="Ketik kategori baru" autocomplete="off" style="display:none;">
+									<small class="field-error" id="photoCategoryError" style="display:none;color:var(--red);font-size:12px;margin-top:4px;">Kategori wajib dipilih.</small>
 								</div>
 							</div>
 
@@ -1998,6 +1980,7 @@
 
 		// ===== Kategori: pilihan "Lainnya..." untuk mengetik kategori sendiri =====
 		const photoCategoryLainnya = document.getElementById('photoCategoryLainnya');
+		const photoCategoryError   = document.getElementById('photoCategoryError');
 
 		function toggleKategoriLainnya() {
 			const aktif = photoCategory.value === '__lainnya__';
@@ -2033,12 +2016,28 @@
 			toggleKategoriLainnya();
 		}
 
-		// Saat disimpan: teks yang diketik menjadi nilai kategori yang dikirim
+		// Saat disimpan: kategori wajib dipilih/diisi sebelum form boleh terkirim
 		galleryForm.addEventListener('submit', function (e) {
+			photoCategoryError.style.display = 'none';
+			photoCategory.classList.remove('is-invalid');
+
+			// Kategori belum dipilih sama sekali
+			if (!photoCategory.value) {
+				e.preventDefault();
+				photoCategoryError.style.display = 'block';
+				photoCategory.classList.add('is-invalid');
+				photoCategory.focus();
+				return;
+			}
+
 			if (photoCategory.value !== '__lainnya__') return;
+
+			// Kategori "Lainnya..." dipilih tapi teksnya belum diketik
 			const teks = photoCategoryLainnya.value.trim().replace(/\s+/g, ' ');
 			if (!teks) {
 				e.preventDefault();
+				photoCategoryError.style.display = 'block';
+				photoCategoryError.textContent = 'Kategori wajib diisi.';
 				photoCategoryLainnya.focus();
 				return;
 			}
@@ -2048,6 +2047,8 @@
 
 		function openModal(mode, data = null) {
 			galleryForm.reset();
+			photoCategoryError.style.display = 'none';
+			photoCategory.classList.remove('is-invalid');
 			toggleKategoriLainnya();
 			setGalleryMediaPreview('');
 			hapusGambarInput.value = '0';
@@ -2069,7 +2070,8 @@
 				modalTitle.textContent = 'Tambah Foto Galeri';
 				galleryForm.action = STORE_URL;
 				formMethod.value = '';
-				photoCategory.value = 'kegiatan';
+				photoCategory.value = '';
+				toggleKategoriLainnya();
 			}
 
 			syncModalWithContentArea();

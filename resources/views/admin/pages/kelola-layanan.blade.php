@@ -1107,7 +1107,7 @@
                     <!-- KONTROL PAGINASI HALAMAN (1, 2, dst.) -->
                     <div class="pagination-wrapper" id="layananPagination">
                         <div class="pagination-info" id="paginationInfo">
-                            Menampilkan 0 data
+                            
                         </div>
                         <div class="pagination-controls" id="paginationControls">
                             <!-- Navigasi 1, 2, dst. di-generate secara dinamis oleh JS -->
@@ -1130,17 +1130,17 @@
                     <div class="form-cols">
                         <div class="col-text">
                             <div class="form-group">
-                                <label for="title">Judul Layanan</label>
+                                <label for="title">Judul Layanan <span class="required-mark" style="color:#e63946;">*</span></label>
                                 <input type="text" id="title" name="title" placeholder="Masukkan judul layanan" required>
                             </div>
                             <div class="form-group">
-                                <label for="description">Deskripsi</label>
+                                <label for="description">Deskripsi <span class="required-mark" style="color:#e63946;">*</span></label>
                                 <textarea id="description" name="description" rows="4" placeholder="Masukkan deskripsi layanan" required></textarea>
                             </div>
                         </div>
                         <div class="col-image">
                             <div class="form-group">
-                                <label>Gambar (Opsional)</label>
+                                <label>Gambar <span class="required-mark" style="color:#e63946;">*</span></label>
                                 <div class="uploader" id="uploaderBox">
                                     <div class="uploader-empty" id="uploaderEmpty">
                                         <div class="uploader-shape" aria-hidden="true">
@@ -1166,7 +1166,7 @@
                                     <input type="file" id="image" name="image" accept="image/*,.jpg,.jpeg,.jfif,.pjpeg,.pjp,.png,.webp,.gif,.bmp,.avif,.heic,.heif" hidden>
                                 </div>
                                 <input type="hidden" name="hapus_gambar" id="hapusGambarFlag" value="0">
-                                <small id="uploaderNote" style="color: var(--dark-grey); font-size: 12px; margin-top: 4px; display: block;">Kosongkan jika tidak ingin mengganti gambar.</small>
+                                <small id="uploaderNote" style="color: var(--dark-grey); font-size: 12px; margin-top: 4px; display: block;">Gambar wajib diisi. Saat edit, kosongkan jika tidak ingin mengganti gambar yang sudah ada.</small>
                             </div>
                         </div>
                     </div>
@@ -1459,6 +1459,8 @@
         const imageZoomOverlay = document.getElementById('imageZoomOverlay');
         const imageZoomImg = document.getElementById('imageZoomImg');
         const hapusGambarFlag = document.getElementById('hapusGambarFlag');
+        // Menandai apakah data yang sedang diedit sudah punya gambar tersimpan di server
+        let currentImageExists = false;
 
         // Uploader elements
         const uploaderBox     = document.getElementById('uploaderBox');
@@ -1628,6 +1630,7 @@
             formLayanan.action = "{{ route('admin.kelola-layanan.store') }}";
             document.getElementById('formMethod').value = 'POST';
             hapusGambarFlag.value = '0';
+            currentImageExists = false;
             resetUploader();
             setUploaderNote('', false);
             modalLayanan.classList.add('show');
@@ -1649,6 +1652,7 @@
             document.getElementById('title').value  = title;
             document.getElementById('description').value = description;
             hapusGambarFlag.value = '0';
+            currentImageExists = !!image;
 
             if (image) {
                 setImagePreviewUrl(image);
@@ -1912,12 +1916,23 @@
             if (e.target === errorModal) errorModal.classList.remove('show');
         });
 
-        // Cegah submit jika file yang dipilih tidak valid
+        // Cegah submit jika file yang dipilih tidak valid, dan pastikan gambar wajib diisi
         formLayanan.addEventListener('submit', function (e) {
             const f = inputImage.files[0];
+
             if (f) {
                 const err = validateImageFile(f);
                 if (err) { e.preventDefault(); showErrorPopup(err); }
+                return;
+            }
+
+            // Tidak ada file baru dipilih: gambar tetap wajib ada.
+            // Diperbolehkan hanya jika sedang edit, sudah ada gambar tersimpan,
+            // dan gambar tersebut tidak sedang dihapus.
+            const masihPunyaGambarLama = currentImageExists && hapusGambarFlag.value !== '1';
+            if (!masihPunyaGambarLama) {
+                e.preventDefault();
+                showErrorPopup('Gambar wajib diisi.');
             }
         });
 

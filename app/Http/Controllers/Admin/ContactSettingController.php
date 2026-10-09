@@ -53,6 +53,7 @@ class ContactSettingController extends Controller
 
         $rules = [
             'wa_number'    => ['nullable', 'digits_between:8,15'],
+            'email'        => ['nullable', 'string', 'email', 'max:255'],
             'address_name' => ['nullable', 'string', 'max:255'],
             'address_full' => ['nullable', 'string', 'max:1000'],
             'map_link'     => ['nullable', 'string', 'max:1000', function ($attr, $value, $fail) {

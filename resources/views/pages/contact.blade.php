@@ -9,7 +9,6 @@
     // Alamat & lokasi (fallback ke data lama bila belum diisi di admin)
     $addrName = $siteSetting->address_name ?? null;
     $addrFull = $siteSetting->address_full ?? 'Jl.STPP karanglo, Area Sawah/Kebun, Glagahombo,Tegalrejo, Magelang, Jawa Tengah 56192';
-    $mapLink  = $siteSetting->map_link ?? null;
     // Peta: utamakan link Google Maps dari admin, lalu alamat, lalu koordinat lama
     $mapSrc = ($siteSetting ? $siteSetting->mapEmbedUrl() : null)
         ?? (!empty($siteSetting->address_full)
@@ -20,6 +19,18 @@
     $waNumber = !empty($siteSetting->wa_number)
         ? '62' . ltrim(preg_replace('/\D/', '', $siteSetting->wa_number), '0')
         : '6287762166795'; // fallback nomor lama bila belum diisi
+
+    // Nomor Telepon yang ditampilkan di info kontak (mengikuti input WhatsApp admin)
+    $phoneDigits = !empty($siteSetting->wa_number)
+        ? ltrim(preg_replace('/\D/', '', $siteSetting->wa_number), '0')
+        : '882006644656'; // fallback nomor lama bila belum diisi
+    $phoneTel = '+62' . $phoneDigits;
+    $phoneDisplay = '+62 ' . (strlen($phoneDigits) > 9
+        ? substr($phoneDigits, 0, 3) . '-' . substr($phoneDigits, 3, 4) . '-' . substr($phoneDigits, 7)
+        : $phoneDigits);
+
+    // Email yang ditampilkan di info kontak (dari admin)
+    $contactEmail = $siteSetting->email ?? 'astabratamgl@gmail.com';
 
     $contactSocials = $siteSetting
         ? $siteSetting->socialLinks(['facebook', 'twitter', 'linkedin', 'instagram', 'youtube', 'github'])
@@ -106,14 +117,14 @@
                         <span class="icon"><i class="fa-solid fa-phone"></i></span>
                         <div>
                             <strong>Telepon</strong>
-                            <a href="tel:+62882006644656">+62 882-0066-44656</a>
+                            <a href="tel:{{ $phoneTel }}">{{ $phoneDisplay }}</a>
                         </div>
                     </li>
                     <li>
                         <span class="icon"><i class="fa-solid fa-envelope"></i></span>
                         <div>
                             <strong>Email</strong>
-                            <a href="mailto:astabratamgl@gmail.com">astabratamgl@gmail.com</a>
+                            <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>
                         </div>
                     </li>
                     <li>
@@ -121,12 +132,8 @@
                         <div>
                             <strong>Alamat</strong>
                             <span>
-                                @if($addrName)<b>{{ $addrName }}</b><br>@endif
                                 {{ $addrFull }}
                             </span>
-                            @if($mapLink)
-                                <a href="{{ $mapLink }}" target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>
-                            @endif
                         </div>
                     </li>
                 </ul>

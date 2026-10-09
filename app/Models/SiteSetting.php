@@ -19,7 +19,7 @@ class SiteSetting extends Model
         'navbar_bg_light', 'navbar_text_light', 'navbar_bg_dark', 'navbar_text_dark',
         'footer_bg_light', 'footer_text_light', 'footer_bg_dark', 'footer_text_dark',
         // Contact / map
-        'wa_number', 'map_link', 'address_full', 'address_name',
+        'wa_number', 'email', 'map_link', 'address_full', 'address_name',
         // Social links
         'social_instagram', 'social_linkedin', 'social_github',
         'social_twitter', 'social_facebook', 'social_youtube',

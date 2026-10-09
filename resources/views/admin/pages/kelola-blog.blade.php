@@ -1066,6 +1066,10 @@
 			background: var(--light-blue);
 			color: var(--blue);
 		}
+		.modal-box.modal-confirm .confirm-icon.warning {
+			background: var(--light-yellow);
+			color: var(--yellow);
+		}
 		.modal-box.modal-confirm h2 {
 			margin-bottom: 8px;
 		}
@@ -1709,6 +1713,19 @@
 				</div>
 			</div>
 
+			<!-- Modal Konfirmasi Keluar Tanpa Menyimpan -->
+			<div class="modal-overlay" id="unsavedConfirmModal">
+				<div class="modal-box modal-confirm">
+					<div class="confirm-icon warning"><i class='bx bx-error'></i></div>
+					<h2>Batalkan Perubahan?</h2>
+					<p>Perubahan yang belum disimpan akan hilang. Yakin ingin keluar tanpa menyimpan?</p>
+					<div class="modal-actions">
+						<button type="button" class="btn btn-cancel" id="btnTetapIsi">Lanjut Isi</button>
+						<button type="button" class="btn btn-danger" id="btnKeluarTanpaSimpan">Ya, Keluar</button>
+					</div>
+				</div>
+			</div>
+
 			<!-- Modal Notifikasi Sukses -->
 			<div class="modal-overlay" id="successModal">
 				<div class="modal-box modal-confirm">
@@ -2006,6 +2023,11 @@
 		const successModal = document.getElementById('successModal');
 		const successMessage = document.getElementById('successMessage');
 		const btnCloseSuccess = document.getElementById('btnCloseSuccess');
+
+		// Modal konfirmasi keluar tanpa menyimpan
+		const unsavedConfirmModal = document.getElementById('unsavedConfirmModal');
+		const btnTetapIsi = document.getElementById('btnTetapIsi');
+		const btnKeluarTanpaSimpan = document.getElementById('btnKeluarTanpaSimpan');
 
 		let isEditMode = false;
 
@@ -2947,6 +2969,11 @@
 		let chbFocusMode = false;
 		let chbFocusLock = false;
 
+		// Penanda aksi yang dijalankan saat tombol "Ya, Keluar" di modal konfirmasi ditekan:
+		// 'modal' = menutup seluruh modal Tambah/Edit Blog (dari tombol "Batal")
+		// 'focus' = hanya menutup mode zoom "Isi Konten Lengkap", modal Tambah/Edit tetap terbuka (dari tombol "Kembali")
+		let unsavedConfirmTarget = 'modal';
+
 		function updateFocusToggle() {
 			// Tombol Perbesar sudah dihapus; tombol Kembali ada di pojok kiri atas (header) saat mode fokus.
 		}
@@ -2985,7 +3012,8 @@
 			editor.addEventListener('focus', enterFocusMode);
 			editor.addEventListener('click', enterFocusMode);
 			editor.addEventListener('input', enterFocusMode);
-			document.getElementById('btnEditorBack').addEventListener('click', exitFocusMode);
+			// Tombol "Kembali" saat mode fokus/zoom = hanya menutup mode zoom (modal Tambah/Edit tetap terbuka)
+			document.getElementById('btnEditorBack').addEventListener('click', requestExitFocusMode);
 
 			// Saat Simpan ditekan, kembalikan tampilan dulu supaya validasi input (Judul, Kategori) bisa berjalan
 			document.querySelector('#blogForm .btn-save').addEventListener('click', exitFocusMode);
@@ -3063,6 +3091,9 @@
 			inputGambar.value = '';
 			resetUploader();
 			inputHapusGambar.value = '1';
+			// Gambar lama sudah dihapus: wajib upload gambar baru sebelum bisa disimpan.
+			gambarHint.textContent = 'Gambar telah dihapus, silakan unggah gambar baru.';
+			gambarHint.style.color = 'var(--red)';
 		});
 
 		// ===== Zoom Mode =====
@@ -3175,14 +3206,18 @@
 			deselectEditorImage();
 			chbSavedRange = null;
 
-			inputHapusGambar.value = '0';
-			gambarHint.textContent = 'Kosongkan jika tidak ingin mengganti gambar.';
-
 			if (data.gambar) {
+				inputHapusGambar.value = '0';
+				gambarHint.textContent = 'Kosongkan jika tidak ingin mengganti gambar.';
+				gambarHint.style.color = '';
 				previewImage.src = data.gambar;
 				uploaderEmpty.style.display = 'none';
 				uploaderPreview.style.display = 'block';
 			} else {
+				// Data lama memang belum punya gambar sama sekali, jadi tetap wajib upload.
+				inputHapusGambar.value = '1';
+				gambarHint.textContent = 'Gambar utama wajib diunggah.';
+				gambarHint.style.color = 'var(--red)';
 				resetUploader();
 			}
 
@@ -3195,6 +3230,42 @@
 			deselectEditorImage();
 			blogModal.classList.remove('show');
 			document.body.classList.remove('chb-modal-open');
+		}
+
+		// Cek apakah form Tambah/Edit Blog sudah ada isinya (judul, kategori, konten, atau gambar)
+		function isBlogFormDirty() {
+			const judul = (document.getElementById('inputJudul').value || '').trim();
+			const kategori = inputKategori.value || '';
+			const editorEl = document.getElementById('inputKontenEditor');
+			const kontenText = (editorEl.textContent || '').trim();
+			const adaMediaKonten = /<(img|iframe)\b|chb-shape/.test(editorEl.innerHTML || '');
+			const adaGambarBaru = inputGambar.files && inputGambar.files.length > 0;
+			const gambarDihapus = inputHapusGambar.value === '1';
+			return !!(judul || kategori || kontenText.length > 0 || adaMediaKonten || adaGambarBaru || gambarDihapus);
+		}
+
+		// Tombol "Batal": menutup seluruh modal Tambah/Edit Blog.
+		// Kalau ada isian yang belum disimpan, minta konfirmasi dulu.
+		function requestCloseModal() {
+			unsavedConfirmTarget = 'modal';
+			if (isBlogFormDirty()) {
+				unsavedConfirmModal.classList.add('show');
+			} else {
+				closeModal();
+			}
+		}
+
+		// Tombol "Kembali" (saat mode zoom "Isi Konten Lengkap" aktif): hanya menutup mode zoom,
+		// modal Tambah/Edit Blog TETAP TERBUKA. Kalau ada isian yang belum disimpan, minta konfirmasi dulu;
+		// jika dikonfirmasi "Ya, Keluar", ketikan yang baru dibuat TIDAK disimpan (form tidak ikut tersubmit),
+		// dan tampilan kembali ke mode normal (bukan menutup seluruh modal).
+		function requestExitFocusMode() {
+			unsavedConfirmTarget = 'focus';
+			if (isBlogFormDirty()) {
+				unsavedConfirmModal.classList.add('show');
+			} else {
+				exitFocusMode();
+			}
 		}
 
 		function openBlogDeleteConfirm(title, text) {
@@ -3307,6 +3378,13 @@
 
 		// ===== Validasi sebelum submit =====
 		blogForm.addEventListener('submit', function (e) {
+			// Kategori wajib dipilih, baik saat Tambah maupun Edit
+			if (!inputKategori.value) {
+				e.preventDefault();
+				inputKategori.focus();
+				return;
+			}
+
 			// Kategori "Lainnya...": jadikan teks yang diketik sebagai nilai kategori yang dikirim
 			if (inputKategori.value === '__lainnya__') {
 				const teks = inputKategoriLainnya.value.trim().replace(/\s+/g, ' ');
@@ -3339,10 +3417,14 @@
 				return;
 			}
 
-			if (!isEditMode && !inputGambar.files.length) {
+			// Gambar utama wajib ada:
+			// - Saat Tambah: wajib upload gambar baru.
+			// - Saat Edit: kalau gambar lama dihapus (hapus_gambar = '1') dan belum ada gambar baru, tetap wajib upload.
+			if (!inputGambar.files.length && (!isEditMode || inputHapusGambar.value === '1')) {
 				e.preventDefault();
 				gambarHint.textContent = 'Gambar utama wajib diunggah.';
 				gambarHint.style.color = 'var(--red)';
+				return;
 			}
 		});
 
@@ -3351,7 +3433,27 @@
 			openAddModal();
 		});
 
-		document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+		document.getElementById('btnCancelModal').addEventListener('click', requestCloseModal);
+
+		// Popup konfirmasi keluar tanpa menyimpan
+		btnTetapIsi.addEventListener('click', function () {
+			unsavedConfirmModal.classList.remove('show');
+		});
+		btnKeluarTanpaSimpan.addEventListener('click', function () {
+			unsavedConfirmModal.classList.remove('show');
+			if (unsavedConfirmTarget === 'focus') {
+				// Dari tombol "Kembali" di mode zoom: hanya tutup mode zoom, modal Tambah/Edit tetap terbuka
+				// dan ketikan yang baru dibuat tidak tersimpan (tidak ikut disubmit).
+				exitFocusMode();
+			} else {
+				// Dari tombol "Batal": tutup seluruh modal Tambah/Edit Blog.
+				closeModal();
+			}
+			unsavedConfirmTarget = 'modal';
+		});
+		unsavedConfirmModal.addEventListener('click', function (e) {
+			if (e.target === unsavedConfirmModal) unsavedConfirmModal.classList.remove('show');
+		});
 
 		@if($errors->any())
 			openAddModal();
