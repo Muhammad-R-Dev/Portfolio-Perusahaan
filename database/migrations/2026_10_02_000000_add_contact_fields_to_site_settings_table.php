@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('site_settings', 'wa_number')) {
+            return;
+        }
+
         Schema::table('site_settings', function (Blueprint $table) {
             $table->string('wa_number', 20)->nullable();
             $table->string('map_link', 1000)->nullable();

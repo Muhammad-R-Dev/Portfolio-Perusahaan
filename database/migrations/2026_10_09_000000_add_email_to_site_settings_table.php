@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('site_settings', 'email')) {
+            return;
+        }
+
         Schema::table('site_settings', function (Blueprint $table) {
             $table->string('email')->nullable()->after('wa_number');
         });

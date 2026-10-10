@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('site_settings', 'login_bg')) {
+            return;
+        }
+
         Schema::table('site_settings', function (Blueprint $table) {
             $table->string('login_bg')->nullable()->after('brand_tagline');
         });
