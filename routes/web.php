@@ -68,7 +68,6 @@ Route::middleware('auth')->group(function () {
             $totalLayanan = \App\Models\Service::count();
             $totalGaleri  = \App\Models\Gallery::count();
             $totalTim     = \App\Models\Team::count();
-            $totalDivisi  = \App\Models\Team::whereNotNull('divisi')->distinct('divisi')->count('divisi');
 
             $recentBlogs   = \App\Models\Blog::latest()->take(3)->get();
             $recentGaleri  = \App\Models\Gallery::latest()->take(4)->get();
@@ -76,7 +75,7 @@ Route::middleware('auth')->group(function () {
             $recentTeam    = \App\Models\Team::latest()->take(4)->get();
 
             return view('admin.pages.dashboard', compact(
-                'totalBlog', 'totalLayanan', 'totalGaleri', 'totalTim', 'totalDivisi',
+                'totalBlog', 'totalLayanan', 'totalGaleri', 'totalTim',
                 'recentBlogs', 'recentGaleri', 'recentLayanan', 'recentTeam'
             ));
         })->name('dashboard');
