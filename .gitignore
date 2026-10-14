@@ -24,3 +24,8 @@ Homestead.yaml
 Thumbs.db
 *.zip
 Magang.zip
+
+# TAMBAHKAN KODE DI BAWAH INI:
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+!/storage/app/public/**
