@@ -43,17 +43,14 @@ button, input, textarea, select { font-family: var(--font-sans); }
 
 /* ===== HERO SECTION ===== */
 html #navHeader { opacity: 1; visibility: visible; pointer-events: auto; }
-/* --hero-p = progres scroll hero (0 = penuh layar, 1 = sejajar dengan teks di bawahnya). Diisi oleh JS di bawah. */
-.hero-frame { --hero-p: 0; padding: 0; background: #FFFFFF; position: relative; }
-main.hero-bg { position: relative; width: 100%; height: clamp(440px, 78vh, 720px); min-height: 0; max-height: none; overflow: hidden; border-radius: 0; background: #0B1412;
-  /* kiri-kanan dipotong (crop) seiring scroll sampai selebar konten di bawahnya, sudut ikut membulat */
-  clip-path: inset(0 calc(var(--side-gap) * var(--hero-p)) round calc(var(--hero-p) * 10px)); }
+.hero-frame { padding: 0; background: #FFFFFF; position: relative; }
+main.hero-bg { position: relative; width: 100%; height: clamp(440px, 78vh, 720px); min-height: 0; max-height: none; overflow: hidden; border-radius: 0; background: #0B1412; }
 .hero-bg__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 40%; z-index: 1; }
 main.hero-bg .hero-gradient { z-index: 2; height: 70%; position: absolute; width: 100%; bottom: 0; left: 0; background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0.62) 100%); pointer-events: none; }
 main.hero-bg .text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9; width: 100%; padding: 0 1rem; text-align: center; text-transform: uppercase; color: #FEFEFE; pointer-events: auto; }
 main.hero-bg .text h1 { font-weight: 800; font-size: clamp(2.8rem, 7vw, 6.4rem); line-height: 0.95; letter-spacing: -0.01em; margin: 0; }
 main.hero-bg .text h2 { font-weight: 300; font-size: clamp(2.1rem, 5.2vw, 4.8rem); line-height: 1; margin-top: 0.15em; letter-spacing: 0.02em; }
-.scroll-hint { opacity: calc(1 - var(--hero-p) * 2.5); position: absolute; z-index: 998; bottom: 1rem; right: 1.5rem; color: rgba(255, 255, 255, 0.75); font-size: 0.7rem; letter-spacing: 0.05em; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.scroll-hint { position: absolute; z-index: 998; bottom: 1rem; right: 1.5rem; color: rgba(255, 255, 255, 0.75); font-size: 0.7rem; letter-spacing: 0.05em; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
 .scroll-hint i { animation: bounce 1.8s infinite; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
@@ -218,10 +215,6 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
       <h1>Astabrata </h1>
       <h2>Teknologi</h2>
     </div>
-    <div class="scroll-hint">
-      <span>Scroll</span>
-      <i class="fa-solid fa-chevron-down"></i>
-    </div>
   </main>
 </div>
 
@@ -348,95 +341,6 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
       if ('ResizeObserver' in window) new ResizeObserver(setPad).observe(nav);
     }
   }
-
-  // Hero: full layar di awal, lalu di-crop kiri-kanan sampai sejajar dengan teks di bawahnya.
-  //  - Desktop/tablet: scroll halaman DITAHAN dulu; gerakan scroll hanya menjalankan animasi crop.
-  //    Setelah crop selesai, scroll ke bawah berjalan normal. Scroll naik di paling atas membalik animasinya.
-  //  - Mobile: animasi crop mengikuti posisi scroll biasa.
-  (function () {
-    const frame = document.querySelector('.hero-frame');
-    if (!frame) return;
-    const desktop = window.matchMedia('(min-width: 726px)');
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const DIST = 420;                       // jumlah gerakan scroll (px) untuk satu animasi crop penuh
-    const ease = (t) => t * t * (3 - 2 * t);
-    let target = 0, shown = 0, raf = null, ticking = false;
-
-    const locked = () => desktop.matches && !reduce.matches;
-    const atTop = () => window.scrollY <= 0;
-    const menuOpen = () => document.body.style.overflow === 'hidden';
-    const render = (p) => frame.style.setProperty('--hero-p', p.toFixed(3));
-
-    // --- Mode scroll biasa (mobile) ---
-    const updateLinked = () => {
-      ticking = false;
-      if (reduce.matches) { render(0); return; }
-      const dist = Math.max(220, frame.offsetHeight * 0.55);
-      const t = Math.min(1, Math.max(0, window.scrollY / dist));
-      render(ease(t));
-    };
-
-    // --- Mode tahan scroll (desktop) ---
-    const step = () => {
-      shown += (target - shown) * 0.14;
-      if (Math.abs(target - shown) < 0.002) shown = target;
-      render(ease(shown));
-      raf = (shown !== target) ? requestAnimationFrame(step) : null;
-    };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
-    const canScrollDown = () => target < 1 || shown < 1;   // masih menunggu animasi crop selesai
-    const canScrollUp = () => target > 0 || shown > 0;
-
-    const nudge = (dy, e) => {
-      if (dy > 0 && canScrollDown()) { e.preventDefault(); target = Math.min(1, target + dy / DIST); kick(); }
-      else if (dy < 0 && canScrollUp()) { e.preventDefault(); target = Math.max(0, target + dy / DIST); kick(); }
-    };
-
-    window.addEventListener('wheel', (e) => {
-      if (!locked() || !atTop() || menuOpen() || e.ctrlKey) return;
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      let dy = e.deltaY;
-      if (e.deltaMode === 1) dy *= 16; else if (e.deltaMode === 2) dy *= window.innerHeight;
-      nudge(dy, e);
-    }, { passive: false });
-
-    let touchY = null;
-    window.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
-    window.addEventListener('touchmove', (e) => {
-      if (touchY === null || !locked() || !atTop() || menuOpen()) return;
-      const y = e.touches[0].clientY;
-      const dy = touchY - y;
-      touchY = y;
-      nudge(dy, e);
-    }, { passive: false });
-
-    window.addEventListener('keydown', (e) => {
-      if (!locked() || !atTop() || menuOpen() || e.altKey || e.ctrlKey || e.metaKey) return;
-      const tag = (e.target && e.target.tagName) || '';
-      if (/^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(tag) || (e.target && e.target.isContentEditable)) return;
-      const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'End' || (e.key === ' ' && !e.shiftKey);
-      const up = e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home' || (e.key === ' ' && e.shiftKey);
-      if (down && canScrollDown()) { e.preventDefault(); target = 1; kick(); }
-      else if (up && canScrollUp()) { e.preventDefault(); target = 0; kick(); }
-    });
-
-    const sync = () => {
-      if (locked()) {
-        // Kalau halaman sudah turun (mis. klik link #faq atau scroll lewat scrollbar), langsung selesaikan crop
-        if (!atTop() && target < 1) { target = 1; kick(); }
-      } else if (!ticking) {
-        ticking = true; requestAnimationFrame(updateLinked);
-      }
-    };
-    window.addEventListener('scroll', sync, { passive: true });
-
-    const init = () => {
-      if (locked()) { target = shown = atTop() ? 0 : 1; render(ease(shown)); }
-      else updateLinked();
-    };
-    window.addEventListener('resize', init);
-    init();
-  })();
 
   if (typeof gsap !== "undefined") {
     gsap.from(".hero-bg .text h1", { y: 60, opacity: 0, duration: 1.2, ease: "power3.out" });
