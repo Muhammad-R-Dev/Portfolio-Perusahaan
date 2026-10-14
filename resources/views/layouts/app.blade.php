@@ -6,7 +6,7 @@
     <title>@yield('title', 'Astabrata Teknologi')</title>
     
     <!-- Tambahkan Favicon Logo Asta di sini -->
-    <link rel="icon" type="image/png" href="{{ asset('img/logo asta.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('image/logo.png') }}">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

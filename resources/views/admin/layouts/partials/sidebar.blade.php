@@ -101,7 +101,7 @@
 </style>
 <section id="sidebar">
 	<a href="#" class="brand">
-		<img src="{{ asset('img/logo asta.png') }}" alt="Logo" class="brand-logo">
+		<img src="{{ asset('image/logo.png') }}" alt="Logo" class="brand-logo">
 		<span class="text brand-text">
 			<span class="brand-astabrata">Astabrata</span>
 			<span class="brand-teknologi">Teknologi</span>
