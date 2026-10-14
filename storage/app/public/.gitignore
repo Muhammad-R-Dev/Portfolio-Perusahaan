@@ -1,0 +1,10 @@
+*
+!.gitignore
+
+/storage/*.key
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+*.zip
+
+# TAMBAHKAN BARIS DI BAWAH INI agar semua gambar & subfolder di storage/app/public ter-push:
+!/storage/app/public/**

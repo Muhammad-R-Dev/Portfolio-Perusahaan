@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koneksi Terputus - Astabrata Teknologi</title>
+
+    <!--
+        CATATAN PERBAIKAN:
+        1. Ilustrasi tidak lagi memanggil gambar dari server luar (Dribbble),
+           karena saat user offline gambar itu TIDAK AKAN pernah bisa dimuat.
+           Diganti dengan SVG inline yang ikut tersimpan di dalam file ini,
+           jadi tetap tampil walau tidak ada koneksi internet sama sekali.
+        2. Bootstrap & Google Fonts CDN DIHAPUS total. Halaman ini adalah
+           halaman OFFLINE ERROR — justru pada saat halaman ini muncul,
+           koneksi internet user sedang mati, jadi CDN apapun pasti gagal
+           dimuat. Sebelumnya centering (container/row/col/text-center)
+           bergantung ke class Bootstrap yang datang dari CDN itu, makanya
+           di HP asli yang offline tampilannya jadi mepet kiri (class-nya
+           kosong tanpa efek). Sekarang semua layout & centering ditulis
+           sendiri di bawah, tidak butuh internet sama sekali.
+        3. Ditambahkan media query supaya ukuran teks & ilustrasi
+           menyesuaikan di layar HP (responsive).
+    -->
+
+    <style>
+        /*======================
+            Error / Offline page
+        =======================*/
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .page_404 {
+            padding: 40px 20px;
+            background: #fff;
+            font-family: Georgia, 'Times New Roman', serif;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .page_404 .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .page_404 img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Ilustrasi sekarang berupa SVG inline, bukan background-image
+           dari URL luar, supaya tetap tampil saat offline */
+        .four_zero_four_bg {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .four_zero_four_bg svg {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+        }
+
+        .four_zero_four_bg h1 {
+            font-size: 80px;
+            margin: 0;
+        }
+
+        .contant_box_404 h3 {
+            font-size: 32px;
+            margin-top: 10px;
+        }
+
+        .contant_box_404 p {
+            font-size: 16px;
+        }
+
+        .link_404 {
+            color: #fff !important;
+            padding: 10px 20px;
+            background: #39ac31;
+            margin: 20px 0;
+            display: inline-block;
+            border-radius: 4px;
+            text-decoration: none !important;
+        }
+
+        .contant_box_404 {
+            margin-top: 0;
+        }
+
+        /* ===== Responsive: tablet ===== */
+        @media (max-width: 768px) {
+            .four_zero_four_bg h1 {
+                font-size: 56px;
+            }
+            .contant_box_404 h3 {
+                font-size: 26px;
+            }
+            .four_zero_four_bg svg {
+                max-width: 300px;
+            }
+        }
+
+        /* ===== Responsive: HP kecil ===== */
+        @media (max-width: 480px) {
+            .page_404 {
+                padding: 24px 12px;
+            }
+            .four_zero_four_bg h1 {
+                font-size: 40px;
+            }
+            .contant_box_404 h3 {
+                font-size: 20px;
+            }
+            .contant_box_404 p {
+                font-size: 14px;
+                padding: 0 8px;
+            }
+            .four_zero_four_bg svg {
+                max-width: 220px;
+            }
+            .link_404 {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="page_404">
+        <div class="container">
+
+            <div class="four_zero_four_bg">
+                <!-- Ilustrasi wifi terputus, SVG inline sehingga tetap
+                     muncul tanpa koneksi internet -->
+                <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi koneksi terputus">
+                    <path d="M70 90 a115 115 0 0 1 160 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <path d="M100 125 a72 72 0 0 1 100 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <path d="M130 158 a30 30 0 0 1 40 0" stroke="#cfd4da" stroke-width="12" fill="none" stroke-linecap="round"/>
+                    <circle cx="150" cy="180" r="10" fill="#cfd4da"/>
+                    <line x1="55" y1="60" x2="245" y2="170" stroke="#e74c3c" stroke-width="10" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div class="contant_box_404">
+                <h1>Error</h1>
+                <h3>Sepertinya kamu sedang offline</h3>
+                <p>Koneksi internet kamu terputus. Periksa jaringan kamu dan coba muat ulang halaman.</p>
+                <a href="/" class="link_404">Kembali ke Beranda</a>
+            </div>
+
+        </div>
+    </section>
+</body>
+</html>
