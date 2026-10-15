@@ -728,11 +728,23 @@
 							<div class="settings-media">
 								<label for="media_upload" class="media-label">Gambar Logo</label>
 								@php
-									$currentLogoUrl = $setting->logo
-										? (\Illuminate\Support\Str::startsWith($setting->logo, ['http://', 'https://'])
-											? $setting->logo
-											: asset('storage/' . $setting->logo))
-										: null;
+									// Jika admin sudah upload logo sendiri (dan file-nya benar-benar ada), pakai itu.
+									// Jika belum/kosong, atau file-nya hilang dari storage, otomatis fallback
+									// ke logo bawaan di public/image/logo.png (asalkan filenya ada).
+									$__fallbackLogoPath = public_path('image/logo.png');
+									$__fallbackLogoUrl  = file_exists($__fallbackLogoPath) ? asset('image/logo.png') : null;
+
+									$currentLogoUrl = $__fallbackLogoUrl;
+									if ($setting->logo) {
+										if (\Illuminate\Support\Str::startsWith($setting->logo, ['http://', 'https://'])) {
+											$currentLogoUrl = $setting->logo;
+										} else {
+											$__logoDiskPath = public_path('storage/' . ltrim($setting->logo, '/'));
+											if (file_exists($__logoDiskPath)) {
+												$currentLogoUrl = asset('storage/' . $setting->logo);
+											}
+										}
+									}
 								@endphp
 								<label class="media-upload-box is-locked" id="mediaUploadBox" for="media_upload" data-existing-url="{{ $currentLogoUrl }}">
 									<div class="media-preview" id="mediaPreview">

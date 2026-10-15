@@ -31,11 +31,6 @@
     <!-- GRID CARD LAYANAN -->
     <!-- ========================================== -->
     <section class="ly-services" id="daftar-layanan">
-        <!-- Background Aurora (pure CSS, tanpa teks) -->
-        <div class="ly-aurora-bg" aria-hidden="true">
-            <div class="ly-aurora"></div>
-        </div>
-
         <div class="ly-inner">
             <div class="ly-section-head">
                 <h2>{{ $pageSetting->titleText() }}</h2>
@@ -169,92 +164,6 @@
         /* Beri ruang dari navbar fixed agar judul tidak tertutup */
         .ly-services { padding: 76px 0 56px; }
     }
-
-    /* ===== BACKGROUND AURORA (pure CSS, tanpa teks, adaptasi dari CSS Aurora Boreal) ===== */
-    .ly-aurora-bg {
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        z-index: 0;
-        pointer-events: none;
-    }
-
-    .ly-aurora {
-        --stripes: repeating-linear-gradient(
-            100deg,
-            #fff 0%,
-            #fff 7%,
-            transparent 10%,
-            transparent 12%,
-            #fff 16%
-        );
-        --stripesDark: repeating-linear-gradient(
-            100deg,
-            #000 0%,
-            #000 7%,
-            transparent 10%,
-            transparent 12%,
-            #000 16%
-        );
-        --rainbow: repeating-linear-gradient(
-            100deg,
-            #60a5fa 10%,
-            #e879f9 15%,
-            #60a5fa 20%,
-            #5eead4 25%,
-            #60a5fa 30%
-        );
-
-        position: absolute;
-        inset: -10px;
-        opacity: 0.5;
-
-        background-image: var(--stripes), var(--rainbow);
-        background-size: 300%, 200%;
-        background-position: 50% 50%, 50% 50%;
-
-        filter: blur(10px) invert(100%);
-
-        mask-image: radial-gradient(ellipse at 100% 0%, black 40%, transparent 70%);
-        -webkit-mask-image: radial-gradient(ellipse at 100% 0%, black 40%, transparent 70%);
-
-        pointer-events: none;
-    }
-
-    .ly-aurora::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: var(--stripes), var(--rainbow);
-        background-size: 200%, 100%;
-        animation: ly-aurora-shift 60s linear infinite;
-        background-attachment: fixed;
-        mix-blend-mode: difference;
-    }
-
-    @keyframes ly-aurora-shift {
-        from {
-            background-position: 50% 50%, 50% 50%;
-        }
-        to {
-            background-position: 350% 50%, 350% 50%;
-        }
-    }
-
-    /* Mode terang/gelap mengikuti atribut data-theme yang sudah dipakai halaman ini */
-    html[data-theme="dark"] .ly-aurora {
-        background-image: var(--stripesDark), var(--rainbow);
-        filter: blur(10px) opacity(50%) saturate(200%);
-    }
-    html[data-theme="dark"] .ly-aurora::after {
-        background-image: var(--stripesDark), var(--rainbow);
-    }
-
-    /* Hormati preferensi pengguna yang mengurangi gerakan */
-    @media (prefers-reduced-motion: reduce) {
-        .ly-aurora::after { animation: none; }
-    }
-
 
     .ly-section-head {
         text-align: center; max-width: 620px; margin: 28px auto 56px;

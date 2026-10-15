@@ -606,7 +606,7 @@
   <header class="header @unless (request()->routeIs('home')) header--pinned @endunless" id="navHeader">
       <nav class="nav-row">
         <div class="nav-left">
-          <a href="{{ url('/') }}" class="nav-brand nav-logo-row">
+          <a href="{{ url('') }}" class="nav-brand nav-logo-row">
               @php
                   $__setting = $siteSetting ?? null;
                   if (class_exists(\App\Models\SiteSetting::class)) {
@@ -616,16 +616,19 @@
                       } catch (\Throwable $e) {}
                   }
 
-                  $__logoUrl = asset('img/logo asta.png');
+                  $__logoUrl = asset('image/logo.png');
                   if ($__setting && !empty($__setting->logo)) {
                       if (\Illuminate\Support\Str::startsWith($__setting->logo, ['http://', 'https://'])) {
+                          // Logo berupa URL eksternal, pakai langsung (tidak bisa dicek file_exists).
                           $__logoUrl = $__setting->logo;
                       } else {
                           $__logoPath = 'storage/' . ltrim($__setting->logo, '/');
-                          $__logoVer = file_exists(public_path($__logoPath))
-                              ? filemtime(public_path($__logoPath))
-                              : (optional($__setting->updated_at)->timestamp ?: time());
-                          $__logoUrl = asset($__logoPath) . '?v=' . $__logoVer;
+                          // Hanya pakai logo dari admin jika file-nya benar-benar ada di storage.
+                          // Jika file hilang/rusak, otomatis fallback ke public/image/logo.png.
+                          if (file_exists(public_path($__logoPath))) {
+                              $__logoVer = filemtime(public_path($__logoPath));
+                              $__logoUrl = asset($__logoPath) . '?v=' . $__logoVer;
+                          }
                       }
                   }
               @endphp
