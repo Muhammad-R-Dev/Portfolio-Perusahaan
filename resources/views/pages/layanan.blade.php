@@ -162,7 +162,7 @@
 
     @media (max-width: 768px) {
         /* Beri ruang dari navbar fixed agar judul tidak tertutup */
-        .ly-services { padding: 76px 0 56px; }
+        .ly-services { padding: 84px 0 56px; }
     }
 
     .ly-section-head {
@@ -247,7 +247,7 @@
 
     @media (max-width: 768px) {
         .ly-services {
-            padding: 76px 0 56px;
+            padding: 84px 0 56px;
             overflow-x: hidden;
         }
 

@@ -1093,7 +1093,11 @@
             overscroll-behavior-x: contain;
             scroll-snap-type: x proximity;
             scroll-behavior: smooth;
-            touch-action: pan-x;
+            /* pan-x pan-y (bukan cuma pan-x): swipe horizontal tetap menggeser baris
+               card, tapi swipe vertikal yang dimulai di atas card tidak lagi diblokir
+               sehingga halaman tetap bisa digulung ke atas/bawah seperti biasa. */
+            touch-action: pan-x pan-y;
+            -webkit-overflow-scrolling: touch; /* momentum scroll di iOS supaya geser kanan-kiri smooth */
             -webkit-user-select: none;
             user-select: none;
             scrollbar-width: none;
@@ -1109,11 +1113,17 @@
             width: 78%;
             max-width: 280px;
             scroll-snap-align: start;
-            touch-action: pan-x;
+            touch-action: pan-x pan-y;
             margin: 0;
-            /* Jangan pakai -webkit-overflow-scrolling:touch di parent + box-shadow/overflow:hidden
-               di sini: kombinasi itu yang bikin background lingkaran foto kelihatan blur/ngeblur
-               (bug rendering Safari iOS saat momentum scroll). */
+            /* Dulu -webkit-overflow-scrolling:touch di parent dihindari karena kombinasi
+               dengan box-shadow/overflow:hidden di card ini memicu bug blur saat momentum
+               scroll di Safari iOS. Sekarang tiap card dipaksa jadi compositing layer
+               sendiri (translateZ + backface-visibility) supaya momentum scroll bisa
+               dipakai tanpa memicu bug blur tersebut. */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         /* Card pertama & terakhir tetap bisa "mentok" rapi saat snap */
@@ -1470,6 +1480,10 @@
         }
         .about-header h1 { font-size: 2.2rem; }
         .page-wrapper { padding-top: 70px; }
+
+        /* Hero (bg gambar) ditarik naik supaya mepet ke header, tidak ada
+           celah putih di atasnya akibat padding-top .page-wrapper di atas. */
+        .hero { margin-top: -70px; }
 
         .th-card-wrapper {
             width: calc(100% + 10vw);

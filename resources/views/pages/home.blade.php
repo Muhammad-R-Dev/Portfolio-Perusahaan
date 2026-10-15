@@ -60,7 +60,7 @@ main.hero-bg .text h2 { font-weight: 300; font-size: clamp(2.1rem, 5.2vw, 4.8rem
 }
 
 @media (max-width: 725px) {
-  .hero-frame { padding: 14px 0 0; }
+  .hero-frame { padding: 0; }
   main.hero-bg { height: auto; aspect-ratio: 16 / 9; min-height: 200px; }
   main.hero-bg .text h1 { font-size: clamp(1.9rem, 9vw, 2.6rem); }
   main.hero-bg .text h2 { font-size: clamp(1.4rem, 6.5vw, 1.9rem); }
@@ -321,10 +321,10 @@ html[data-theme="dark"] .faq-answer p { color: rgba(232, 238, 240, 0.68); }
     const frame = document.querySelector('.hero-frame');
     const pos = getComputedStyle(nav).position;
     if (frame && (pos === 'fixed' || pos === 'absolute')) {
-      // Letakkan hero PERSIS di bawah navbar (desktop: menempel, mobile: jarak 14px).
+      // Letakkan hero PERSIS di bawah navbar (desktop & mobile: menempel, tanpa celah).
       // Dihitung dari posisi asli di dokumen, jadi spasi/padding lain di atasnya (layout, dll.) ikut dikoreksi.
       const setPad = () => {
-        const gap = window.innerWidth <= 725 ? 14 : 0;
+        const gap = 0;
         const navH = nav.getBoundingClientRect().height;
         frame.style.paddingTop = '0px';
         frame.style.marginTop = '0px';

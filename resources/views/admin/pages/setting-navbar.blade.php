@@ -1503,7 +1503,16 @@
 		pinCardHead();
 		syncLayout();
 		window.addEventListener('resize', syncLayout);
+		window.addEventListener('scroll', syncLayout, { passive: true });
 		setTimeout(syncLayout, 300);
+
+		// Selalu samakan lebar & posisi bar dengan card, termasuk saat sidebar
+		// dikecilkan/dibesarkan atau ukuran card berubah karena hal lain
+		// (perubahan yang tidak memicu resize/scroll).
+		if (window.ResizeObserver) {
+			var ro = new ResizeObserver(function () { syncLayout(); });
+			ro.observe(card);
+		}
 	})();
 </script>
 @endpush

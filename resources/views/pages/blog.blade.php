@@ -476,7 +476,10 @@
         .page-wrapper { padding-top: 72px; background: #FAFAFA; }
         .page-header {
             width: auto; left: auto; right: auto;
-            margin: 0 !important;
+            /* Tarik naik sebesar padding-top .page-wrapper (72px) supaya header tetap
+               mepet ke navbar seperti di desktop, bukan cuma margin:0 yang bikin
+               ada celah 72px kosong di atasnya. */
+            margin: -15px 0 0 0 !important;
             min-height: 0;
             flex-direction: column; justify-content: flex-end; align-items: stretch;
             padding-top: 32px;

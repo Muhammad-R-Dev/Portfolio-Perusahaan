@@ -1254,7 +1254,15 @@
 		}
 		window.addEventListener('resize', syncActionsBar);
 		window.addEventListener('load', syncActionsBar);
+		window.addEventListener('scroll', syncActionsBar, { passive: true });
 		setTimeout(syncActionsBar, 300); // jaga-jaga kalau sidebar admin baru selesai render
+
+		// Ikut menyesuaikan saat sidebar admin dikecilkan/dibesarkan (card berubah
+		// ukuran tanpa memicu event resize/scroll).
+		if (window.ResizeObserver && pagesCard) {
+			var roActionsBar = new ResizeObserver(function () { syncActionsBar(); });
+			roActionsBar.observe(pagesCard);
+		}
 
 		var btnEdit = $('btnEdit'), btnCancelEdit = $('btnCancelEdit'), btnSave = $('btnSave');
 		var confirmModal = $('confirmModal'), confirmTitle = $('confirmTitle'), confirmMessage = $('confirmMessage'),
@@ -1808,7 +1816,16 @@
 
 		syncLayout();
 		window.addEventListener('resize', syncLayout);
+		window.addEventListener('scroll', syncLayout, { passive: true });
 		setTimeout(syncLayout, 300); // jaga-jaga kalau layout admin (sidebar dll) baru selesai render
+
+		// Selalu samakan lebar & posisi bar dengan card, termasuk saat sidebar
+		// dikecilkan/dibesarkan atau ukuran card berubah karena hal lain
+		// (perubahan yang tidak memicu resize/scroll).
+		if (window.ResizeObserver) {
+			var ro = new ResizeObserver(function () { syncLayout(); });
+			ro.observe(card);
+		}
 	})();
 </script>
 @endpush
