@@ -19,7 +19,7 @@
         <div class="login-form-panel">
             <div class="login-form-inner">
                 <a href="{{ url('/') }}" class="login-logo">
-                    <img src="{{ asset('img/logo asta.png') }}" alt="Logo Astabrata Teknologi">
+                    <img src="{{ asset('image/logo.png') }}" alt="Logo Astabrata Teknologi">
                 </a>
 
                 <h2>Masuk ke Akun Anda</h2>
