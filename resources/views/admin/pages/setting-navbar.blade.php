@@ -522,6 +522,14 @@
 	body.dark #content {
 		background: #1b2538 !important;
 	}
+	/* Teks "Upload Media" & tombol konfirmasi ("OK", "Ya, Simpan", dst.) tetap putih di dark mode
+	   (var(--light) di dark mode dipakai ulang jadi warna kartu gelap, bukan putih,
+	   jadi harus dipaksa eksplisit di sini) */
+	body.dark #content main .media-upload-box .upload-btn,
+	body.dark #content main .confirm-actions .btn-confirm,
+	body.dark #content main .confirm-actions .btn-confirm:hover {
+		color: #fff !important;
+	}
 	body:not(.dark) #content,
 	body:not(.dark) #content main {
 		--light: #ffffff;          /* kartu, modal, header tabel */

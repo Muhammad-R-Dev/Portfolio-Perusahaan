@@ -613,6 +613,32 @@
 			color: #fff !important;
 		}
 
+		/* Judul notifikasi "Hapus Foto Terpilih?" (& judul modal konfirmasi lain) tetap putih di dark mode */
+		body.dark .modal-box.modal-confirm h2 {
+			color: #fff !important;
+		}
+
+		/* Tombol "Batal" pada modal konfirmasi hapus tetap putih tulisannya di dark mode */
+		body.dark .modal-box.modal-confirm .btn-cancel,
+		body.dark .modal-box.modal-confirm .btn-cancel:hover {
+			color: #fff !important;
+		}
+
+		/* Judul "Sesuaikan Foto" pada modal crop tetap putih di dark mode */
+		body.dark #cropModal .modal-head h3 {
+			color: #fff !important;
+		}
+
+		/* Tombol "Batal" & "Terapkan" pada modal crop tetap putih tulisannya di dark mode
+		   (var(--light) di dark mode dipakai ulang jadi warna kartu gelap, bukan putih,
+		   jadi harus dipaksa eksplisit di sini) */
+		body.dark #cropModal .btn-cancel,
+		body.dark #cropModal .btn-cancel:hover,
+		body.dark #cropModal .btn-save,
+		body.dark #cropModal .btn-save:hover {
+			color: #fff !important;
+		}
+
 		#content main .menu, #content nav .menu {
 			display: none;
 			list-style-type: none;

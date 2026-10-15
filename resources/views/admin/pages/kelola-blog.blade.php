@@ -1240,6 +1240,16 @@
 			color: #fff !important;
 		}
 
+		/* Tombol "Batal" & "Terapkan" pada modal Crop (Sesuaikan Gambar) tetap putih tulisannya di dark mode
+		   (var(--light) di dark mode dipakai ulang jadi warna kartu gelap, bukan putih,
+		   jadi harus dipaksa eksplisit di sini) */
+		body.dark #cropModal .btn-cancel,
+		body.dark #cropModal .btn-cancel:hover,
+		body.dark #cropModal .btn-save,
+		body.dark #cropModal .btn-save:hover {
+			color: #fff !important;
+		}
+
 
 
 		/* ============================================================
