@@ -21,7 +21,10 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4aea03c8488e9f412dc36f0ccac2cb6dbb00fe80
 # Portfolio Perusahaan - Laravel Project
 
 Proyek web portfolio perusahaan berbasis framework **Laravel**. Panduan ini berisi langkah-langkah untuk mengunduh (*clone*) dan menjalankan proyek ini di lingkungan lokal (*local machine*).
@@ -111,7 +114,10 @@ Akses aplikasi melalui browser di tautan berikut:
 ## 📝 Catatan Tambahan
 * Pastikan kamu sudah menyalakan service **MySQL** (misalnya lewat XAMPP) dan menyesuaikan nama database pada file `.env` di baris `DB_DATABASE=nama_database_kamu`.
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4aea03c8488e9f412dc36f0ccac2cb6dbb00fe80
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
