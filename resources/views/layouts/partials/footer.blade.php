@@ -438,17 +438,21 @@ html[data-theme="dark"] .team-card-sosmed.brand-text-tt { --sm-bg: #f2f5f4; --sm
                         }
                     }
 
-                    // URL logo + parameter versi agar browser tidak memakai gambar lama dari cache
-                    $__logoUrl = asset('img/logo asta.png');
+                    // URL logo + parameter versi agar browser tidak memakai gambar lama dari cache.
+                    // Default: logo bawaan di public/image/logo.png.
+                    $__logoUrl = asset('image/logo.png');
                     if ($__setting && !empty($__setting->logo)) {
                         if (\Illuminate\Support\Str::startsWith($__setting->logo, ['http://', 'https://'])) {
+                            // Logo berupa URL eksternal, pakai langsung (tidak bisa dicek file_exists).
                             $__logoUrl = $__setting->logo;
                         } else {
                             $__logoPath = 'storage/' . ltrim($__setting->logo, '/');
-                            $__logoVer = file_exists(public_path($__logoPath))
-                                ? filemtime(public_path($__logoPath))
-                                : (optional($__setting->updated_at)->timestamp ?: time());
-                            $__logoUrl = asset($__logoPath) . '?v=' . $__logoVer;
+                            // Hanya pakai logo dari admin jika file-nya benar-benar ada di storage.
+                            // Jika file hilang/rusak, otomatis fallback ke public/image/logo.png.
+                            if (file_exists(public_path($__logoPath))) {
+                                $__logoVer = filemtime(public_path($__logoPath));
+                                $__logoUrl = asset($__logoPath) . '?v=' . $__logoVer;
+                            }
                         }
                     }
                 @endphp
